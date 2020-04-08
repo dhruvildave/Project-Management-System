@@ -1,3 +1,10 @@
+
+DROP DATABASE IF EXISTS project;
+
+CREATE DATABASE project;
+
+\c project
+
 DROP TABLE IF EXISTS users CASCADE;
 
 DROP TABLE IF EXISTS project CASCADE;

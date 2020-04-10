@@ -41,14 +41,22 @@ CREATE TABLE IF NOT EXISTS users (
 -- username check -> Alphanumeric string that may include _ and – having a length of 3 to 16 characters
 -- check if path provided for profilepic is an image in the frontend or backend
 -- firstname, lastname check -> case insensitive alphabetic string
-
+/*
+create user:
+    insert into users values (username,firstname,lastname,password,emailID,profilepic);
+    delete from users where username = '';
+    update users set  password = 'helloWorld123' where username = 'arpit';
+*/
 CREATE TABLE IF NOT EXISTS project (
     projectid serial PRIMARY KEY,
-    "name" text NOT NULL CHECK("name" ~* '^[a-z]+$'),
-    DOC date NOT NULL, -- Date Of Creation
+    "name" text NOT NULL ,
+    createdon date NOT NULL, -- Date Of Creation
     "path" text, -- path refers to the path of git repository
     createdby text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE
 );
+/*
+insert into project (name,DOC,createdby) values (Project1,CURRENT_DATE,'arpit');
+*/
 
 CREATE TYPE role_type as ENUM ('Leader','member');
 
@@ -68,7 +76,7 @@ CREATE TABLE IF NOT EXISTS ProjectFiles (
 );
 
 CREATE TYPE status_type as ENUM ('Inactive','Active','Working','Completed','Verified');
-
+CREATE TYPE priority_type as ENUM ('Highest','High','Normal','Low')
 CREATE TABLE IF NOT EXISTS Task (
     TaskID serial PRIMARY KEY,
     Title text NOT NULL,
@@ -77,6 +85,7 @@ CREATE TABLE IF NOT EXISTS Task (
     EndDate date,
     "Status" status_type,
     DateOfCompletion Date,
+    priority priority_type,
     AssignedBy text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE,
     ProjectID int REFERENCES project (ProjectID) ON DELETE CASCADE ON UPDATE CASCADE,
     CHECK(StartDate <= EndDate)

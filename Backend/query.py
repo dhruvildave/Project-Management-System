@@ -48,4 +48,3 @@ def allUsers():
 if __name__ == "__main__":
     #createUser('_$arpit2', 'Arpit', 'Vaghela', '', 'dhruvildave@ahduni.edu.in')
     print(allUsers())
-te

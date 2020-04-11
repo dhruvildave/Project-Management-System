@@ -1,9 +1,9 @@
 
-DROP DATABASE IF EXISTS PMS;
+DROP DATABASE IF EXISTS pms;
 
-CREATE DATABASE project;
+CREATE DATABASE pms;
 
-\c project
+\c pms
 
 DROP TABLE IF EXISTS users CASCADE;
 
@@ -11,13 +11,13 @@ DROP TABLE IF EXISTS project CASCADE;
 
 DROP TABLE IF EXISTS member CASCADE;
 
-DROP TABLE IF EXISTS ProjectFiles CASCADE;
+DROP TABLE IF EXISTS projectfiles CASCADE;
 
-DROP TABLE IF EXISTS Task CASCADE;
+DROP TABLE IF EXISTS task CASCADE;
 
-DROP TABLE IF EXISTS AssignedTo CASCADE;
+DROP TABLE IF EXISTS assignedto CASCADE;
 
-DROP TABLE IF EXISTS Preqtask CASCADE;
+DROP TABLE IF EXISTS preqtask CASCADE;
 
 DROP TABLE IF EXISTS board CASCADE;
 
@@ -29,92 +29,128 @@ DROP TYPE IF EXISTS role_type;
 
 DROP TYPE IF EXISTS status_type;
 
+DROP TYPE IF EXISTS priority_type;
+
 CREATE TABLE IF NOT EXISTS users (
-    username text PRIMARY KEY CHECK(username ~ '^[a-z0-9_-]{3,16}$'),
-    firstname text CHECK(firstname ~* '^[a-z]+$') NOT NULL,
-    lastname text CHECK(lastname ~* '^[a-z]+$') NOT NULL,
-    "password" TEXT CHECK ("password" ~ '(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,}$') NOT NULL,
-    emailID text CHECK(emailID ~ '^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$') NOT NULL,
+    username text
+        CHECK(username ~ '^[a-z0-9_-]{3,16}$') PRIMARY KEY,
+    firstname text
+        CHECK(firstname ~* '^[a-z]+$') NOT NULL,
+    lastname text
+        CHECK(lastname ~* '^[a-z]+$') NOT NULL,
+    "password" text NOT NULL,
+    emailid text
+        UNIQUE CHECK(emailid ~ '^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$') NOT NULL,
     profilepic bytea
 );
--- password check -> Should have 1 lowercase letter, 1 uppercase letter, 1 number, and be at least 8 characters long
+
 -- username check -> Alphanumeric string that may include _ and – having a length of 3 to 16 characters
 -- check if path provided for profilepic is an image in the frontend or backend
 -- firstname, lastname check -> case insensitive alphabetic string
-/*
-create user:
-    insert into users values (username,firstname,lastname,password,emailID,profilepic);
-    delete from users where username = '';
-    update users set  password = 'helloWorld123' where username = 'arpit';
-*/
+
 CREATE TABLE IF NOT EXISTS project (
     projectid serial PRIMARY KEY,
-    "name" text NOT NULL ,
+    "name" text NOT NULL,
     createdon date NOT NULL, -- Date Of Creation
     "path" text, -- path refers to the path of git repository
-    createdby text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE
+    createdby text
+        REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE
 );
 /*
 insert into project (name,DOC,createdby) values (Project1,CURRENT_DATE,'arpit');
 */
 
-CREATE TYPE role_type as ENUM ('Leader','member');
+CREATE TYPE role_type as ENUM ('leader', 'member');
 
 CREATE TABLE IF NOT EXISTS member (
-    member text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-    ProjectID int REFERENCES project (ProjectID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-    "Role" role_type,
-    PRIMARY KEY (member)
+    username text PRIMARY KEY
+        REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
+    projectid int
+        REFERENCES project (projectid) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+    "role" role_type
 );
 
-CREATE TABLE IF NOT EXISTS ProjectFiles (
-    FileID serial PRIMARY KEY,
-    "filename" text CHECK("filename" ~ '^[\w,\s-]+\.[A-Za-z]+$') NOT NULL,
+CREATE TABLE IF NOT EXISTS projectfiles (
+    fileid serial PRIMARY KEY,
+    "filename" text
+        CHECK ("filename" ~ '^[\w,\s-]+\.[A-Za-z]+$') NOT NULL,
     "file" bytea NOT NULL,
     lastupdated date NOT NULL,
-    ProjectID int REFERENCES project (ProjectID) ON DELETE CASCADE ON UPDATE CASCADE
+    projectid int
+        REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TYPE status_type as ENUM ('Inactive','Active','Working','Completed','Verified');
-CREATE TYPE priority_type as ENUM ('Highest','High','Normal','Low')
-CREATE TABLE IF NOT EXISTS Task (
-    TaskID serial PRIMARY KEY,
-    Title text NOT NULL,
-    "Description" text,
-    StartDate date,
-    EndDate date,
-    "Status" status_type,
-    DateOfCompletion Date,
+CREATE TYPE status_type as ENUM ('inactive', 'active', 'working', 'completed', 'verified');
+
+CREATE TYPE priority_type as ENUM ('highest', 'high', 'normal', 'low');
+
+CREATE TABLE IF NOT EXISTS task (
+    taskid serial PRIMARY KEY,
+    title text NOT NULL,
+    description text,
+    startdate date
+        CHECK (startdate <= enddate),
+    enddate date,
+    status status_type,
+    dateofcompletion date,
     priority priority_type,
-    AssignedBy text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE,
-    ProjectID int REFERENCES project (ProjectID) ON DELETE CASCADE ON UPDATE CASCADE,
-    CHECK(StartDate <= EndDate)
+    assignedby text
+        REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE,
+    projectid int
+        REFERENCES project (projectid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS AssignedTo (
-    TaskID int REFERENCES Task (TaskID) ON DELETE CASCADE ON UPDATE CASCADE,
-    member text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE,
-    PRIMARY KEY (TaskID, member)
+CREATE TABLE IF NOT EXISTS assignedto (
+    taskid int
+        REFERENCES task ON DELETE CASCADE ON UPDATE CASCADE,
+    member text
+        REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY (taskid, member)
 );
 
 CREATE TABLE IF NOT EXISTS preqtask (
-    Task int REFERENCES Task (TaskID) ON DELETE CASCADE ON UPDATE CASCADE,
-    Preqtask int REFERENCES Task (TaskID) ON DELETE CASCADE ON UPDATE CASCADE,
-    PRIMARY KEY (Task, Preqtask)
+    task int
+        REFERENCES task (taskid) ON DELETE CASCADE ON UPDATE CASCADE,
+    preqtask int
+        REFERENCES task (taskid) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY (task, preqtask)
 );
 
 CREATE TABLE IF NOT EXISTS board (
-    boardID serial PRIMARY KEY,
+    boardid serial PRIMARY KEY,
     title text NOT NULL,
-    "Description" text,
-    "user" text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE,
-    ProjectID int REFERENCES project (ProjectID) ON DELETE CASCADE ON UPDATE CASCADE
+    "description" text,
+    username text
+        REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
+    projectid int
+        REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Note (
-    noteID serial PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS note (
+    noteid serial PRIMARY KEY,
     title text NOT NULL,
-    "Description" text,
+    "description" text,
     color text,
-    columnID int REFERENCES board (boardID) ON DELETE CASCADE ON UPDATE CASCADE
+    columnid int
+        REFERENCES board (boardid) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE EXTENSION pgcrypto;
+
+CREATE OR REPLACE FUNCTION create_hash() RETURNS TRIGGER AS $create_hash$
+    BEGIN
+        --
+        -- Store passwords securely
+        -- password should have 1 lowercase letter, 1 uppercase letter, 1 number, and be 8 to 72 characters long
+        --
+        IF NEW.password !~ '(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,72}$' THEN
+            RAISE EXCEPTION 'Please enter a strong password';
+        ELSE
+            NEW.password = crypt(NEW.password, gen_salt('bf'));
+        END IF;
+        RETURN NEW;
+    END;
+$create_hash$ LANGUAGE plpgsql;
+
+CREATE TRIGGER create_hash BEFORE INSERT OR UPDATE ON users
+    FOR EACH ROW EXECUTE FUNCTION create_hash(password);

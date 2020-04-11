@@ -1,25 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+// import logo from "./logo.svg";
+import "./App.css";
+import SignUp from "./components/Signup";
+import Login from "./components/Login";
+import Dashboard from "./components/DashBoard";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+// import { createBrowserHistory } from "history";
+// var hist = createBrowserHistory();
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        {/* <Route path="/landing-page" component={LandingPage} /> */}
+        {/* <Route path="/profile-page" component={ProfilePage} /> */}
+        <Route path="/login-page" component={Login} />
+        <Route path="/signup-page" component={SignUp} />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/" component={Login} />
+      </Switch>
+    </Router>
   );
 }
 

@@ -13,19 +13,7 @@ import { createStyles, withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Title from "./components/Title";
 import { Redirect } from "react-router-dom";
-
-function Copyright() {
-  return (
-    <Typography variant="body1" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://github.com/Python-Secret-Underground">
-        PSU
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import Copyright from "./components/Copyright";
 
 const useStyles = createStyles((theme) => ({
   paper: {
@@ -65,6 +53,7 @@ class SignIn extends React.Component {
     if (this.state.username === "hello" && this.state.password === "world") {
       console.log("login");
       //   history.push("/");
+      // this.setState({})
       this.setState({ authenticated: true });
     } else {
       console.log("not login");
@@ -78,7 +67,10 @@ class SignIn extends React.Component {
         <Redirect
           to={{
             pathname: "/dashboard",
-            state: { username: this.state.username },
+            state: {
+              username: this.state.username,
+              authenticated: this.state.authenticated,
+            },
           }}
         />
       );

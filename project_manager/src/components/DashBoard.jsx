@@ -1,46 +1,41 @@
 import React from "react";
 import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
+import { createStyles, withStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Drawer from "@material-ui/core/Drawer";
+
 import Box from "@material-ui/core/Box";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-// import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
-import Badge from "@material-ui/core/Badge";
+
+import Button from "@material-ui/core/Button";
+
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
-import Link from "@material-ui/core/Link";
-import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import NotificationsIcon from "@material-ui/icons/Notifications";
-// import { mainListItems, secondaryListItems } from "./listItems";
-// import Chart from "./Chart";
-// import Deposits from "./Deposits";
-// import Orders from "./Orders";
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import Copyright from "./components/Copyright";
+import Header from "./components/Header";
+
+import PeopleIcon from "@material-ui/icons/People";
+import BarChartIcon from "@material-ui/icons/BarChart";
+import LayersIcon from "@material-ui/icons/Layers";
+import DescriptionIcon from "@material-ui/icons/Description";
+import AssignmentReturnedIcon from "@material-ui/icons/AssignmentReturned";
+
+import SettingsIcon from "@material-ui/icons/Settings";
+
+import Avatar from "@material-ui/core/Avatar";
+import Footer from "./components/Footer";
+import { Redirect } from "react-router-dom";
+// import Button from "@material-ui/core/Button";
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
   },
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
@@ -67,8 +62,28 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
+  buttondiv: {
+    textAlign: "center",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "24",
+    padding: "3%",
+  },
   menuButton: {
-    marginRight: 36,
+    padding: "7%",
+    textAlign: "center",
+    display: "flex",
+    width: "lg",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "27px",
+    // size: "medium",
+    // background: "#FF0000",
   },
   menuButtonHidden: {
     display: "none",
@@ -78,7 +93,6 @@ const useStyles = makeStyles((theme) => ({
   },
   drawerPaper: {
     position: "relative",
-    whiteSpace: "nowrap",
     width: drawerWidth,
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
@@ -113,98 +127,254 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   fixedHeight: {
-    height: 240,
+    display: "flex",
+    alignItems: "center",
   },
 }));
 
-export default function Dashboard() {
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+class Dashboard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      authenticated: false,
+      pagename: "dashboard",
+    };
 
-  return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <AppBar
-        position="absolute"
-        className={clsx(classes.appBar, open && classes.appBarShift)}
-      >
-        <Toolbar className={classes.toolbar}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            className={clsx(
-              classes.menuButton,
-              open && classes.menuButtonHidden
-            )}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap
-            className={classes.title}
-          >
-            Dashboard
-          </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-        }}
-        open={open}
-      >
-        <div className={classes.toolbarIcon}>
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon />
-          </IconButton>
+    // console.log(this.props.username);
+    // console.log(this.props.location.state.username);
+  }
+  // call api here to get rest of user data from backend
+  // this.handleClick = this.handleClick.bind(this);
+
+  componentWillMount() {
+    if (this.props.username !== undefined) {
+      this.setState({
+        username: this.props.username,
+        authenticated: this.props.authenticated,
+      });
+    }
+    if (this.props.location.state !== undefined) {
+      this.setState({
+        username: this.props.location.state.username,
+        authenticated: this.props.location.state.authenticated,
+      });
+    } else {
+      this.setState({
+        username: "",
+        authenticated: false,
+      });
+    }
+  }
+  componentDidMount() {
+    console.log(this.state.username);
+    console.log(this.state.authenticated);
+  }
+  render() {
+    if (this.state.authenticated === false) {
+      return <h1>Not Authenticated Go to Login Page and Login</h1>;
+    }
+    if (this.state.pagename === "projects") {
+      return (
+        <Redirect
+          to={{
+            pathname: "/projects",
+            state: {
+              username: this.state.username,
+              authenticated: this.state.authenticated,
+            },
+          }}
+        />
+      );
+    }
+    if (this.state.pagename === "tasks") {
+      return (
+        <Redirect
+          to={{
+            pathname: "/tasks",
+            state: {
+              username: this.state.username,
+              authenticated: this.state.authenticated,
+            },
+          }}
+        />
+      );
+    }
+    if (this.state.pagename === "reports") {
+      return (
+        <Redirect
+          to={{
+            pathname: "/reports",
+            state: {
+              username: this.state.username,
+              authenticated: this.state.authenticated,
+            },
+          }}
+        />
+      );
+    }
+    if (this.state.pagename === "analytics") {
+      return (
+        <Redirect
+          to={{
+            pathname: "/analytics",
+            state: {
+              username: this.state.username,
+              authenticated: this.state.authenticated,
+            },
+          }}
+        />
+      );
+    }
+    if (this.state.pagename === "settings") {
+      return (
+        <Redirect
+          to={{
+            pathname: "/settings",
+            state: {
+              username: this.state.username,
+              authenticated: this.state.authenticated,
+            },
+          }}
+        />
+      );
+    }
+    if (this.state.pagename === "profiles") {
+      return (
+        <Redirect
+          to={{
+            pathname: "/profile",
+            state: {
+              username: this.state.username,
+              authenticated: this.state.authenticated,
+            },
+          }}
+        />
+      );
+    }
+
+    if (this.state.pagename === "dashboard") {
+      const { classes } = this.props;
+      const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+      return (
+        <div className={classes.root}>
+          <CssBaseline />
+          <Header
+            string={"User:" + this.state.username}
+            username={this.state.username}
+            authenticated={this.state.authenticated}
+          />
+
+          <main className={classes.content}>
+            <div className={classes.appBarSpacer} />
+            <Container maxWidth="xl" className={classes.container}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={8} lg={9}>
+                  <Paper className={fixedHeightPaper}>
+                    <div className={classes.buttondiv}>
+                      <Button
+                        edge="start"
+                        color="inherit"
+                        className={clsx(classes.menuButton)}
+                        style={{ color: "#F19A3E" }}
+                        size="medium"
+                        onClick={() => this.setState({ pagename: "projects" })}
+                      >
+                        <AssignmentReturnedIcon style={{ fontSize: 40 }} />
+                        Projects
+                      </Button>
+                    </div>
+                    <div className={classes.buttondiv}>
+                      <Button
+                        edge="start"
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={() => this.setState({ pagename: "tasks" })}
+                        className={clsx(classes.menuButton)}
+                        style={{ color: "#98D9C2" }}
+                      >
+                        <DescriptionIcon style={{ fontSize: 40 }} />
+                        Tasks
+                      </Button>
+                    </div>
+                    <div className={classes.buttondiv}>
+                      <Button
+                        edge="start"
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={() => this.setState({ pagename: "reports" })}
+                        className={clsx(classes.menuButton)}
+                        style={{ color: "#BD4F6C" }}
+                      >
+                        <LayersIcon style={{ fontSize: 40 }} />
+                        Reports
+                      </Button>
+                    </div>
+                    <div className={classes.buttondiv}>
+                      <Button
+                        edge="start"
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={() => this.setState({ pagename: "analytics" })}
+                        className={clsx(classes.menuButton)}
+                        style={{ color: "#EF5B5B" }}
+                      >
+                        <BarChartIcon style={{ fontSize: 40 }} />
+                        Analytics
+                      </Button>
+                    </div>
+                    <div className={classes.buttondiv}>
+                      <Button
+                        edge="start"
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={() => this.setState({ pagename: "settings" })}
+                        className={clsx(classes.menuButton)}
+                        style={{ color: "#426A5A" }}
+                      >
+                        <SettingsIcon style={{ fontSize: 40 }} />
+                        Settings
+                      </Button>
+                    </div>
+                    <div className={classes.buttondiv}>
+                      <Button
+                        edge="start"
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={() => this.setState({ pagename: "profiles" })}
+                        className={clsx(classes.menuButton)}
+                        style={{ color: "#F71735" }}
+                      >
+                        <PeopleIcon
+                          style={{
+                            fontSize: 40,
+                          }}
+                        />
+                        Profile
+                      </Button>
+                    </div>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} md={4} lg={3}>
+                  <Paper className={fixedHeightPaper}>
+                    <Avatar className={classes.avatar}>
+                      <PeopleIcon />
+                    </Avatar>
+                    <br></br>
+                    Profile Info:<br></br> Name: <br></br> Email:<br></br>{" "}
+                    Username:
+                  </Paper>
+                </Grid>
+                <Footer />
+              </Grid>
+              <Box pt={4}>
+                <Copyright />
+              </Box>
+            </Container>
+          </main>
         </div>
-        <Divider />
-        {/* <List>{mainListItems}</List>
-        <Divider />
-        <List>{secondaryListItems}</List> */}
-      </Drawer>
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3}>
-            {/* Chart */}
-            <Grid item xs={12} md={8} lg={9}>
-              <Paper className={fixedHeightPaper}>{/* <Chart /> */}</Paper>
-            </Grid>
-            {/* Recent Deposits */}
-            <Grid item xs={12} md={4} lg={3}>
-              <Paper className={fixedHeightPaper}>{/* <Deposits /> */}</Paper>
-            </Grid>
-            {/* Recent Orders */}
-            <Grid item xs={12}>
-              <Paper className={classes.paper}>{/* <Orders /> */}</Paper>
-            </Grid>
-          </Grid>
-          <Box pt={4}>
-            <Copyright />
-          </Box>
-        </Container>
-      </main>
-    </div>
-  );
+      );
+    }
+  }
 }
-
-// export default Dashboard;
+export default withStyles(useStyles)(Dashboard);

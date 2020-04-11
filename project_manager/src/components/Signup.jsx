@@ -12,18 +12,8 @@ import { createStyles, withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Title from "./components/Title";
 import PropTypes from "prop-types";
-function Copyright() {
-  return (
-    <Typography variant="body1" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://github.com/Python-Secret-Underground">
-        PSU
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import { Redirect } from "react-router-dom";
+import Copyright from "./components/Copyright";
 
 const useStyles = createStyles((theme) => ({
   paper: {
@@ -51,13 +41,30 @@ class SignUp extends React.Component {
     this.state = {
       first_name: "",
       last_name: "",
-      email: "",
+      username: "",
       password: "",
+      signup: false,
     };
+    this.handleClick = this.handleClick.bind(this);
   }
 
+  handleClick(event) {
+    const signupsucess = true;
+    //call mutation query for graphql here
+    this.setState({ signup: signupsucess });
+  }
   render() {
     const { classes } = this.props;
+
+    if (this.state.signup) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/login-page",
+          }}
+        />
+      );
+    }
 
     return (
       <Container component="main" maxWidth="lg">
@@ -84,6 +91,9 @@ class SignUp extends React.Component {
                     id="firstName"
                     label="First Name"
                     autoFocus
+                    onChange={(event) =>
+                      this.setState({ first_name: event.target.value })
+                    }
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -95,6 +105,9 @@ class SignUp extends React.Component {
                     label="Last Name"
                     name="lastName"
                     autoComplete="lname"
+                    onChange={(event) =>
+                      this.setState({ last_name: event.target.value })
+                    }
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -102,10 +115,13 @@ class SignUp extends React.Component {
                     variant="outlined"
                     required
                     fullWidth
-                    id="email"
-                    label="Email Address"
-                    name="email"
-                    autoComplete="email"
+                    id="username"
+                    label="username"
+                    name="username"
+                    autoComplete="username"
+                    onChange={(event) =>
+                      this.setState({ username: event.target.value })
+                    }
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -118,6 +134,9 @@ class SignUp extends React.Component {
                     type="password"
                     id="password"
                     autoComplete="current-password"
+                    onChange={(event) =>
+                      this.setState({ password: event.target.value })
+                    }
                   />
                 </Grid>
               </Grid>
@@ -127,6 +146,7 @@ class SignUp extends React.Component {
                 variant="contained"
                 color="primary"
                 className={classes.submit}
+                onClick={(event) => this.handleClick(event)}
               >
                 Sign Up
               </Button>

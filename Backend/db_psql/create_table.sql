@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS project (
     "name" text NOT NULL,
     createdon date NOT NULL, -- Date Of Creation
     "path" text, -- path refers to the path of git repository
-    createdby text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE
+    createdby text REFERENCES users (username) ON DELETE CASCADE
 );
 
 
@@ -63,9 +63,9 @@ CREATE TYPE role_type AS ENUM (
 );
 
 CREATE TABLE IF NOT EXISTS member (
-    username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
-    projectid int REFERENCES project (projectid) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-    "role" role_type DEFAULT 'member',
+    username text PRIMARY KEY REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
+    projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+    "role" role_type,
     PRIMARY KEY (username, projectid)
 );
 
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS projectfiles (
     fileid serial PRIMARY KEY,
     "filename" text CHECK ("filename" ~ '^[\w,\s-]+\.[A-Za-z]+$') NOT NULL,
     "file" bytea NOT NULL,
-    lastupdated timestamp NOT NULL,
+    lastupdated date NOT NULL,
     projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -116,7 +116,7 @@ values('task1','just a task',null,null,'arpit',1);
  */
 CREATE TABLE IF NOT EXISTS assignedto (
     taskid int REFERENCES task ON DELETE CASCADE ON UPDATE CASCADE,
-    username text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE,
+    username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (taskid, username)
 );
 
@@ -173,24 +173,24 @@ CREATE TRIGGER create_hash
 --#2 trigger to add the user who created the project as a member
 CREATE OR REPLACE FUNCTION add_leader ()
     RETURNS TRIGGER
-    AS $$
+    AS $add_leader$
 BEGIN
     INSERT INTO member
         VALUES (NEW.createdby, NEW.projectid, 'leader');
     RETURN NEW;
 END
-$$
+$add_leader$
 LANGUAGE plpgsql;
 
 CREATE TRIGGER add_leader
-    AFTER INSERT OR UPDATE ON project
+    AFTER INSERT ON project
     FOR EACH ROW
-    EXECUTE PROCEDURE add_leader ();
+    EXECUTE FUNCTION add_leader ();
 
 -- #3 trigger only leader can assign task
 CREATE OR REPLACE FUNCTION add_task ()
     RETURNS TRIGGER
-    AS $$
+    AS $add_task$
 DECLARE
     myrole role_type;
 BEGIN
@@ -198,8 +198,9 @@ BEGIN
         "role" INTO myrole
     FROM
         member
-    WHERE (username = NEW.assignedby
-        AND projectid = NEW.projectid);
+    WHERE
+        username = NEW.assignedby
+        AND projectid = NEW.projectid;
     IF myrole = 'leader' THEN
         RETURN NEW;
     ELSE
@@ -207,7 +208,7 @@ BEGIN
         RETURN NULL;
     END IF;
 END
-$$
+$add_task$
 LANGUAGE plpgsql;
 
 CREATE TRIGGER add_task

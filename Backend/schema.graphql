@@ -12,14 +12,55 @@ type Project{
     createdon:String
     path:String
     createdby:String
+    files:[File!]!
+}
+type Report{
+    inactive:int
+    active:int
+    working:int
+    completed:int
+    completedbeforedeadline:int
+    completedafterdeadline:int
 }
 
+type Task{
+    taskid:int!
+    title:String
+    description:String
+    startdate:Date
+    endDate:Date
+    dateofcompletion:Date
+    priority:String
+    assignedby:String
+    assignedTo:[String!]
+    preqTask:[Task!]
+}
+
+type Note{
+    noteid:int!
+    title:String
+    description:String
+    color:String
+}
 type Status{
     Success:Boolean!
     msg:String
 }
 type Query{
+    myProjects(filter:ProjectFilter!,username:String!):[Project!]!
 
+    myTasks(filter:Filter!,username:String!,sort:Boolean):[Task!]!
+
+    projectTasks(filter:Filter!,username:String!,projectid:Int!):[Task!]!
+
+    allnotes(projectid:Int!,username:String!):[Note!]!
+
+    projectReport(projectid:Int!,username:String!):[Report!]!
+    userReport(username:String!):[Report!]!
+
+    intervalReport(startdate:Date!,enddate:Date!,projectid:Int!,username:String!):[Report!]!
+
+    projectReportbyUser(projectid:Int!,username:String!):[Report!]!
 }
 type Mutation{
 

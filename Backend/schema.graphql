@@ -1,0 +1,109 @@
+type User{
+    username:String!
+    firstname:String
+    lastname:String
+    password:String
+    emailid:String
+    profilepic:file
+}
+type Project{
+    projectid:Int!
+    name:String
+    createdon:String
+    path:String
+    createdby:String
+}
+
+type Status{
+    Success:Boolean!
+    msg:String
+}
+type Query{
+
+}
+type Mutation{
+
+# user mutations
+    createUser(
+        username:String!,
+        firstname:String!,
+        lastname:String!,
+        password:String!,
+        emailid:String!,
+        profilepic:file
+        ):String!
+
+    authenticate(username:String!,password:String!):Status!
+
+    changePassword(username:String!,oldPassword:String!,newPassword:String!):Status!
+
+    changeName(username:String!,newfirstname:String!,newlastname:String!):Status!
+
+    changeProfilepic(username:String!,image:file!):Status!
+
+    deleteUser(user:User!):Status!
+
+# project mutations
+    createProject(name:String!,createdby:String!,path:String):Status!
+
+    deleteProject(username:String!,projectid:Int!):Status!
+
+    changePath(username:String!,projectid:Int!,path:String!):Status!
+
+    changeName(username:String!,projectid:Int!,name:String!):Status!
+
+    addMembers(username:String!,projectid:Int!,usernames:[String!]!):Status!
+
+    deleteMember(username:String!,member:String!,projectid:int!):Status!
+
+    addFiles(username:String!,filename:String!,file:file!,projectid:Int!):Status!
+
+    addTask(
+        title:String!,
+        description:String,
+        startdate:Date,
+        enddate:Date,
+        priority:String,
+        assignedby:String!,
+        assignedTo:[String!]!,
+        projectid:Int!,
+        preqtaskid:[Int!]!
+        ):Status!
+
+# relentless if each project will have compulsory board
+    addBoard(username:Int!,projectid:Int!):Status!
+
+    deleteBoard(username:Int!,projectid:Int!):Status!
+# task mutation
+
+    deleteTask(username:String!,taskid:int!):Status!
+
+    updateTask(
+        taskid:Int!,
+        title:String,
+        description:String,
+        startdate:Date,
+        enddate:Date,
+        priority:String,
+        assignedTo:[String!]!,
+        preqtaskid:[Int!]!
+        ):Status!
+    # updateTask can be more atomic should I do that : ( YES / NO )
+
+    completeTask(username:Int!,taskid:Int!):Status!
+#files mutation
+
+    deleteFile(username:String!,fileid:int!):Status!
+
+    updateFile():Status!
+
+#board mutations
+    addNotes(boardid:Int!,username:String!,title:String!,description:String,color:String!):Status!
+
+# note mutation
+    editNote(noteid:int!,username:String!,newtitle:String!,newdescription:String):Status!
+
+    changeNoteColor(noteid:int!,username:String!,color:String!):Status!
+
+    deleteNote(noteid:int!,username:String!):Status!
+}

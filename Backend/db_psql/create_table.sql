@@ -309,5 +309,3 @@ WHERE
 
 AS $$ $$
 LANGUAGE plpgsql;
-
--- #7 function => User all task report

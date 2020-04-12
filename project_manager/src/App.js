@@ -14,24 +14,33 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 // import { createBrowserHistory } from "history";
 // var hist = createBrowserHistory();
 
+import { positions, Provider } from "react-alert";
+import AlertTemplate from "react-alert-template-basic";
+const options = {
+  timeout: 5000,
+  position: positions.BOTTOM_CENTER,
+};
+
 function App() {
   return (
-    <Router>
-      <Switch>
-        {/* <Route path="/landing-page" component={LandingPage} /> */}
-        {/* <Route path="/profile-page" component={ProfilePage} /> */}
-        <Route path="/login-page" component={Login} />
-        <Route path="/signup-page" component={SignUp} />
-        <Route path="/dashboard" component={DashBoard} />
-        <Route path="/projects" component={Projects} />
-        <Route path="/tasks" component={Tasks} />
-        <Route path="/reports" component={Reports} />
-        <Route path="/analytics" component={Analytics} />
-        <Route path="/settings" component={Settings} />
-        <Route path="/profile" component={Profiles} />
-        <Route path="/" component={Login} />
-      </Switch>
-    </Router>
+    <Provider template={AlertTemplate} {...options}>
+      <Router>
+        <Switch>
+          {/* <Route path="/landing-page" component={LandingPage} /> */}
+          {/* <Route path="/profile-page" component={ProfilePage} /> */}
+          <Route path="/login-page" component={Login} />
+          <Route path="/signup-page" component={SignUp} />
+          <Route path="/dashboard" component={DashBoard} />
+          <Route path="/projects" component={Projects} />
+          <Route path="/tasks" component={Tasks} />
+          <Route path="/reports" component={Reports} />
+          <Route path="/analytics" component={Analytics} />
+          <Route path="/settings" component={Settings} />
+          <Route path="/profile" component={Profiles} />
+          <Route path="/" component={Login} />
+        </Switch>
+      </Router>
+    </Provider>
   );
 }
 

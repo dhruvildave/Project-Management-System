@@ -193,18 +193,13 @@ CREATE OR REPLACE FUNCTION add_leader()
     RETURNS TRIGGER
     AS $add_leader$
 BEGIN
-    IF TG_OP = 'INSERT' THEN
-        INSERT INTO member
-            VALUES (NEW.createdby, NEW.projectid, 'leader');
-    ELSE
-        DELETE FROM member
-        WHERE projectid = OLD.projectid;
-    END IF;
+    INSERT INTO member
+        VALUES (NEW.createdby, NEW.projectid, 'leader');
     RETURN NEW;
 END
 $add_leader$ LANGUAGE plpgsql;
 
-CREATE TRIGGER add_leader AFTER INSERT OR DELETE ON project
+CREATE TRIGGER add_leader AFTER INSERT ON project
     FOR EACH ROW EXECUTE FUNCTION add_leader();
 
 -- #3 trigger only leader can assign task

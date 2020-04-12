@@ -52,9 +52,10 @@ CREATE TABLE IF NOT EXISTS project (
     projectid serial PRIMARY KEY,
     "name" text NOT NULL,
     createdon date NOT NULL, -- Date Of Creation
-    "path" text, -- path refers to the path of git repository
+    "path" text NOT NULL, -- path refers to the path of git repository
     createdby text
-        REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE
+        REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE (name, createdby)
 );
 /*
 insert into project (name,DOC,createdby) values (Project1,CURRENT_DATE,'arpit');
@@ -63,11 +64,12 @@ insert into project (name,DOC,createdby) values (Project1,CURRENT_DATE,'arpit');
 CREATE TYPE role_type as ENUM ('leader', 'member');
 
 CREATE TABLE IF NOT EXISTS member (
-    username text PRIMARY KEY
-        REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
+    username text
+        REFERENCES users ON DELETE CASCADE,
     projectid int
-        REFERENCES project (projectid) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-    "role" role_type
+        REFERENCES project ON DELETE CASCADE,
+    "role" role_type,
+    PRIMARY KEY (username, projectid)
 );
 
 CREATE TABLE IF NOT EXISTS projectfiles (
@@ -77,7 +79,7 @@ CREATE TABLE IF NOT EXISTS projectfiles (
     "file" bytea NOT NULL,
     lastupdated date NOT NULL,
     projectid int
-        REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE
+        REFERENCES project ON DELETE CASCADE
 );
 
 CREATE TYPE status_type as ENUM ('inactive', 'active', 'working', 'completed', 'verified');
@@ -89,11 +91,11 @@ CREATE TABLE IF NOT EXISTS task (
     title text NOT NULL,
     description text,
     startdate date
-        CHECK (startdate <= enddate),
+        CHECK (startdate <= enddate) DEFAULT CURRENT_DATE,
     enddate date,
     status status_type,
     dateofcompletion date,
-    priority priority_type,
+    priority priority_type NOT NULL,
     assignedby text
         REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE,
     projectid int
@@ -153,4 +155,16 @@ CREATE OR REPLACE FUNCTION create_hash() RETURNS TRIGGER AS $create_hash$
 $create_hash$ LANGUAGE plpgsql;
 
 CREATE TRIGGER create_hash BEFORE INSERT OR UPDATE ON users
-    FOR EACH ROW EXECUTE FUNCTION create_hash(password);
+    FOR EACH ROW EXECUTE FUNCTION create_hash();
+
+CREATE OR REPLACE FUNCTION add_leader() RETURNS TRIGGER AS $add_leader$
+    BEGIN
+        INSERT INTO member
+        VALUES
+            (NEW.createdby, NEW.projectid, 'leader');
+        RETURN NEW;
+    END;
+$add_leader$ LANGUAGE plpgsql;
+
+CREATE TRIGGER add_leader AFTER INSERT ON project
+    FOR EACH ROW EXECUTE FUNCTION add_leader();

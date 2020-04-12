@@ -24,9 +24,10 @@ export default function FooterPaper() {
       <Paper className={classes.paper}>
         <Typography variant="h6" component="h2">
           <div style={{ display: "flex" }}>
-            A Project by <a href="https://github.com/Kaushal1011">Kaushal</a>,"
+            {/* A Project by <a href="https://github.com/Kaushal1011">Kaushal</a>,"
             "<a href="https://github.com/arpitvaghela">Arpit</a>" "&" "
-            <a href="https://github.com/dhruvildave">Dhruvil</a>.
+            <a href="https://github.com/dhruvildave">Dhruvil</a>. */}
+            A Project on DBMS By Kaushal, Arpit and Dhruvil.
           </div>
         </Typography>
       </Paper>

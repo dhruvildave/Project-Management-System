@@ -47,7 +47,7 @@ const useStyles = createStyles((theme) => ({
     padding: theme.spacing(3),
   },
   buttonclass: {
-    marginRight: theme.spacing(7),
+    margin: theme.spacing(3),
   },
   headinger: {
     padding: theme.spacing(1),
@@ -68,6 +68,7 @@ class Projects extends React.Component {
       username: "",
       authenticated: false,
       pagename: "projects",
+      projectid: 42069,
       projectlist: {
         ongoing: [
           {
@@ -81,7 +82,7 @@ class Projects extends React.Component {
         completed: [
           {
             projectid: 2,
-            name: "A",
+            name: "B",
             date: "12-4-20",
             path: "git:arpit-vaghela:a",
             username: "arpit-vaghela",
@@ -89,13 +90,18 @@ class Projects extends React.Component {
         ],
       },
     };
-
+    this.handleToUpdate = this.handleToUpdate.bind(this);
     // console.log(this.props.username);
     // console.log(this.props.location.state.username);
   }
   // call api here to get rest of user data from backend
   // this.handleClick = this.handleClick.bind(this);
 
+  handleToUpdate(projectid1, redirect) {
+    if (redirect === 1) {
+      this.setState({ projectid: projectid1, pagename: "projectpage" });
+    }
+  }
   componentWillMount() {
     if (this.props.username !== undefined) {
       this.setState({
@@ -137,8 +143,24 @@ class Projects extends React.Component {
       classes.background
     );
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+    let aftermid = (
+      <Grid item xs={12} md={4} lg={3}>
+        <Paper className={fixedHeightPaper}>Bhai Bhai Bhai</Paper>
+      </Grid>
+    );
+
     if (this.state.pagename === "projects") {
-      mid = <ProjectList projectlist={this.state.projectlist} />;
+      mid = (
+        <ProjectList
+          projectlist={this.state.projectlist}
+          handleToUpdate={this.handleToUpdate}
+        />
+      );
+      aftermid = (
+        <Grid item xs={12} md={4} lg={3}>
+          <Paper className={fixedHeightPaper}>Bhai Bhai Bhai</Paper>
+        </Grid>
+      );
     }
 
     return (
@@ -183,9 +205,7 @@ class Projects extends React.Component {
                   {mid}
                 </Paper>
               </Grid>
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper className={fixedHeightPaper}></Paper>
-              </Grid>
+              {aftermid}
               <Footer />
             </Grid>
             <Box pt={4}>

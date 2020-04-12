@@ -8,7 +8,10 @@ import WorkIcon from "@material-ui/icons/Work";
 class Listelemproj extends React.Component {
   render() {
     return (
-      <ListItem button>
+      <ListItem
+        button
+        onClick={() => this.props.handleToUpdate(this.props.project.projectid)}
+      >
         <ListItemAvatar>
           <Avatar>
             <WorkIcon />

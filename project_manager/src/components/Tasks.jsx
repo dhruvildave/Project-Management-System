@@ -9,7 +9,11 @@ import Paper from "@material-ui/core/Paper";
 import Copyright from "./components/Copyright";
 import Footer from "./components/Footer";
 import clsx from "clsx";
-
+import { Typography } from "@material-ui/core";
+import Fab from "@material-ui/core/Fab";
+import AddIcon from "@material-ui/icons/Add";
+import DeleteRounded from "@material-ui/icons/DeleteRounded";
+import backgrondimage from "./img/background.jpg";
 const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
@@ -34,6 +38,26 @@ const useStyles = createStyles((theme) => ({
     display: "flex",
     alignItems: "center",
   },
+  extendedIcon: {
+    marginRight: theme.spacing(1),
+  },
+  divforbutton: {
+    flexDirection: "column",
+    padding: theme.spacing(3),
+  },
+  buttonclass: {
+    margin: theme.spacing(3),
+  },
+  headinger: {
+    padding: theme.spacing(1),
+    background: "#FFFFFF",
+  },
+  background: {
+    backgroundImage: `url(${backgrondimage})`,
+    backgroundSize: "cover",
+
+    backgroundRepeat: "no-repeat",
+  },
 }));
 
 class Tasks extends React.Component {
@@ -42,8 +66,8 @@ class Tasks extends React.Component {
     this.state = {
       username: "",
       authenticated: false,
-      pagename: "settings",
-      //   projectlist: { ongoing: null, completed: null },
+      pagename: "tasks",
+      tasklist: { ongoing: null, completed: null },
     };
 
     // console.log(this.props.username);
@@ -77,11 +101,28 @@ class Tasks extends React.Component {
   }
 
   render() {
-    if (this.state.authenticated === false) {
-      return <h1>Not Authenticated Go to Login Page and Login</h1>;
-    }
+    let mid;
     const { classes } = this.props;
+    const fixedHeightPaper1 = clsx(
+      classes.paper,
+      classes.fixedHeight,
+      classes.background
+    );
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+    let aftermid = (
+      <Grid item xs={12} md={4} lg={3}>
+        <Paper className={fixedHeightPaper}>Bhai Bhai Bhai</Paper>
+      </Grid>
+    );
+
+    if (this.state.pagename === "tasks") {
+      mid = null;
+      aftermid = (
+        <Grid item xs={12} md={4} lg={3}>
+          <Paper className={fixedHeightPaper}>Bhai Bhai Bhai</Paper>
+        </Grid>
+      );
+    }
 
     return (
       <div className={classes.root}>
@@ -96,11 +137,36 @@ class Tasks extends React.Component {
           <Container maxWidth="xl" className={classes.container}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={8} lg={9}>
-                <Paper className={fixedHeightPaper}>ok</Paper>
+                <Paper className={fixedHeightPaper1}>
+                  <Typography variant="h3" className={classes.headinger}>
+                    Your Tasks
+                  </Typography>
+                  <div className={classes.divforbutton}>
+                    <Fab
+                      color="primary"
+                      aria-label="add"
+                      className={classes.buttonclass}
+                      onClick={(event) =>
+                        this.setState({ pagename: "addtask" })
+                      }
+                    >
+                      <AddIcon />
+                    </Fab>
+                    <Fab
+                      color="secondary"
+                      aria-label="delete"
+                      className={classes.buttonclass}
+                      onClick={(event) =>
+                        this.setState({ pagename: "deletetask" })
+                      }
+                    >
+                      <DeleteRounded />
+                    </Fab>
+                  </div>
+                  {mid}
+                </Paper>
               </Grid>
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper className={fixedHeightPaper}></Paper>
-              </Grid>
+              {aftermid}
               <Footer />
             </Grid>
             <Box pt={4}>

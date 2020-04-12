@@ -23,41 +23,53 @@ class ProjectList extends React.Component {
     this.state = {
       value: 0,
       projectlist: this.props.projectlist,
+      projectid: 42069,
+      redirect: 0,
     };
+    this.handleToUpdate = this.handleToUpdate.bind(this);
   }
+
+  handleToUpdate(someArg) {
+    this.setState({ projectid: someArg, redirect: 1 });
+  }
+
   componentDidUpdate() {
-    console.log(this.state.value);
+    this.props.handleToUpdate(this.state.projectid, this.state.redirect);
   }
   render() {
     const classes = useStyles();
     let ListElement;
     if (this.state.value === 0) {
-      let projectson = this.state.projectlist.ongoing;
-      let projectscom = this.state.projectlist.ongoing;
-      let listItems1 = projectson.map((projectson) => (
-        <Listelemproj project={projectson} />
-      ));
-      let listItems2 = projectscom.map((projectscom) => (
-        <Listelemproj project={projectscom} />
-      ));
-      ListElement = (
-        <List className={classes.list}>
-          {listItems1}
-          {listItems2}
-        </List>
+      let projectson = this.state.projectlist.ongoing.concat(
+        this.state.projectlist.completed
       );
+
+      let listItems1 = projectson.map((projectson) => (
+        <Listelemproj
+          project={projectson}
+          handleToUpdate={this.handleToUpdate}
+        />
+      ));
+
+      ListElement = <List className={classes.list}>{listItems1}</List>;
     }
     if (this.state.value === 1) {
       let projectson = this.state.projectlist.ongoing;
       let listItems1 = projectson.map((projectson) => (
-        <Listelemproj project={projectson} />
+        <Listelemproj
+          project={projectson}
+          handleToUpdate={this.handleToUpdate}
+        />
       ));
       ListElement = <List className={classes.list}>{listItems1}</List>;
     }
     if (this.state.value === 2) {
-      let projectscom = this.state.projectlist.ongoing;
+      let projectscom = this.state.projectlist.completed;
       let listItems2 = projectscom.map((projectscom) => (
-        <Listelemproj project={projectscom} />
+        <Listelemproj
+          project={projectscom}
+          handleToUpdate={this.handleToUpdate}
+        />
       ));
       ListElement = <List className={classes.list}>{listItems2}</List>;
     }

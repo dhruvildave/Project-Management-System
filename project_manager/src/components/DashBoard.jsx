@@ -25,6 +25,7 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import Avatar from "@material-ui/core/Avatar";
 import Footer from "./components/Footer";
 import { Redirect } from "react-router-dom";
+import backgrondimage from "./img/background.jpg";
 // import Button from "@material-ui/core/Button";
 
 const drawerWidth = 240;
@@ -82,6 +83,8 @@ const useStyles = createStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     fontSize: "27px",
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
     // size: "medium",
     // background: "#FF0000",
   },
@@ -129,6 +132,15 @@ const useStyles = createStyles((theme) => ({
   fixedHeight: {
     display: "flex",
     alignItems: "center",
+  },
+  innerpaper: {
+    display: "flex",
+  },
+  background: {
+    backgroundImage: `url(${backgrondimage})`,
+    backgroundSize: "cover",
+
+    backgroundRepeat: "no-repeat",
   },
 }));
 
@@ -257,6 +269,16 @@ class Dashboard extends React.Component {
     if (this.state.pagename === "dashboard") {
       const { classes } = this.props;
       const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+      const fixedHeightPaper1 = clsx(
+        classes.paper,
+        classes.fixedHeight,
+        classes.background
+      );
+      const fixedHeightPaper2 = clsx(
+        classes.paper,
+        classes.fixedHeight,
+        classes.innerpaper
+      );
       return (
         <div className={classes.root}>
           <CssBaseline />
@@ -271,89 +293,110 @@ class Dashboard extends React.Component {
             <Container maxWidth="xl" className={classes.container}>
               <Grid container spacing={3}>
                 <Grid item xs={12} md={8} lg={9}>
-                  <Paper className={fixedHeightPaper}>
-                    <div className={classes.buttondiv}>
-                      <Button
-                        edge="start"
-                        color="inherit"
-                        className={clsx(classes.menuButton)}
-                        style={{ color: "#F19A3E" }}
-                        size="medium"
-                        onClick={() => this.setState({ pagename: "projects" })}
-                      >
-                        <AssignmentReturnedIcon style={{ fontSize: 40 }} />
-                        Projects
-                      </Button>
-                    </div>
-                    <div className={classes.buttondiv}>
-                      <Button
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={() => this.setState({ pagename: "tasks" })}
-                        className={clsx(classes.menuButton)}
-                        style={{ color: "#98D9C2" }}
-                      >
-                        <DescriptionIcon style={{ fontSize: 40 }} />
-                        Tasks
-                      </Button>
-                    </div>
-                    <div className={classes.buttondiv}>
-                      <Button
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={() => this.setState({ pagename: "reports" })}
-                        className={clsx(classes.menuButton)}
-                        style={{ color: "#BD4F6C" }}
-                      >
-                        <LayersIcon style={{ fontSize: 40 }} />
-                        Reports
-                      </Button>
-                    </div>
-                    <div className={classes.buttondiv}>
-                      <Button
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={() => this.setState({ pagename: "analytics" })}
-                        className={clsx(classes.menuButton)}
-                        style={{ color: "#EF5B5B" }}
-                      >
-                        <BarChartIcon style={{ fontSize: 40 }} />
-                        Analytics
-                      </Button>
-                    </div>
-                    <div className={classes.buttondiv}>
-                      <Button
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={() => this.setState({ pagename: "settings" })}
-                        className={clsx(classes.menuButton)}
-                        style={{ color: "#426A5A" }}
-                      >
-                        <SettingsIcon style={{ fontSize: 40 }} />
-                        Settings
-                      </Button>
-                    </div>
-                    <div className={classes.buttondiv}>
-                      <Button
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={() => this.setState({ pagename: "profiles" })}
-                        className={clsx(classes.menuButton)}
-                        style={{ color: "#F71735" }}
-                      >
-                        <PeopleIcon
-                          style={{
-                            fontSize: 40,
-                          }}
-                        />
-                        Profile
-                      </Button>
-                    </div>
+                  <Paper className={fixedHeightPaper1}>
+                    <Paper className={fixedHeightPaper2}>
+                      <div className={classes.buttondiv}>
+                        <Button
+                          edge="start"
+                          color="secondary"
+                          className={clsx(classes.menuButton)}
+                          style={{ color: "#ED6A5A", textTransform: "none" }}
+                          size="medium"
+                          onClick={() =>
+                            this.setState({ pagename: "projects" })
+                          }
+                        >
+                          <AssignmentReturnedIcon
+                            style={{ fontSize: 40, marginRight: "20%" }}
+                          />
+                          Projects
+                        </Button>
+                      </div>
+                      <div className={classes.buttondiv}>
+                        <Button
+                          edge="start"
+                          color="secondary"
+                          aria-label="open drawer"
+                          onClick={() => this.setState({ pagename: "tasks" })}
+                          className={clsx(classes.menuButton)}
+                          style={{ color: "#5BC0EB", textTransform: "none" }}
+                        >
+                          <DescriptionIcon
+                            style={{ fontSize: 40, marginRight: "20%" }}
+                          />
+                          Tasks
+                        </Button>
+                      </div>
+                      <div className={classes.buttondiv}>
+                        <Button
+                          edge="start"
+                          color="secondary"
+                          aria-label="open drawer"
+                          onClick={() => this.setState({ pagename: "reports" })}
+                          className={clsx(classes.menuButton)}
+                          style={{ color: "#9BC53D", textTransform: "none" }}
+                        >
+                          <LayersIcon
+                            style={{ fontSize: 40, marginRight: "20%" }}
+                          />
+                          Reports
+                        </Button>
+                      </div>
+                      <div className={classes.buttondiv}>
+                        <Button
+                          edge="start"
+                          color="secondary"
+                          aria-label="open drawer"
+                          onClick={() =>
+                            this.setState({ pagename: "analytics" })
+                          }
+                          className={clsx(classes.menuButton)}
+                          style={{ color: "#E43F6F", textTransform: "none" }}
+                        >
+                          <BarChartIcon
+                            style={{ fontSize: 40, marginRight: "20%" }}
+                          />
+                          Analytics
+                        </Button>
+                      </div>
+                      <div className={classes.buttondiv}>
+                        <Button
+                          edge="start"
+                          color="secondary"
+                          aria-label="open drawer"
+                          onClick={() =>
+                            this.setState({ pagename: "settings" })
+                          }
+                          className={clsx(classes.menuButton)}
+                          style={{ color: "#342E37", textTransform: "none" }}
+                        >
+                          <SettingsIcon
+                            style={{ fontSize: 40, marginRight: "20%" }}
+                          />
+                          Settings
+                        </Button>
+                      </div>
+                      <div className={classes.buttondiv}>
+                        <Button
+                          edge="start"
+                          color="secondary"
+                          aria-label="open drawer"
+                          onClick={() =>
+                            this.setState({ pagename: "profiles" })
+                          }
+                          className={clsx(classes.menuButton)}
+                          style={{ color: "#4F2FA8", textTransform: "none" }}
+                        >
+                          <PeopleIcon
+                            style={{
+                              fontSize: 40,
+                              marginRight: "20%",
+                            }}
+                          />
+                          Profile
+                        </Button>
+                      </div>
+                    </Paper>
                   </Paper>
                 </Grid>
                 <Grid item xs={12} md={4} lg={3}>

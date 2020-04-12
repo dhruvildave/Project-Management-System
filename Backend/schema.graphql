@@ -72,7 +72,7 @@ type Mutation{
         password:String!,
         emailid:String!,
         profilepic:file
-        ):String!
+        ):Status!
 
     authenticate(username:String!,password:String!):Status!
 

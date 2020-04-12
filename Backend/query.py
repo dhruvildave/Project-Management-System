@@ -4,12 +4,14 @@ DSN = "dbname='pms' user='arpit' host='localhost' password='1let2me3in'"
 # establish connection
 
 
-def createUser(username: str,
+def insertUser(username: str,
                fisrstname: str,
                lastname: str,
                password: str,
                email: str,
                profilepic=None):
+    DSN = "dbname='pms' user='arpit' host='localhost' password='1let2me3in'"
+
     sql = "INSERT INTO users VALUES (%s,%s,%s,%s,%s,%s)"
     data = [username, fisrstname, lastname, password, email, profilepic]
     try:
@@ -21,10 +23,11 @@ def createUser(username: str,
                     print(cur.query)
 
             except:
-                print("failed to add user")
-
+                return "failed to add user"
+            else:
+                return "added user successfully"
     except db.OperationalError:
-        print("connection failed")
+        return "connection failed"
 
 
 def allUsers():

@@ -7,6 +7,7 @@ app = Flask(__name__)
 app.debug = True
 
 from graphene import ObjectType, String, Schema
+import mutation
 
 
 class Query(ObjectType):
@@ -23,7 +24,11 @@ class Query(ObjectType):
         return q.allUsers()
 
 
-schema = Schema(query=Query)
+class MyMutation(ObjectType):
+    create_user = mutation.CreateUser.Field()
+
+
+schema = Schema(query=Query, mutation=MyMutation)
 
 
 @app.route('/')

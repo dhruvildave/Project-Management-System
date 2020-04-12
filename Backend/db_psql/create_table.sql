@@ -85,8 +85,7 @@ CREATE TYPE status_type AS ENUM (
     'inactive',
     'active',
     'working',
-    'completed',
-    'verified'
+    'completed'
 );
 
 CREATE TYPE priority_type AS ENUM (
@@ -169,7 +168,7 @@ LANGUAGE plpgsql;
 CREATE TRIGGER create_hash
     BEFORE INSERT OR UPDATE ON users
     FOR EACH ROW
-    EXECUTE FUNCTION create_hash (PASSWORD);
+    EXECUTE FUNCTION create_hash ();
 
 --#2 trigger to add the user who created the project as a member
 CREATE OR REPLACE FUNCTION add_leader ()
@@ -183,7 +182,7 @@ END
 $$
 LANGUAGE plpgsql;
 
-CREATE TRIGGER add_member
+CREATE TRIGGER add_leader
     AFTER INSERT OR UPDATE ON project
     FOR EACH ROW
     EXECUTE PROCEDURE add_leader ();
@@ -217,15 +216,97 @@ CREATE TRIGGER add_task
     EXECUTE PROCEDURE add_task ();
 
 -- #4 procedure assigned to is a member
-CREATE PROCEDURE assigntask (taskid int, username text
+CREATE PROCEDURE assigntask (tid int, un text
 )
     AS $$
 DECLARE
-    b boolean;
 BEGIN
-    SELECT
+    IF EXISTS (
+        SELECT
+            username
+        FROM
+            member
+        WHERE
+            projectid = (
+                SELECT
+                    projectid
+                FROM
+                    task
+                WHERE
+                    taskid = tid)
+                AND username = un) THEN
+        INSERT INTO assignedto
+            VALUES (tid, un);
+ELSE
+    RAISE EXCEPTION 'user is not a member of the project';
+END IF;
 END
 $$
 LANGUAGE plpgsql;
 
 -- #5 trigger update status of task(to active) when prereq task is completed
+CREATE OR REPLACE FUNCTION update_status ()
+    RETURNS TRIGGER
+    AS $$
+DECLARE
+    cur1 CURSOR (tid int)
+    FOR
+        SELECT
+            task
+        FROM
+            preqtask
+        WHERE
+            preqtask = tid;
+BEGIN
+    IF NEW.status = 'completed' THEN
+        OPEN CURSOR (NEW.taskid);
+        FOR record IN cur1 LOOP
+            IF NOT EXISTS (
+                SELECT
+                    status
+                FROM
+                    task
+                WHERE
+                    taskid IN (
+                        SELECT
+                            preqtask
+                        FROM
+                            preqtask
+                        WHERE
+                            task = record)
+                        AND (status != 'completed')) THEN
+                UPDATE
+                    task
+                SET
+                    status = 'active'
+                WHERE
+                    taskid = record;
+            RETURN NEW;
+        ELSE
+            RETURN NEW;
+        END IF;
+    END LOOP;
+END
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER update_status
+    AFTER UPDATE ON task
+    FOR EACH ROW
+    EXECUTE FUNCTION update_status ();
+
+-- #6 procedure => add preqtask and set task status to inactive
+CREATE PROCEDURE add_preqtask (taskid int, preqid int) INSERT INTO preqtask
+    VALUES (taskid, preqid);
+
+UPDATE
+    task
+SET
+    status = 'inactive'
+WHERE
+    task = taskid;
+
+AS $$ $$
+LANGUAGE plpgsql;
+
+-- #7 function => User all task report

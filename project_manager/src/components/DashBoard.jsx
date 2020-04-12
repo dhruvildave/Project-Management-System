@@ -182,6 +182,7 @@ class Dashboard extends React.Component {
             state: {
               username: this.state.username,
               authenticated: this.state.authenticated,
+              pagename: "projects",
             },
           }}
         />

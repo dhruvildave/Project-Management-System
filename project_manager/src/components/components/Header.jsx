@@ -137,6 +137,7 @@ export default function Header(props) {
           state: {
             username: props.username,
             authenticated: props.authenticated,
+            pagename: "projects",
           },
         }}
       >

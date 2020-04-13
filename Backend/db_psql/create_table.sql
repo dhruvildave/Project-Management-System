@@ -63,7 +63,7 @@ CREATE TYPE role_type AS ENUM (
 );
 
 CREATE TABLE IF NOT EXISTS member (
-    username text PRIMARY KEY REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
+    username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
     projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
     "role" role_type,
     PRIMARY KEY (username, projectid)
@@ -170,7 +170,7 @@ CREATE TRIGGER create_hash
     FOR EACH ROW
     EXECUTE FUNCTION create_hash ();
 
---#2 trigger to add the user who created the project as a member
+--#2 trigger=> to add the user who created the project as a member
 CREATE OR REPLACE FUNCTION add_leader ()
     RETURNS TRIGGER
     AS $add_leader$
@@ -260,8 +260,8 @@ DECLARE
             preqtask = tid;
 BEGIN
     IF NEW.status = 'completed' THEN
-        OPEN CURSOR (NEW.taskid);
-        FOR record IN cur1 LOOP
+        FOR record IN cur1 (NEW.taskid)
+        LOOP
             IF NOT EXISTS (
                 SELECT
                     status
@@ -287,6 +287,7 @@ BEGIN
             RETURN NEW;
         END IF;
     END LOOP;
+END IF;
 END
 $$
 LANGUAGE plpgsql;
@@ -297,15 +298,96 @@ CREATE TRIGGER update_status
     EXECUTE FUNCTION update_status ();
 
 -- #6 procedure => add preqtask and set task status to inactive
-CREATE PROCEDURE add_preqtask (taskid int, preqid int) INSERT INTO preqtask
-    VALUES (taskid, preqid);
+CREATE PROCEDURE add_preqtask (taskid int, preqid int
+)
+    AS $$
+BEGIN
+    INSERT INTO preqtask
+        VALUES (taskid, preqid);
+    UPDATE
+        task
+    SET
+        status = 'inactive'
+    WHERE
+        task = taskid;
+END
+$$
+LANGUAGE plpgsql;
 
-UPDATE
-    task
-SET
-    status = 'inactive'
-WHERE
-    task = taskid;
+-- #7 procedure => delete project only if the user doing it is a leader
+CREATE PROCEDURE delete_project (usr text, pid int
+)
+    AS $$
+DECLARE
+    userrole text;
+BEGIN
+    SELECT
+        ROLE INTO userrole
+    FROM
+        member
+    WHERE
+        username = usr
+        AND projectid = pid;
+    IF userrole = 'leader' THEN
+        DELETE FROM project
+        WHERE projectid = pid;
+    ELSE
+        RAISE EXCEPTION 'user is not a leader';
+    END IF;
+END
+$$
+LANGUAGE plpgsql;
 
-AS $$ $$
+-- #8 procedure => change project name if the user is a leader
+CREATE PROCEDURE change_projectname (usr text, newname text, pid int
+)
+    AS $$
+DECLARE
+    userrole text;
+BEGIN
+    SELECT
+        ROLE INTO userrole
+    FROM
+        member
+    WHERE
+        username = usr
+        AND projectid = pid;
+    IF userrole = 'leader' THEN
+        UPDATE
+            project
+        SET
+            name = newname
+        WHERE
+            projectid = pid;
+    ELSE
+        RAISE EXCEPTION 'user is not a leader';
+    END IF;
+END
+$$
+LANGUAGE plpgsql;
+
+-- #9 procedure -> add array of members only if all of them are a user
+CREATE OR REPLACE PROCEDURE add_members (usr text, members text[], pid int
+)
+    AS $$
+DECLARE
+    mem text;
+BEGIN
+    FOREACH mem IN ARRAY members LOOP
+        IF NOT EXISTS (
+            SELECT
+                1
+            FROM
+                users
+            WHERE
+                username = mem) THEN
+        RAISE EXCEPTION '% user doesnot exists', mem;
+    END IF;
+END LOOP;
+    FOREACH mem IN ARRAY members LOOP
+        INSERT INTO member
+            VALUES (mem, pid, 'member');
+    END LOOP;
+END
+$$
 LANGUAGE plpgsql;

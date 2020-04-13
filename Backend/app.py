@@ -1,7 +1,7 @@
 # Imports
 from flask import Flask
 from flask_graphql import GraphQLView
-import query as q
+import pg
 # initializing our app
 app = Flask(__name__)
 app.debug = True
@@ -18,22 +18,25 @@ class Query(ObjectType):
     # our Resolver method takes the GraphQL context (root, info) as well as
     # Argument (name) for the Field and returns data for the query Response
     def resolve_hello(root, info):
-        return f'Hello {name}!'
-
-    def resolve_goodbye(root, info):
-        return q.allUsers()
+        return f'Hello'
 
 
-class MyMutation(ObjectType):
-    create_user = mutation.CreateUser.Field()
+class Mutation(ObjectType):
+    create_user = mutation.createUser.Field()
+    change_name = mutation.changeName.Field()
+    delete_user = mutation.deleteUser.Field()
+    create_project = mutation.createProject.Field()
+    delete_project = mutation.deleteProject.Field()
+    change_projectname = mutation.changeProjectName.Field()
+    add_Member = mutation.addMembers.Field()
 
 
-schema = Schema(query=Query, mutation=MyMutation)
+schema = Schema(query=Query, mutation=Mutation)
 
 
 @app.route('/')
 def index():
-    return 'Welcome to Api2.0'
+    return '<html><body><h1>Welcome API 2.0</h1><code>path: /graphql-api<code></body></html>'
 
 
 app.add_url_rule(

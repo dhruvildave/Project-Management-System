@@ -111,5 +111,3 @@ class addMembers(Mutation):
         s, m = pg.executequery("CALL add_members(%s,%s,%s);",
                                [username, members, projectid])
         return addMembers(status=s, msg=m)
-
-class

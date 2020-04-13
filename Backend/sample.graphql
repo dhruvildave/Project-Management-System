@@ -1,0 +1,46 @@
+mutation {
+  createUser(firstname:"Arpit",lastname:"Vaghela",username:"arpit91",emailid:"arpitvaghela@gmail.com",password:"Password1"){
+      msg
+      status
+  }
+}
+
+mutation {
+  deleteUser(username:"arpit91"){
+    status
+    msg
+  }
+}
+mutation {
+  changeName(newfirstname:"Alpha",newlastname:"Beta",username:"arpit91"){
+      msg
+      status
+  }
+}
+
+mutation {
+  createProject(name:"Project1",createdby:"arpit91"){
+      msg
+      status
+  }
+}
+
+mutation {
+  deleteProject(projectid:1,username:"arpit91"){
+      msg
+      status
+  }
+}
+
+mutation{
+  changeProjectname(projectid:2,newname:"The project",username:"arpit-vaghela"){
+    status
+    msg
+  }
+}
+mutation{
+  addMember(projectid:2,username:"arpit-vaghela",members:["panth-pate","prachee-javiya"]){
+    status
+    msg
+  }
+}

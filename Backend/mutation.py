@@ -1,4 +1,4 @@
-from graphene import Mutation, ObjectType, String, Boolean, Int, List, NonNull
+from graphene import Mutation, ObjectType, String, Boolean, Int, List, NonNull, types
 import pg
 
 
@@ -18,6 +18,21 @@ class createUser(Mutation):
             "INSERT INTO users VALUES (%s,%s,%s,%s,%s,%s)",
             [username, firstname, lastname, password, emailid, None])
         return createUser(status=s, msg=m)
+
+
+class changePassword(Mutation):
+    class Arguments:
+        username = String(required=True)
+        oldpassword = String(required=True)
+        newpassword = String(required=True)
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(root, info, username, oldpassword, newpassword):
+        s, m = pg.executequery("CALL change_password(%s,%s,%s);",
+                               [username, oldpassword, newpassword])
+        return changePassword(status=s, msg=m)
 
 
 class changeName(Mutation):
@@ -102,7 +117,7 @@ class addMembers(Mutation):
     class Arguments:
         username = String(required=True)
         projectid = Int(required=True)
-        members = List(NonNull(String))
+        members = NonNull(List(NonNull(String)))
 
     status = Boolean(required=True)
     msg = String()
@@ -111,3 +126,54 @@ class addMembers(Mutation):
         s, m = pg.executequery("CALL add_members(%s,%s,%s);",
                                [username, members, projectid])
         return addMembers(status=s, msg=m)
+
+
+class deleteMember(Mutation):
+    class Arguments:
+        username = String(required=True)
+        member = String(required=True)
+        projectid = String(required=True)
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(root, info, username, member, projectid):
+        s, m = pg.executequery("CALL delete_members(%s,%s,%s);",
+                               [username, member, projectid])
+        return deleteMember(status=s, msg=m)
+
+
+class addTask(Mutation):
+    class Arguments:
+        assignedby = String(required=True)
+        assignedto = NonNull(List(NonNull(String()))),
+        projectid = Int(required=True)
+        title = String(required=True)
+        description = String()
+        starttime = types.DateTime()
+        endtime = types.DateTime()
+        priority = String()
+        preqtaskid = List(NonNull(Int))
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(root,
+               info,
+               assignedby,
+               assignedto,
+               projectid,
+               title,
+               description=None,
+               startdate=None,
+               enddate=None,
+               priority=None,
+               preqtaskid=None):
+        if not priority:
+            priority = 'normal'
+            s, m = pg.executequery(
+                "call add_task (%s,%s,%s,%s,%s,%s,%s,%s);", [
+                    assignedby, assignedto, projectid, title, description,
+                    startdate, enddate, priority, preqtaskid
+                ])
+        return deleteMember(status=s, msg=m)

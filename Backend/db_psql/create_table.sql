@@ -391,3 +391,107 @@ END LOOP;
 END
 $$
 LANGUAGE plpgsql;
+
+-- #10procedure change password (authenticate the old password before adding the new one)
+CREATE PROCEDURE change_password (usr text, oldpswd text, newpswd text
+)
+    AS $$
+DECLARE
+    pswmatch boolean;
+BEGIN
+    SELECT
+        (PASSWORD = crypt(oldpswd, PASSWORD)) INTO pswmatch
+    FROM
+        users
+    WHERE
+        username = usr;
+    IF pswmatch THEN
+        UPDATE
+            users
+        SET
+            PASSWORD = crypt(newpswd, gen_salt('bf'));
+    END IF;
+END
+$$
+LANGUAGE plpgsql;
+
+-- #11 Procedure Delete member (delete memeber if user doing it is a leader and send error if member doesnot exist)
+CREATE OR REPLACE PROCEDURE delete_member (usrname text, mem text, pid int
+)
+    AS $$
+BEGIN
+    IF EXISTS (
+        SELECT
+            1
+        FROM
+            member
+        WHERE
+            username = usrname
+            AND projectid = pid
+            AND ROLE = 'leader') THEN
+    IF EXISTS (
+        SELECT
+            1
+        FROM
+            member
+        WHERE
+            username = mem
+            AND projectid = pid) THEN
+    DELETE FROM member
+    WHERE username = mem
+        AND projectid = pid;
+ELSE
+    RAISE EXCEPTION '% is not a member of the project', mem;
+END IF;
+        ELSE
+            RAISE EXCEPTION '% is not a leader of the project', usrname;
+END IF;
+END
+$$
+LANGUAGE plpgsql;
+
+-- #12 Procedure => (add task with assigned to and prereq task values if user is a leader and members assigned to exists)
+CREATE OR REPLACE PROCEDURE add_task (assignedby text, assignedto text[], pid int, title text, description text, st timestamp, et timestamp, priority text, preqtaskid int[]
+)
+    AS $$
+DECLARE
+    tid int;
+    m text;
+    p int;
+BEGIN
+    IF NOT EXISTS (
+        SELECT
+            1
+        FROM
+            member
+        WHERE
+            username = assignedby
+            AND projectid = pid
+            AND ROLE = 'leader') THEN
+    RAISE EXCEPTION '% user is not a leader', assignedby;
+END IF;
+INSERT INTO task (title, description, starttime, endtime, assignedby, projectid)
+    VALUES (title, description, st, et, assignedby, pid)
+RETURNING
+    taskid INTO tid;
+    foreach m IN ARRAY assignedto LOOP
+        IF NOT EXISTS (
+            SELECT
+                1
+            FROM
+                member
+            WHERE
+                username = m
+                AND projectid = pid) THEN
+        RAISE exception '% is not a member', m;
+    END IF;
+INSERT INTO assignedto
+    VALUES (tid, m);
+END LOOP;
+    foreach p IN ARRAY preqtaskid LOOP
+        INSERT INTO preqtask
+            VALUES (p, tid);
+    END LOOP;
+END
+$$
+LANGUAGE plpgsql;

@@ -282,7 +282,7 @@ DECLARE
                     SET
                         status = 'active'
                     WHERE
-                        taskid = r.t
+                        taskid = r.t;
             END IF;
         END LOOP;
     END IF;

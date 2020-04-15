@@ -1,4 +1,4 @@
-from graphene import Mutation, ObjectType, String, Boolean, Int, List, NonNull, types
+from graphene import Mutation, ObjectType, String, Boolean, Int, List, NonNull, types, InputObjectType
 import pg
 
 
@@ -146,7 +146,7 @@ class deleteMember(Mutation):
 class addTask(Mutation):
     class Arguments:
         assignedby = String(required=True)
-        assignedto = NonNull(List(NonNull(String()))),
+        assignedto = NonNull(List(NonNull(String)))
         projectid = Int(required=True)
         title = String(required=True)
         description = String()
@@ -188,5 +188,19 @@ class deleteTask(Mutation):
     msg = String()
 
     def mutate(root, info, username, taskid):
-        s, m = pg.executequery('', [username, taskid])
+        s, m = pg.executequery('call delete_task(%s,%s)', [taskid, username])
         return deleteTask(status=s, msg=m)
+
+
+class completeTask(Mutation):
+    class Arguments:
+        username = String(required=True)
+        taskid = Int(required=True)
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(root, info, username, taskid):
+        s, m = pg.executequery('call complete_task (%s,%s);',
+                               [taskid, username])
+        return completeTask(status=s, msg=m)

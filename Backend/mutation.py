@@ -15,7 +15,7 @@ class createUser(Mutation):
 
     def mutate(root, info, username, firstname, lastname, password, emailid):
         s, m = pg.executequery(
-            "INSERT INTO users VALUES (%s,%s,%s,%s,%s,%s)",
+            "INSERT INTO users VALUES (%s,%s,%s,%s,%s,%s);",
             [username, firstname, lastname, password, emailid, None])
         return createUser(status=s, msg=m)
 
@@ -113,6 +113,21 @@ class changeProjectName(Mutation):
         return changeProjectName(status=s, msg=m)
 
 
+class changeProjectPath(Mutation):
+    class Arguments:
+        username = String(required=True)
+        projectid = Int(required=True)
+        newpath = String(required=True)
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(root, info, username, newpath, projectid):
+        s, m = pg.executequery("change_projectpath(%s,%s,%s);",
+                               [username, newpath, projectid])
+        return changeProjectName(status=s, msg=m)
+
+
 class addMembers(Mutation):
     class Arguments:
         username = String(required=True)
@@ -204,3 +219,76 @@ class completeTask(Mutation):
         s, m = pg.executequery('call complete_task (%s,%s);',
                                [taskid, username])
         return completeTask(status=s, msg=m)
+
+
+class addNote(Mutation):
+    class Arguments:
+        username = String(required=True)
+        title = String(required=True)
+        description = String()
+        color = String()
+        projectid = Int()
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(root,
+               info,
+               username,
+               title,
+               projectid=None,
+               description=None,
+               color=None):
+        if not projectid:
+            s, m = pg.executequery(
+                'insert into note (title,description,color,boardid,createdby) values (%s,%s,%s,(select boardid from board where username = %s),%s);',
+                [title, description, color, username, username])
+
+        else:
+            s, m = pg.executequery('call add_note (%s, %s,%s,%s,%s)', [
+                username,
+                projectid,
+                title,
+                description,
+                color,
+            ])
+
+        return addNote(status=s, msg=m)
+
+
+class deleteNote(Mutation):
+    class Arguments:
+        username = String(required=True)
+        noteid = Int(required=True)
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(root, info, username, noteid):
+        s, m = pg.executequery('delete from note where noteid = %s);',
+                               [noteid, username])
+        return deleteNote(status=s, msg=m)
+
+
+class editNote(Mutation):
+    class Arguments:
+        username = String(required=True)
+        noteid = Int(required=True)
+        title = String(required=True)
+        description = String()
+        color = String()
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(root,
+               info,
+               username,
+               noteid,
+               title,
+               description=None,
+               color=None):
+        s, m = pg.executequery(
+            'update note set title = %s description = %s color = %s createdby = %s where noteid = %s);',
+            [title, description, color, username, noteid])
+        return editNote(status=s, msg=m)

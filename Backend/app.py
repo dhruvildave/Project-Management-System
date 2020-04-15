@@ -18,17 +18,26 @@ class Query(ObjectType):
     # our Resolver method takes the GraphQL context (root, info) as well as
     # Argument (name) for the Field and returns data for the query Response
     def resolve_hello(root, info):
-        return f'Hello'
+        return 'Hello'
 
 
 class Mutation(ObjectType):
     create_user = mutation.createUser.Field()
+    change_password = mutation.changePassword.Field()
     change_name = mutation.changeName.Field()
     delete_user = mutation.deleteUser.Field()
     create_project = mutation.createProject.Field()
     delete_project = mutation.deleteProject.Field()
     change_projectname = mutation.changeProjectName.Field()
-    add_Member = mutation.addMembers.Field()
+    change_projectpath = mutation.changeProjectPath.Field()
+    add_member = mutation.addMembers.Field()
+    delete_member = mutation.deleteMember.Field()
+    add_task = mutation.addTask.Field()
+    delete_task = mutation.deleteTask.Field()
+    complete_task = mutation.completeTask.Field()
+    add_note = mutation.addNote.Field()
+    edit_note = mutation.editNote.Field()
+    delete_note = mutation.deleteNote.Field()
 
 
 schema = Schema(query=Query, mutation=Mutation)

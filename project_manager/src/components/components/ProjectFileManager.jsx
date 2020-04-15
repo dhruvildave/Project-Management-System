@@ -2,7 +2,6 @@ import React from "react";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
 import DeleteRounded from "@material-ui/icons/DeleteRounded";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { createStyles, withStyles } from "@material-ui/core/styles";
 import Listfileproj from "../assets/listfileproj";
 import { Typography, Paper, CssBaseline, Grid } from "@material-ui/core";
@@ -71,6 +70,11 @@ class ProjectFileManager extends React.Component {
     this.setState({ viewname: "allfiles" });
   }
 
+  componentDidUpdate() {
+    if (this.setState.viewname === "back") {
+      this.props.handleToUpdate();
+    }
+  }
   handleClose() {
     this.setState({
       open: false,
@@ -115,14 +119,6 @@ class ProjectFileManager extends React.Component {
           onClick={(event) => this.setState({ viewname: "deletefile" })}
         >
           <DeleteRounded />
-        </Fab>
-        <Fab
-          color="secondary"
-          aria-label="delete"
-          className={classes.buttonclass}
-          onClick={(event) => this.setState({ viewname: "back" })}
-        >
-          <ArrowBackIcon />
         </Fab>
         <DropzoneDialog
           open={this.state.open}

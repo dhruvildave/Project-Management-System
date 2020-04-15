@@ -7,6 +7,7 @@ import backgrondimage from "../img/background.jpg";
 import clsx from "clsx";
 import Copyright from "./Copyright";
 import ProjectFileManager from "./ProjectFileManager";
+import TaskManagerProj from "./TaskManagerProj";
 const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
@@ -66,12 +67,7 @@ class ProjectsPage extends React.Component {
       description:
         "Chal Hai ayyarrr idhhar kuchsdnisavue rbvaeuyvgiekru vbveryguviuaegivg evhaegivygeyg vkeviuaegvcvvbwaryvgauyv vabuiusvyd auy waygci",
       files: [],
-      notes: [],
-      tasks: [],
       members: [],
-      projectsection: "display", // display / edit
-      notesection: "displaylist", // display / add / edit
-      tasksection: "displaylist", // display/view1
     };
   }
   componentWillMount() {
@@ -79,8 +75,9 @@ class ProjectsPage extends React.Component {
       this.setState({
         projectid: this.props.projectid,
       });
+      this.setState({ username: this.props.username });
     }
-    this.setState({ username: this.props.username });
+
     console.log("Mounting Project Page");
     this.setState({
       files: [
@@ -188,6 +185,13 @@ class ProjectsPage extends React.Component {
         description={this.state.description}
         date={this.state.date}
         username={this.state.username}
+      />
+    );
+
+    tasks = (
+      <TaskManagerProj
+        username={this.state.username}
+        projid={this.state.projectid}
       />
     );
 

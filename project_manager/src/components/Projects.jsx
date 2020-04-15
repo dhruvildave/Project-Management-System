@@ -219,6 +219,7 @@ class Projects extends React.Component {
         <ProjectsPage
           projectid={this.state.projectid}
           username={this.state.username}
+          handleToUpdate={this.pageUpdate}
         />
       );
     }

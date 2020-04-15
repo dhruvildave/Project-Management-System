@@ -16,7 +16,9 @@ import DeleteRounded from "@material-ui/icons/DeleteRounded";
 import ProjectList from "./components/ProjectList";
 import backgrondimage from "./img/background.jpg";
 import ProjectsPage from "./components/ProjectsPage";
-
+import AddProject from "./components/AddProject";
+import DeleteProject from "./components/DeleteProject";
+import { withAlert } from "react-alert";
 const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
@@ -75,11 +77,12 @@ class Projects extends React.Component {
         ongoing: [
           {
             projectid: 1,
-            name: "AAAAAAAAAAAAAAA",
+            name: "AAAAAAAAAAAAAAAA",
             date: "12-4-20",
             path: "git:arpit-vaghela:a",
             username: "arpit-vaghela",
-            description: "Something there",
+            description: "This is a longer detailed description",
+            shortdescription: "Something there",
           },
         ],
         completed: [
@@ -89,12 +92,14 @@ class Projects extends React.Component {
             date: "12-4-20",
             path: "git:arpit-vaghela:a",
             username: "arpit-vaghela",
-            description: "Something Here",
+            description: "This is a longer detailed description",
+            shortdescription: "Something there",
           },
         ],
       },
     };
     this.handleToUpdate = this.handleToUpdate.bind(this);
+    this.pageUpdate = this.pageUpdate.bind(this);
     // console.log(this.props.username);
     // console.log(this.props.location.state.username);
   }
@@ -105,6 +110,9 @@ class Projects extends React.Component {
     if (redirect === 1) {
       this.setState({ projectid: projectid1, pagename: "projectpage" });
     }
+  }
+  pageUpdate() {
+    this.setState({ pagename: "projects" });
   }
   componentWillMount() {
     if (this.props.username !== undefined) {
@@ -156,7 +164,7 @@ class Projects extends React.Component {
     if (this.state.pagename === "projects") {
       mid = (
         <>
-          <div className={classes.divforbutton}>
+          <Grid container item justify="center" direction="row">
             <Fab
               color="primary"
               aria-label="add"
@@ -173,7 +181,7 @@ class Projects extends React.Component {
             >
               <DeleteRounded />
             </Fab>
-          </div>
+          </Grid>
           <ProjectList
             projectlist={this.state.projectlist}
             handleToUpdate={this.handleToUpdate}
@@ -207,7 +215,68 @@ class Projects extends React.Component {
       );
     }
     if (this.state.pagename === "projectpage") {
-      maincontent = <ProjectsPage projectid={this.projectid} />;
+      maincontent = (
+        <ProjectsPage
+          projectid={this.state.projectid}
+          username={this.state.username}
+        />
+      );
+    }
+    if (this.state.pagename === "addproject") {
+      mid = (
+        <AddProject
+          username={this.state.username}
+          handleToUpdate={this.pageUpdate}
+        />
+      );
+      maincontent = (
+        <Container maxWidth="xl" className={classes.container}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={8} lg={9}>
+              <Paper className={fixedHeightPaper1}>
+                <Typography variant="h3" className={classes.headinger}>
+                  Add Project
+                </Typography>
+
+                {mid}
+              </Paper>
+            </Grid>
+            {aftermid}
+            <Footer />
+          </Grid>
+          <Box pt={4}>
+            <Copyright />
+          </Box>
+        </Container>
+      );
+    }
+    if (this.state.pagename === "deleteproject") {
+      mid = (
+        <DeleteProject
+          username={this.state.username}
+          handleToUpdate={this.pageUpdate}
+        />
+      );
+      maincontent = (
+        <Container maxWidth="xl" className={classes.container}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={8} lg={9}>
+              <Paper className={fixedHeightPaper1}>
+                <Typography variant="h3" className={classes.headinger}>
+                  Delete Project
+                </Typography>
+
+                {mid}
+              </Paper>
+            </Grid>
+            {aftermid}
+            <Footer />
+          </Grid>
+          <Box pt={4}>
+            <Copyright />
+          </Box>
+        </Container>
+      );
     }
 
     return (
@@ -226,4 +295,4 @@ class Projects extends React.Component {
     );
   }
 }
-export default withStyles(useStyles)(Projects);
+export default withAlert()(withStyles(useStyles)(Projects));

@@ -11,12 +11,9 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "material-ui-dropzone": "^2.5.0",
     "node-sass": "^4.13.1",
     "react": "^16.13.1",
-<<<<<<< HEAD
-=======
-    "react-alert": "^7.0.0",
->>>>>>> f984e84aa0917b28716030196e855f867c514bd0
     "react-alert-template-basic": "^1.0.0",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",

@@ -1,6 +1,6 @@
 import React from "react";
 import { createStyles, withStyles } from "@material-ui/core/styles";
-import Listdelproj from "../assets/listdelproj";
+import Listdelfile from "../assets/listdelfile";
 import { Grid, Paper } from "@material-ui/core";
 import { withAlert } from "react-alert";
 const useStyles = createStyles((theme) => ({
@@ -17,27 +17,20 @@ class DeleteProject extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      projectid: [],
+      fileid: [],
       selected: 0,
       deleteflag: 0,
-      projects: [
+      files: [
+        { fileid: 1, filename: "Okay 1", lastupdated: "12-35-3566" },
         {
-          projectid: 2,
-          name: "BBBBBBBBBBBBB",
-          date: "12-4-20",
-          path: "git:arpit-vaghela:a",
-          username: "arpit-vaghela",
-          description: "This is a longer detailed description",
-          shortdescription: "Something there",
+          fileid: 2,
+          filename: "Okay 2",
+          lastupdated: "12-35-3566",
         },
         {
-          projectid: 2,
-          name: "BBBBBBBBBBBBB",
-          date: "12-4-20",
-          path: "git:arpit-vaghela:a",
-          username: "arpit-vaghela",
-          description: "This is a longer detailed description",
-          shortdescription: "Something there",
+          fileid: 3,
+          filename: "Okay 3",
+          lastupdated: "12-35-3566",
         },
       ],
       username: "",
@@ -45,20 +38,20 @@ class DeleteProject extends React.Component {
     this.handleUpdate = this.handleUpdate.bind(this);
     // this.handleClick = this.handleClick.bind(this);
   }
-  handleUpdate(projid, number) {
-    this.setState({ projectid: projid, selected: number, deleteflag: 1 });
+  handleUpdate(fileid, number) {
+    this.setState({ fileid: fileid, selected: number, deleteflag: 1 });
   }
   componentDidUpdate() {
     if (this.state.deleteflag === 1) {
       this.setState({ deleteflag: 0 });
       this.props.alert.success("sucessfully deleted");
       this.props.handleToUpdate();
-
       //call delete here
     }
   }
   componentWillMount() {
     this.setState({ username: this.props.username });
+    //fetch filelist here
   }
   render() {
     const { classes } = this.props;
@@ -78,8 +71,8 @@ class DeleteProject extends React.Component {
           className={classes.button}
         ></Grid>
         <Paper className={classes.root}>
-          <Listdelproj
-            project={this.state.projects}
+          <Listdelfile
+            file={this.state.files}
             handleToUpdate={this.handleUpdate}
           />
         </Paper>

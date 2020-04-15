@@ -5,6 +5,7 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import WorkIcon from "@material-ui/icons/Work";
 import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
 import { createStyles, withStyles } from "@material-ui/core/styles";
 //  import Card from "./Card";
 // import ListSubheader from "@material-ui/core/ListSubheader";
@@ -27,10 +28,11 @@ class Listelemproj extends React.Component {
             <WorkIcon />
           </Avatar>
         </ListItemAvatar>
-        <div styles={{ flexDirection: "column" }}>
+        <Grid container direction="column">
           <Typography variant="h6">{this.props.project.name}</Typography>
+
           <ListItemText
-            primary={this.props.project.description}
+            primary={this.props.project.shortdescription}
             secondary={
               `Started: ` +
               this.props.project.date +
@@ -38,8 +40,8 @@ class Listelemproj extends React.Component {
               this.props.project.username
             }
           ></ListItemText>
-        </div>
-        {/* <Card project={this.props.project}></Card> */}
+          {/* <Card project={this.props.project}></Card> */}
+        </Grid>
       </ListItem>
     );
   }

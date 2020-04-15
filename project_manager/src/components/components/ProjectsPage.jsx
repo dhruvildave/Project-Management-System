@@ -62,6 +62,7 @@ class ProjectsPage extends React.Component {
       date: "",
       path: "",
       username: "",
+      shortdescription: "",
       description:
         "Chal Hai ayyarrr idhhar kuchsdnisavue rbvaeuyvgiekru vbveryguviuaegivg evhaegivygeyg vkeviuaegvcvvbwaryvgauyv vabuiusvyd auy waygci",
       files: [],
@@ -79,6 +80,7 @@ class ProjectsPage extends React.Component {
         projectid: this.props.projectid,
       });
     }
+    this.setState({ username: this.props.username });
     console.log("Mounting Project Page");
     this.setState({
       files: [
@@ -185,6 +187,7 @@ class ProjectsPage extends React.Component {
         members={this.state.members}
         description={this.state.description}
         date={this.state.date}
+        username={this.state.username}
       />
     );
 

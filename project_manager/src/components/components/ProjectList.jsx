@@ -1,15 +1,16 @@
 import React from "react";
-import { withStyles } from "@material-ui/core";
+import { withStyles, Grid } from "@material-ui/core";
 import { createStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import List from "@material-ui/core/List";
-import Listelemproj from "./listelemproj";
+import Listelemproj from "../assets/listelemproj";
 // import Card from "./Card";
 const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
+    width: "90%",
   },
   list: {
     width: "100%",
@@ -75,21 +76,24 @@ class ProjectList extends React.Component {
     }
 
     return (
-      <Paper className={classes.root}>
-        <Tabs
-          value={this.state.value}
-          onChange={(event, value) => this.setState({ value: value })}
-          indicatorColor="primary"
-          textColor="primary"
-          centered
-          variant="fullWidth"
-        >
-          <Tab label="All Projects" />
-          <Tab label="Ongoing Projects" />
-          <Tab label="Completed Projects" />
-        </Tabs>
-        {ListElement}
-      </Paper>
+      <Grid conatiner justify="center" xs={12}>
+        {" "}
+        <Paper className={classes.root}>
+          <Tabs
+            value={this.state.value}
+            onChange={(event, value) => this.setState({ value: value })}
+            indicatorColor="primary"
+            textColor="primary"
+            centered
+            variant="fullWidth"
+          >
+            <Tab label="All Projects" />
+            <Tab label="Ongoing Projects" />
+            <Tab label="Completed Projects" />
+          </Tabs>
+          {ListElement}
+        </Paper>
+      </Grid>
     );
   }
 }

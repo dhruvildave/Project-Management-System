@@ -10,5 +10,7 @@ INSERT INTO project (name, createdon, createdby)
 INSERT INTO member
     VALUES ('kaushal10', 1);
 
-INSERT INTO task (title, description, endtime, assignedby, projectid)
-    VALUES ('task1', 'just a task', NULL, 'arpit', 1);
+INSERT INTO task (title, description, assignedby, status, projectid)
+VALUES
+    ('task1', 'just a task', 'arpit', 'active', 1),
+    ('task2', 'another task', 'arpit', 'inactive', 1);

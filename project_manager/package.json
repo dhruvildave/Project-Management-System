@@ -13,6 +13,10 @@
     "@testing-library/user-event": "^7.2.1",
     "node-sass": "^4.13.1",
     "react": "^16.13.1",
+<<<<<<< HEAD
+=======
+    "react-alert": "^7.0.0",
+>>>>>>> f984e84aa0917b28716030196e855f867c514bd0
     "react-alert-template-basic": "^1.0.0",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",

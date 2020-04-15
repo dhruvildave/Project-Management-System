@@ -104,9 +104,10 @@ CREATE TABLE IF NOT EXISTS task (
     status status_type DEFAULT 'active',
     completiontime timestamp CHECK (starttime <= completiontime),
     priority priority_type DEFAULT 'normal',
-    assignedby text,
-    projectid int,
-    FOREIGN KEY (assignedby, projectid) REFERENCES member (username, projectid) ON DELETE CASCADE ON UPDATE CASCADE
+    assignedby text NOT NULL,
+    projectid int NOT NULL,
+    FOREIGN KEY (assignedby, projectid)
+        REFERENCES member (username, projectid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -554,3 +555,58 @@ END IF;
 END
 $$
 LANGUAGE plpgsql;
+
+
+-- projectReport
+SELECT COUNT(*)
+FROM task
+WHERE projectid = 1;
+
+SELECT status, COUNT(1)
+FROM task
+WHERE projectid = 1
+GROUP BY status;
+
+SELECT COUNT(*)
+FROM task
+WHERE completiontime IS NOT NULL;
+
+SELECT COUNT(*) as completedbeforedealine
+FROM task
+WHERE endtime <= completiontime;
+
+SELECT COUNT(*) as completedafterdealine
+FROM task
+WHERE endtime > completiontime;
+
+-- intervalReport
+SELECT COUNT(*)
+FROM task
+WHERE projectid = 1 AND starttime >= '2020-04-13' AND endtime <= '2020-04-18';
+
+SELECT status, COUNT(1)
+FROM task
+WHERE projectid = 1 AND starttime >= '2020-04-13' AND endtime <= '2020-04-18'
+GROUP BY status;
+
+SELECT COUNT(*)
+FROM task
+WHERE completiontime IS NOT NULL AND starttime >= '2020-04-13' AND endtime <= '2020-04-18';
+
+SELECT COUNT(*) as completedbeforedealine
+FROM task
+WHERE endtime <= completiontime AND starttime >= '2020-04-13' AND endtime <= '2020-04-18';
+
+SELECT COUNT(*) as completedafterdealine
+FROM task
+WHERE endtime > completiontime AND starttime >= '2020-04-13' AND endtime <= '2020-04-18';
+
+-- myProjects
+SELECT *
+FROM project
+WHERE username = 'arpit';
+
+-- allNotes
+SELECT *
+FROM note
+WHERE columnid = 1;

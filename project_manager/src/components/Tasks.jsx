@@ -50,7 +50,8 @@ const useStyles = createStyles((theme) => ({
   },
   headinger: {
     padding: theme.spacing(1),
-    background: "#FFFFFF",
+    // background: "#FFFFFF",
+    // colorPrimary: "$FF",
   },
   background: {
     backgroundImage: `url(${backgrondimage})`,

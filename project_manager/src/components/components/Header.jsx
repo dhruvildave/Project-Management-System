@@ -22,6 +22,7 @@ import DescriptionIcon from "@material-ui/icons/Description";
 import AssignmentReturnedIcon from "@material-ui/icons/AssignmentReturned";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { Link } from "react-router-dom";
+import { Link as MaterialLink } from "@material-ui/core";
 
 const drawerWidth = 240;
 
@@ -115,119 +116,133 @@ export default function Header(props) {
   };
   const mainListItems = (
     <div>
-      <Link
-        to={{
-          pathname: "/dashboard",
-          state: {
-            username: props.username,
-            authenticated: props.authenticated,
-          },
-        }}
-      >
-        <ListItem button>
-          <ListItemIcon>
-            <DashboardIcon />
-          </ListItemIcon>
-          <ListItemText primary="Dashboard" />
-        </ListItem>
-      </Link>
-      <Link
-        to={{
-          pathname: "/projects",
-          state: {
-            username: props.username,
-            authenticated: props.authenticated,
-            pagename: "projects",
-          },
-        }}
-      >
-        <ListItem button>
-          <ListItemIcon>
-            <AssignmentReturnedIcon />
-          </ListItemIcon>
-          <ListItemText primary="Projects" />
-        </ListItem>
-      </Link>
-      <Link
-        to={{
-          pathname: "/tasks",
-          state: {
-            username: props.username,
-            authenticated: props.authenticated,
-          },
-        }}
-      >
-        <ListItem button>
-          <ListItemIcon>
-            <DescriptionIcon />
-          </ListItemIcon>
-          <ListItemText primary="Tasks" />
-        </ListItem>
-      </Link>
-      <Link
-        to={{
-          pathname: "/reports",
-          state: {
-            username: props.username,
-            authenticated: props.authenticated,
-          },
-        }}
-      >
-        <ListItem button>
-          <ListItemIcon>
-            <LayersIcon />
-          </ListItemIcon>
-          <ListItemText primary="Reports" />
-        </ListItem>
-      </Link>
-      <Link
-        to={{
-          pathname: "/analytics",
-          state: {
-            username: props.username,
-            authenticated: props.authenticated,
-          },
-        }}
-      >
-        <ListItem button>
-          <ListItemIcon>
-            <BarChartIcon />
-          </ListItemIcon>
-          <ListItemText primary="Analytics" />
-        </ListItem>
-      </Link>
-      <Link
-        to={{
-          pathname: "/settings",
-          state: {
-            username: props.username,
-            authenticated: props.authenticated,
-          },
-        }}
-      >
-        <ListItem button>
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText primary="Settings" />
-        </ListItem>
-      </Link>
-      <Link
-        to={{
-          pathname: "/profile",
-          state: {
-            username: props.username,
-            authenticated: props.authenticated,
-          },
-        }}
-      >
-        <ListItem button>
-          <ListItemIcon>
-            <PeopleIcon />
-          </ListItemIcon>
-          <ListItemText primary="Profile" />
-        </ListItem>
-      </Link>
+      <MaterialLink>
+        <Link
+          to={{
+            pathname: "/dashboard",
+            state: {
+              username: props.username,
+              authenticated: props.authenticated,
+            },
+          }}
+        >
+          <ListItem button>
+            <ListItemIcon>
+              <DashboardIcon />
+            </ListItemIcon>
+            <ListItemText primary="Dashboard" />
+          </ListItem>
+        </Link>
+      </MaterialLink>
+      <MaterialLink>
+        <Link
+          to={{
+            pathname: "/projects",
+            state: {
+              username: props.username,
+              authenticated: props.authenticated,
+              pagename: "projects",
+            },
+          }}
+        >
+          <ListItem button>
+            <ListItemIcon>
+              <AssignmentReturnedIcon />
+            </ListItemIcon>
+            <ListItemText primary="Projects" />
+          </ListItem>
+        </Link>
+      </MaterialLink>
+      <MaterialLink>
+        <Link
+          to={{
+            pathname: "/tasks",
+            state: {
+              username: props.username,
+              authenticated: props.authenticated,
+            },
+          }}
+        >
+          <ListItem button>
+            <ListItemIcon>
+              <DescriptionIcon />
+            </ListItemIcon>
+            <ListItemText primary="Tasks" />
+          </ListItem>
+        </Link>
+      </MaterialLink>
+      <MaterialLink>
+        <Link
+          to={{
+            pathname: "/reports",
+            state: {
+              username: props.username,
+              authenticated: props.authenticated,
+            },
+          }}
+        >
+          <ListItem button>
+            <ListItemIcon>
+              <LayersIcon />
+            </ListItemIcon>
+            <ListItemText primary="Reports" />
+          </ListItem>
+        </Link>
+      </MaterialLink>
+      <MaterialLink>
+        <Link
+          to={{
+            pathname: "/analytics",
+            state: {
+              username: props.username,
+              authenticated: props.authenticated,
+            },
+          }}
+        >
+          <ListItem button>
+            <ListItemIcon>
+              <BarChartIcon />
+            </ListItemIcon>
+            <ListItemText primary="Analytics" />
+          </ListItem>
+        </Link>
+      </MaterialLink>
+      <MaterialLink>
+        <Link
+          to={{
+            pathname: "/settings",
+            state: {
+              username: props.username,
+              authenticated: props.authenticated,
+            },
+          }}
+        >
+          <ListItem button>
+            <ListItemIcon>
+              <SettingsIcon />
+            </ListItemIcon>
+            <ListItemText primary="Settings" />
+          </ListItem>
+        </Link>
+      </MaterialLink>
+      <MaterialLink>
+        <Link
+          to={{
+            pathname: "/profile",
+            state: {
+              username: props.username,
+              authenticated: props.authenticated,
+            },
+          }}
+        >
+          <ListItem button>
+            <ListItemIcon>
+              <PeopleIcon />
+            </ListItemIcon>
+            <ListItemText primary="Profile" />
+          </ListItem>
+        </Link>
+      </MaterialLink>
     </div>
   );
 

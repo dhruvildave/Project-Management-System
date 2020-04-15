@@ -41,6 +41,7 @@ class SignUp extends React.Component {
     this.state = {
       first_name: "",
       last_name: "",
+      email: "",
       username: "",
       password: "",
       signup: false,

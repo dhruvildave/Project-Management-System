@@ -14,7 +14,8 @@ import Container from "@material-ui/core/Container";
 import Title from "./components/Title";
 import { Redirect } from "react-router-dom";
 import Copyright from "./components/Copyright";
-
+// import { useAlert } from "react-alert";
+import { withAlert } from "react-alert";
 const useStyles = createStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -54,11 +55,13 @@ class SignIn extends React.Component {
       console.log("login");
       //   history.push("/");
       // this.setState({})
+      this.props.alert.success("Login Sucessfull");
       this.setState({ authenticated: true });
     } else {
       console.log("not login");
     }
   }
+
   render() {
     const { classes } = this.props;
 
@@ -152,4 +155,4 @@ class SignIn extends React.Component {
 SignIn.propTypes = {
   classes: PropTypes.object.isRequired,
 };
-export default withStyles(useStyles)(SignIn);
+export default withAlert()(withStyles(useStyles)(SignIn));

@@ -15,6 +15,8 @@ import AddIcon from "@material-ui/icons/Add";
 import DeleteRounded from "@material-ui/icons/DeleteRounded";
 import ProjectList from "./components/ProjectList";
 import backgrondimage from "./img/background.jpg";
+import ProjectsPage from "./components/ProjectsPage";
+
 const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
@@ -43,7 +45,7 @@ const useStyles = createStyles((theme) => ({
     marginRight: theme.spacing(1),
   },
   divforbutton: {
-    flexDirection: "column",
+    flexDirection: "row",
     padding: theme.spacing(3),
   },
   buttonclass: {
@@ -51,7 +53,7 @@ const useStyles = createStyles((theme) => ({
   },
   headinger: {
     padding: theme.spacing(1),
-    background: "#FFFFFF",
+    // background: "#FFFFFF",
   },
   background: {
     backgroundImage: `url(${backgrondimage})`,
@@ -73,19 +75,21 @@ class Projects extends React.Component {
         ongoing: [
           {
             projectid: 1,
-            name: "A",
+            name: "AAAAAAAAAAAAAAA",
             date: "12-4-20",
             path: "git:arpit-vaghela:a",
             username: "arpit-vaghela",
+            description: "Something there",
           },
         ],
         completed: [
           {
             projectid: 2,
-            name: "B",
+            name: "BBBBBBBBBBBBB",
             date: "12-4-20",
             path: "git:arpit-vaghela:a",
             username: "arpit-vaghela",
+            description: "Something Here",
           },
         ],
       },
@@ -135,7 +139,7 @@ class Projects extends React.Component {
     if (this.state.authenticated === false) {
       return <h1>Not Authenticated Go to Login Page and Login</h1>;
     }
-    let mid;
+    let mid, maincontent;
     const { classes } = this.props;
     const fixedHeightPaper1 = clsx(
       classes.paper,
@@ -151,16 +155,59 @@ class Projects extends React.Component {
 
     if (this.state.pagename === "projects") {
       mid = (
-        <ProjectList
-          projectlist={this.state.projectlist}
-          handleToUpdate={this.handleToUpdate}
-        />
+        <>
+          <div className={classes.divforbutton}>
+            <Fab
+              color="primary"
+              aria-label="add"
+              className={classes.buttonclass}
+              onClick={(event) => this.setState({ pagename: "addproject" })}
+            >
+              <AddIcon />
+            </Fab>
+            <Fab
+              color="secondary"
+              aria-label="delete"
+              className={classes.buttonclass}
+              onClick={(event) => this.setState({ pagename: "deleteproject" })}
+            >
+              <DeleteRounded />
+            </Fab>
+          </div>
+          <ProjectList
+            projectlist={this.state.projectlist}
+            handleToUpdate={this.handleToUpdate}
+          />
+        </>
       );
       aftermid = (
         <Grid item xs={12} md={4} lg={3}>
           <Paper className={fixedHeightPaper}>Bhai Bhai Bhai</Paper>
         </Grid>
       );
+      maincontent = (
+        <Container maxWidth="xl" className={classes.container}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={8} lg={9}>
+              <Paper className={fixedHeightPaper1}>
+                <Typography variant="h3" className={classes.headinger}>
+                  Your Projects
+                </Typography>
+
+                {mid}
+              </Paper>
+            </Grid>
+            {aftermid}
+            <Footer />
+          </Grid>
+          <Box pt={4}>
+            <Copyright />
+          </Box>
+        </Container>
+      );
+    }
+    if (this.state.pagename === "projectpage") {
+      maincontent = <ProjectsPage projectid={this.projectid} />;
     }
 
     return (
@@ -173,45 +220,7 @@ class Projects extends React.Component {
         />
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
-          <Container maxWidth="xl" className={classes.container}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={8} lg={9}>
-                <Paper className={fixedHeightPaper1}>
-                  <Typography variant="h3" className={classes.headinger}>
-                    Your Projects
-                  </Typography>
-                  <div className={classes.divforbutton}>
-                    <Fab
-                      color="primary"
-                      aria-label="add"
-                      className={classes.buttonclass}
-                      onClick={(event) =>
-                        this.setState({ pagename: "addproject" })
-                      }
-                    >
-                      <AddIcon />
-                    </Fab>
-                    <Fab
-                      color="secondary"
-                      aria-label="delete"
-                      className={classes.buttonclass}
-                      onClick={(event) =>
-                        this.setState({ pagename: "deleteproject" })
-                      }
-                    >
-                      <DeleteRounded />
-                    </Fab>
-                  </div>
-                  {mid}
-                </Paper>
-              </Grid>
-              {aftermid}
-              <Footer />
-            </Grid>
-            <Box pt={4}>
-              <Copyright />
-            </Box>
-          </Container>
+          {maincontent}
         </main>
       </div>
     );

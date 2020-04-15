@@ -70,6 +70,7 @@ const useStyles = createStyles((theme) => ({
     justifyContent: "center",
     fontSize: "24",
     padding: "3%",
+    // flexDirection: "row",
   },
   menuButton: {
     padding: "7%",
@@ -135,6 +136,7 @@ const useStyles = createStyles((theme) => ({
   },
   innerpaper: {
     display: "flex",
+    maxWidth: "90%",
   },
   background: {
     backgroundImage: `url(${backgrondimage})`,

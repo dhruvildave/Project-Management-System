@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS projectfiles (
     fileid serial PRIMARY KEY,
     "filename" text CHECK ("filename" ~ '^[\w,\s-]+\.[A-Za-z]+$') NOT NULL,
     "file" bytea NOT NULL,
-    lastupdated date NOT NULL,
+    lastupdated timestamp NOT NULL DEFAULT now(),
     projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE
 );
 

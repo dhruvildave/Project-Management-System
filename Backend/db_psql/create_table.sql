@@ -250,44 +250,43 @@ CREATE OR REPLACE FUNCTION update_status ()
     RETURNS TRIGGER
     AS $$
 DECLARE
+    r int;
     cur1 CURSOR (tid int)
     FOR
         SELECT
-            task
+            task AS t
         FROM
             preqtask
         WHERE
             preqtask = tid;
-BEGIN
-    IF NEW.status = 'completed' THEN
-        FOR record IN cur1 (NEW.taskid)
-        LOOP
-            IF NOT EXISTS (
-                SELECT
-                    status
-                FROM
-                    task
-                WHERE
-                    taskid IN (
-                        SELECT
-                            preqtask
-                        FROM
-                            preqtask
-                        WHERE
-                            task = record)
-                        AND (status != 'completed')) THEN
-                UPDATE
-                    task
-                SET
-                    status = 'active'
-                WHERE
-                    taskid = record;
+    BEGIN
+        IF NEW.status = 'completed' THEN
+            FOR r IN cur1 (NEW.taskid)
+            LOOP
+                IF NOT EXISTS (
+                    SELECT
+                        status
+                    FROM
+                        task
+                    WHERE
+                        taskid IN (
+                            SELECT
+                                preqtask
+                            FROM
+                                preqtask
+                            WHERE
+                                task = r.t)
+                            AND (status != 'completed')) THEN
+                    UPDATE
+                        task
+                    SET
+                        status = 'active'
+                    WHERE
+                        taskid = r.t
+            END IF;
+        END LOOP;
+    END IF;
             RETURN NEW;
-        ELSE
-            RETURN NEW;
-        END IF;
-    END LOOP;
-END IF;
 END
 $$
 LANGUAGE plpgsql;
@@ -492,6 +491,66 @@ END LOOP;
         INSERT INTO preqtask
             VALUES (p, tid);
     END LOOP;
+END
+$$
+LANGUAGE plpgsql;
+
+-- #13 procedure => (check if user is a leader and delete assignedto and preqtask where task is refered)
+CREATE OR REPLACE PROCEDURE deleteTask (tid int, usrname text
+)
+    AS $$
+DECLARE
+    pid int;
+BEGIN
+    SELECT
+        projectid INTO pid
+    FROM
+        task
+    WHERE
+        taskid = tid;
+    IF EXISTS (
+        SELECT
+            1
+        FROM
+            member
+        WHERE
+            username = usrname
+            AND projectid = pid
+            AND ROLE = 'leader') THEN
+    DELETE FROM assignedto
+    WHERE taskid = tid;
+    DELETE FROM preqtask
+    WHERE task = tid;
+    DELETE FROM task
+    WHERE taskid = tid;
+ELSE
+    RAISE exception '% is not a leader', usrname;
+END IF;
+END
+$$
+LANGUAGE plpgsql;
+
+-- #14 procedure =>(set staus to completed if task is assigned to user and also enter current timestamp)
+CREATE OR REPLACE PROCEDURE complete_task (tid int, usr text
+)
+    AS $$
+BEGIN
+    IF EXISTS (
+        SELECT
+            1
+        FROM
+            assignedto
+        WHERE
+            taskid = tid
+            AND username = usr) THEN
+    UPDATE
+        task
+    SET
+        status = 'completed',
+        completiontime = NOW()
+    WHERE
+        taskid = tid;
+END IF;
 END
 $$
 LANGUAGE plpgsql;

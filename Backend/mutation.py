@@ -176,4 +176,17 @@ class addTask(Mutation):
                     assignedby, assignedto, projectid, title, description,
                     startdate, enddate, priority, preqtaskid
                 ])
-        return deleteMember(status=s, msg=m)
+        return addTask(status=s, msg=m)
+
+
+class deleteTask(Mutation):
+    class Arguments:
+        username = String(required=True)
+        taskid = Int(required=True)
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(root, info, username, taskid):
+        s, m = pg.executequery('', [username, taskid])
+        return deleteTask(status=s, msg=m)

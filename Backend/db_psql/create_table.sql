@@ -48,6 +48,8 @@ insert into users values('username','fn','ln','pswd','email',null);
 CREATE TABLE IF NOT EXISTS project (
     projectid serial PRIMARY KEY,
     "name" text NOT NULL,
+    "shortdescription" text,
+    "longdescription" text,
     createdon date NOT NULL, -- Date Of Creation
     "path" text, -- path refers to the path of git repository
     createdby text REFERENCES users (username) ON DELETE CASCADE
@@ -139,7 +141,9 @@ CREATE TABLE IF NOT EXISTS note (
     title text NOT NULL,
     "description" text,
     color text,
-    columnid int REFERENCES board (boardid) ON DELETE CASCADE ON UPDATE CASCADE
+    createdby text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+    createdat timestamp DEFAULT NOW() NOT NULL,
+    boardid int REFERENCES board (boardid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- PL-Blocks
@@ -365,6 +369,33 @@ END
 $$
 LANGUAGE plpgsql;
 
+CREATE PROCEDURE change_projectpath (usr text, newpath text, pid int
+)
+    AS $$
+DECLARE
+    userrole text;
+BEGIN
+    SELECT
+        ROLE INTO userrole
+    FROM
+        member
+    WHERE
+        username = usr
+        AND projectid = pid;
+    IF userrole = 'leader' THEN
+        UPDATE
+            project
+        SET
+            path = newpath
+        WHERE
+            projectid = pid;
+    ELSE
+        RAISE EXCEPTION 'user is not a leader';
+    END IF;
+END
+$$
+LANGUAGE plpgsql;
+
 -- #9 procedure -> add array of members only if all of them are a user
 CREATE OR REPLACE PROCEDURE add_members (usr text, members text[], pid int
 )
@@ -551,6 +582,81 @@ BEGIN
     WHERE
         taskid = tid;
 END IF;
+END
+$$
+LANGUAGE plpgsql;
+
+-- #15 trigger => add a board for a user and each project
+CREATE OR REPLACE FUNCTION add_board ()
+    RETURNS TRIGGER
+    AS $$
+BEGIN
+    IF TG_TABLE_NAME = 'project' THEN
+        INSERT INTO board (title, projectid)
+            VALUES ('Project Board_' || NEW.projectid, NEW.projectid);
+    END IF;
+    IF TG_TABLE_NAME = 'users' THEN
+        INSERT INTO board (title, username)
+            VALUES ('User Board_' || NEW.username, NEW.username);
+    END IF;
+    RETURN NEW;
+END
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER add_board
+    AFTER INSERT ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION add_board ();
+
+CREATE TRIGGER add_board
+    AFTER INSERT ON project
+    FOR EACH ROW
+    EXECUTE FUNCTION add_board ();
+
+-- # 16 trigger => while insert in board rasie exception if both username and projectid is empty
+CREATE OR REPLACE FUNCTION check_board ()
+    RETURNS TRIGGER
+    AS $$
+BEGIN
+    IF NEW.projectid IS NULL AND NEW.username IS NULL THEN
+        RAISE exception 'one of username or project id required';
+        RETURN NULL;
+    ELSE
+        RETURN new;
+    END IF;
+END
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER check_board
+    BEFORE INSERT ON board
+    FOR EACH ROW
+    EXECUTE FUNCTION check_board ();
+
+-- #17 Procedure => add note to project only if user is a member
+CREATE PROCEDURE add_note (usr text, pid int, title text, description text, color text
+)
+    AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT
+            1
+        FROM
+            member
+        WHERE
+            username = usr
+            AND projectid = pid) THEN
+    RAISE exception '% is not a member of the project', usr;
+ELSE
+    INSERT INTO note (title, description, color, boardid, createdby)
+        VALUES (title, description, color, (
+                SELECT
+                    boardid
+                FROM
+                    board
+                WHERE
+                    projectid = pid), usr);
 END
 $$
 LANGUAGE plpgsql;

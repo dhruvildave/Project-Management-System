@@ -9,6 +9,7 @@ import Paper from "@material-ui/core/Paper";
 import Copyright from "./components/Copyright";
 import Footer from "./components/Footer";
 import clsx from "clsx";
+import NotesList from "./components/NotesList";
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -29,10 +30,17 @@ const useStyles = createStyles((theme) => ({
     display: "flex",
     overflow: "auto",
     flexDirection: "column",
+    height: "100%",
   },
   fixedHeight: {
     display: "flex",
     alignItems: "center",
+  },
+  background: {
+    // backgroundImage: `url(${backgrondimage})`,
+    backgroundSize: "cover",
+
+    backgroundRepeat: "no-repeat",
   },
 }));
 
@@ -81,7 +89,11 @@ class Reports extends React.Component {
       return <h1>Not Authenticated Go to Login Page and Login</h1>;
     }
     const { classes } = this.props;
-    const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+    const fixedHeightPaper = clsx(
+      classes.paper,
+      classes.fixedHeight,
+      classes.background
+    );
 
     return (
       <div className={classes.root}>
@@ -98,9 +110,10 @@ class Reports extends React.Component {
               <Grid item xs={12} md={8} lg={9}>
                 <Paper className={fixedHeightPaper}>ok</Paper>
               </Grid>
-              <Grid item xs={12} md={4} lg={3}>
+              {/* <Grid item xs={12} md={4} lg={3}>
                 <Paper className={fixedHeightPaper}></Paper>
-              </Grid>
+              </Grid> */}
+              <NotesList username={this.state.username} />;
               <Footer />
             </Grid>
             <Box pt={4}>

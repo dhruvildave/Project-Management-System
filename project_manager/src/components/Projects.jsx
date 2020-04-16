@@ -19,6 +19,7 @@ import ProjectsPage from "./components/ProjectsPage";
 import AddProject from "./components/AddProject";
 import DeleteProject from "./components/DeleteProject";
 import { withAlert } from "react-alert";
+import NotesList from "./components/NotesList";
 const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
@@ -42,6 +43,7 @@ const useStyles = createStyles((theme) => ({
   fixedHeight: {
     display: "flex",
     alignItems: "center",
+    height: "100%",
   },
   extendedIcon: {
     marginRight: theme.spacing(1),
@@ -154,12 +156,8 @@ class Projects extends React.Component {
       classes.fixedHeight,
       classes.background
     );
-    const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-    let aftermid = (
-      <Grid item xs={12} md={4} lg={3}>
-        <Paper className={fixedHeightPaper}>Bhai Bhai Bhai</Paper>
-      </Grid>
-    );
+    // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+    let aftermid = <NotesList username={this.state.username} />;
 
     if (this.state.pagename === "projects") {
       mid = (
@@ -188,11 +186,7 @@ class Projects extends React.Component {
           />
         </>
       );
-      aftermid = (
-        <Grid item xs={12} md={4} lg={3}>
-          <Paper className={fixedHeightPaper}>Bhai Bhai Bhai</Paper>
-        </Grid>
-      );
+
       maincontent = (
         <Container maxWidth="xl" className={classes.container}>
           <Grid container spacing={3}>

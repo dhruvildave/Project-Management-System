@@ -10,12 +10,10 @@ import Copyright from "./components/Copyright";
 import Footer from "./components/Footer";
 import clsx from "clsx";
 import { Typography } from "@material-ui/core";
-import Fab from "@material-ui/core/Fab";
-import AddIcon from "@material-ui/icons/Add";
-import DeleteRounded from "@material-ui/icons/DeleteRounded";
 import backgrondimage from "./img/background.jpg";
 import TaskView from "./components/TaskView";
 import TaskList from "./components/TasksList";
+import NotesList from "./components/NotesList";
 const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
@@ -39,6 +37,7 @@ const useStyles = createStyles((theme) => ({
   fixedHeight: {
     display: "flex",
     alignItems: "center",
+    height: "100%",
   },
   extendedIcon: {
     marginRight: theme.spacing(1),
@@ -172,12 +171,8 @@ class Tasks extends React.Component {
       classes.fixedHeight,
       classes.background
     );
-    const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-    let aftermid = (
-      <Grid item xs={12} md={4} lg={3}>
-        <Paper className={fixedHeightPaper}>Bhai Bhai Bhai</Paper>
-      </Grid>
-    );
+    // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+    let aftermid = <NotesList username={this.state.username} />;
     if (this.state.pagename === "viewtask") {
       mid = (
         <TaskView
@@ -193,11 +188,6 @@ class Tasks extends React.Component {
           tasklist={this.state.tasklist}
           handleToUpdate={this.handleToUpdate}
         />
-      );
-      aftermid = (
-        <Grid item xs={12} md={4} lg={3}>
-          <Paper className={fixedHeightPaper}>Bhai Bhai Bhai</Paper>
-        </Grid>
       );
     }
 

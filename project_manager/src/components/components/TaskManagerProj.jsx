@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Fab, Grid, Typography, Box } from "@material-ui/core";
+import { Fab, Grid, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/core";
 import { createStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -9,6 +9,9 @@ import AddIcon from "@material-ui/icons/Add";
 import DeleteRounded from "@material-ui/icons/DeleteRounded";
 import TaskList from "./TasksList";
 import TaskView from "./TaskView";
+import DeleteTask from "./DeleteTask";
+import AddTask from "./AddTask";
+
 const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
@@ -69,8 +72,8 @@ class TaskManagerProj extends React.Component {
     this.pageUpdate = this.pageUpdate.bind(this);
     this.handleToUpdate = this.handleToUpdate.bind(this);
   }
-  pageUpdate(pagename) {
-    this.setState({ viewname: pagename });
+  pageUpdate() {
+    this.setState({ viewname: "alltasklist" });
   }
   handleToUpdate(taskid) {
     this.setState({ taskid: taskid, viewname: "viewtask" });
@@ -189,11 +192,30 @@ class TaskManagerProj extends React.Component {
           username={this.state.username}
           projectid={this.state.projectid}
           taskid={this.state.taskid}
+          handleToUpdate={this.pageUpdate}
+        />
+      );
+    }
+    if (this.state.viewname === "deletetask") {
+      mid = (
+        <DeleteTask
+          username={this.state.username}
+          projectid={this.state.projectid}
+          handleToUpdate={this.pageUpdate}
+        />
+      );
+    }
+    if (this.state.viewname === "addtask") {
+      mid = (
+        <AddTask
+          username={this.state.username}
+          projectid={this.state.projectid}
+          handleToUpdate={this.pageUpdate}
         />
       );
     }
     return (
-      <Grid item xs={12} md={8} lg={9} justify="center">
+      <Grid item xs={12} justify="center">
         <Paper className={fixedHeightPaper1} justify="center">
           <Typography variant="h3" component="h3">
             Task List

@@ -5,13 +5,14 @@ import DeleteRounded from "@material-ui/icons/DeleteRounded";
 import { createStyles, withStyles } from "@material-ui/core/styles";
 import Listfileproj from "../assets/listfileproj";
 import { Typography, Paper, CssBaseline, Grid } from "@material-ui/core";
-import { ListItem, List } from "@material-ui/core/";
+import { ListItem, List, Button } from "@material-ui/core/";
 import PeopleIcon from "@material-ui/icons/People";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import { DropzoneDialog } from "material-ui-dropzone";
 import DeleteFile from "./DeleteFile";
+import EditProject from "./EditProject";
 // import Typography from '@material-ui/core/Typography';
 
 const useStyles = createStyles((theme) => ({
@@ -60,7 +61,8 @@ class ProjectFileManager extends React.Component {
   }
   componentWillMount() {
     this.setState({ files: this.props.files, projectid: this.props.projectid });
-    // console.log(this.state.files);
+    this.setState({ states: this.props.stateforedit });
+
     // console.log(this.props.files);
   }
   handleToUpdate(someArg) {
@@ -74,6 +76,7 @@ class ProjectFileManager extends React.Component {
     if (this.setState.viewname === "back") {
       this.props.handleToUpdate();
     }
+    console.log(this.state.states);
   }
   handleClose() {
     this.setState({
@@ -120,6 +123,15 @@ class ProjectFileManager extends React.Component {
         >
           <DeleteRounded />
         </Fab>
+        <Button
+          variant="contained"
+          color="primary"
+          aria-label="edit"
+          className={classes.buttonclass}
+          onClick={(event) => this.setState({ viewname: "editproject" })}
+        >
+          Edit
+        </Button>
         <DropzoneDialog
           open={this.state.open}
           onSave={this.handleSave.bind(this)}
@@ -201,6 +213,21 @@ class ProjectFileManager extends React.Component {
 
     if (this.state.viewname === "deletefile") {
       mid = <DeleteFile handleToUpdate={this.handlePage} />;
+    }
+    if (this.state.viewname === "editproject") {
+      mid = (
+        <EditProject
+          projectid={this.state.projectid}
+          name={this.props.name}
+          date={this.props.date}
+          path={this.props.path}
+          username={this.props.username}
+          shortdescription={this.props.shortdescription}
+          description={this.props.description}
+          members={this.props.members}
+          handleToUpdate={this.handlePage}
+        />
+      );
     }
 
     return [top, mid];

@@ -8,6 +8,7 @@ import clsx from "clsx";
 import Copyright from "./Copyright";
 import ProjectFileManager from "./ProjectFileManager";
 import TaskManagerProj from "./TaskManagerProj";
+import NotesList from "./NotesList";
 const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
@@ -52,6 +53,9 @@ const useStyles = createStyles((theme) => ({
 
     backgroundRepeat: "no-repeat",
   },
+  maxheightpaper: {
+    height: "100%",
+  },
 }));
 
 class ProjectsPage extends React.Component {
@@ -91,26 +95,6 @@ class ProjectsPage extends React.Component {
           fileid: 3,
           filename: "Okay 3",
           lastupdated: "12-35-3566",
-        },
-      ],
-      notes: [
-        {
-          noteid: 1,
-          title: "Okay",
-          description: "hmmm this is one note",
-          color: "red",
-        },
-        {
-          noteid: 2,
-          title: "Okay",
-          description: "hmmm this is one note",
-          color: "blue",
-        },
-        {
-          noteid: 3,
-          title: "Okay",
-          description: "hmmm this is one note",
-          color: "green",
         },
       ],
       tasks: [
@@ -172,10 +156,16 @@ class ProjectsPage extends React.Component {
     let projectmid, notes, tasks;
 
     const { classes } = this.props;
-    const fixedHeightPaper1 = clsx(
+    // const fixedHeightPaper1 = clsx(
+    //   classes.paper,
+    //   classes.fixedHeight,
+    //   classes.background
+    // );
+    const fixedHeightPaper2 = clsx(
       classes.paper,
       classes.fixedHeight,
-      classes.background
+      classes.background,
+      classes.maxheightpaper
     );
     projectmid = (
       <ProjectFileManager
@@ -183,11 +173,17 @@ class ProjectsPage extends React.Component {
         projectid={this.state.projectid}
         members={this.state.members}
         description={this.state.description}
+        shortdescription={this.state.shortdescription}
         date={this.state.date}
+        path={this.state.path}
+        name={this.state.name}
         username={this.state.username}
       />
     );
 
+    notes = (
+      <NotesList username={this.state.username} projid={this.state.projectid} />
+    );
     tasks = (
       <TaskManagerProj
         username={this.state.username}
@@ -200,7 +196,7 @@ class ProjectsPage extends React.Component {
       <Container maxWidth="xl" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={8} lg={9}>
-            <Paper className={fixedHeightPaper1}>
+            <Paper className={fixedHeightPaper2}>
               <Typography variant="h3" className={classes.headinger}>
                 {this.state.name}
               </Typography>

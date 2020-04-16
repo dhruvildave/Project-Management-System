@@ -18,6 +18,7 @@ const useStyles = createStyles((theme) => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
+    padding: theme.spacing(2),
   },
 }));
 class Listdelproj extends React.Component {
@@ -82,18 +83,19 @@ class Listdelproj extends React.Component {
       </>
     ));
     let button = (
-      <Button
-        type="submit"
-        fullWidth
-        variant="contained"
-        color="primary"
-        className={classes.submit}
-        onClick={(event) =>
-          this.props.handleToUpdate(this.state.del, this.state.selected)
-        }
-      >
-        Delete Project
-      </Button>
+      <Grid container justify="center">
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          className={classes.submit}
+          onClick={(event) =>
+            this.props.handleToUpdate(this.state.del, this.state.selected)
+          }
+        >
+          Delete Project
+        </Button>
+      </Grid>
     );
     return [button, list];
   }

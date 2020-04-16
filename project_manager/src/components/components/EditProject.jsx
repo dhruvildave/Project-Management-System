@@ -17,27 +17,38 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-class AddProject extends React.Component {
+class EditProject extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
-      name: "",
+      projectid: 42069,
+      name: "ProjectPage",
       date: "",
       path: "",
-      description: "",
+      username: "",
       shortdescription: "",
+      description: "",
+      files: [],
+      members: [],
     };
     this.handleClick = this.handleClick.bind(this);
   }
   componentWillMount() {
-    if (this.props.username !== undefined) {
-      this.setState({ username: this.props.username });
-    }
+    this.setState({
+      projectid: this.props.projectid,
+      name: this.props.name,
+      date: this.props.date,
+      path: this.props.path,
+      username: this.props.username,
+      shortdescription: this.props.shortdescription,
+      description: this.props.description,
+      members: this.props.members,
+    });
   }
   handleClick(event) {
     event.preventDefault();
     console.log("Clicker");
+    console.log(this.state.members);
     //if success redirect back
     this.props.handleToUpdate();
   }
@@ -59,6 +70,7 @@ class AddProject extends React.Component {
                 id="Name"
                 name="Name"
                 label="Project name"
+                value={this.state.name}
                 fullWidth
                 onChange={(event) =>
                   this.setState({ name: event.target.value })
@@ -73,6 +85,7 @@ class AddProject extends React.Component {
                 id="description1"
                 name="description1"
                 label="Short Description 1"
+                value={this.state.shortdescription}
                 fullWidth
                 onChange={(event) =>
                   this.setState({ shortdescription: event.target.value })
@@ -86,6 +99,7 @@ class AddProject extends React.Component {
                 id="description2"
                 name="description2"
                 label="Description"
+                value={this.state.description}
                 fullWidth
                 onChange={(event) =>
                   this.setState({ description: event.target.value })
@@ -100,6 +114,7 @@ class AddProject extends React.Component {
                 name="path"
                 label="path"
                 fullWidth
+                value={this.state.path}
                 onChange={(event) =>
                   this.setState({ path: event.target.value })
                 }
@@ -112,6 +127,7 @@ class AddProject extends React.Component {
                 id="date"
                 name="date"
                 label="Date"
+                value={this.state.date}
                 defaultValue={today}
                 fullWidth
                 inputProps={{ readOnly: true }}
@@ -120,8 +136,26 @@ class AddProject extends React.Component {
                 }
               />
             </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                id="title"
+                name="titile"
+                label="Member : Enter members in json format [{'username':'ksp','role':'leader'},{}]"
+                fullWidth
+                value={this.state.members[0].username}
+                onChange={(event) => {
+                  this.setState({
+                    members: JSON.parse(event.target.value),
+                  });
+                }}
+                //
+                //   autoComplete="fname"
+              />
+            </Grid>
           </Grid>
         </Paper>
+
         <Button
           type="submit"
           fullWidth
@@ -130,7 +164,7 @@ class AddProject extends React.Component {
           className={classes.submit}
           onClick={(event) => this.handleClick(event)}
         >
-          Add Project
+          Edit Project
         </Button>
         <Button
           type="submit"
@@ -147,4 +181,4 @@ class AddProject extends React.Component {
   }
 }
 
-export default withStyles(useStyles)(AddProject);
+export default withStyles(useStyles)(EditProject);

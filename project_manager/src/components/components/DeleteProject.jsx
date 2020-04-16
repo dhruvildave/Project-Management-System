@@ -1,7 +1,7 @@
 import React from "react";
 import { createStyles, withStyles } from "@material-ui/core/styles";
 import Listdelproj from "../assets/listdelproj";
-import { Grid, Paper } from "@material-ui/core";
+import { Paper } from "@material-ui/core";
 import { withAlert } from "react-alert";
 const useStyles = createStyles((theme) => ({
   avatar: {
@@ -63,27 +63,12 @@ class DeleteProject extends React.Component {
   render() {
     const { classes } = this.props;
     return (
-      <Grid
-        container
-        item
-        xs={12}
-        justify="center"
-        alignItems="center"
-        direction="column"
-      >
-        <Grid
-          container
-          xs={6}
-          justify="center"
-          className={classes.button}
-        ></Grid>
-        <Paper className={classes.root}>
-          <Listdelproj
-            project={this.state.projects}
-            handleToUpdate={this.handleUpdate}
-          />
-        </Paper>
-      </Grid>
+      <Paper className={classes.root}>
+        <Listdelproj
+          project={this.state.projects}
+          handleToUpdate={this.handleUpdate}
+        />
+      </Paper>
     );
   }
 }

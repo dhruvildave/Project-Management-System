@@ -12,6 +12,7 @@ import {
   Paper,
 } from "@material-ui/core";
 import PeopleIcon from "@material-ui/icons/People";
+import EditTask from "./EditTask";
 const useStyles = createStyles((theme) => ({
   avatar: {
     margin: theme.spacing(1),
@@ -44,6 +45,10 @@ class TaskView extends React.Component {
       assignedto: [],
       viewname: "taskdetails", // edit task
     };
+    this.pageUpdate = this.pageUpdate.bind(this);
+  }
+  pageUpdate() {
+    this.setState({ viewname: "taskdetails" });
   }
   componentWillMount() {
     this.setState({
@@ -61,19 +66,15 @@ class TaskView extends React.Component {
       assignedto: [
         {
           username: "Something",
-          role: "leader",
         },
         {
           username: "Something",
-          role: "leader",
         },
         {
           username: "Something",
-          role: "leader",
         },
         {
           username: "Something",
-          role: "leader",
         },
       ],
     });
@@ -155,6 +156,10 @@ class TaskView extends React.Component {
         </List>
       </Paper>
     );
+    if (this.state.viewname === "edittask") {
+      mid = <EditTask states={this.state} handleToUpdate={this.pageUpdate} />;
+      low = null;
+    }
     return [mid, low];
   }
 }

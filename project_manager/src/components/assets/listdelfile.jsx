@@ -3,7 +3,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
-import WorkIcon from "@material-ui/icons/Work";
+import FileCopy from "@material-ui/icons/FileCopy";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { createStyles, withStyles } from "@material-ui/core/styles";
@@ -18,6 +18,10 @@ const useStyles = createStyles((theme) => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
+    padding: theme.spacing(2),
+  },
+  root: {
+    display: "flex",
   },
 }));
 class Listdelfile extends React.Component {
@@ -43,7 +47,7 @@ class Listdelfile extends React.Component {
         <ListItem button>
           <ListItemAvatar>
             <Avatar className={classes.avatar}>
-              <WorkIcon />
+              <FileCopy />
             </Avatar>
           </ListItemAvatar>
           <Grid container direction="column">
@@ -79,18 +83,19 @@ class Listdelfile extends React.Component {
       </>
     ));
     let button = (
-      <Button
-        type="submit"
-        fullWidth
-        variant="contained"
-        color="primary"
-        className={classes.submit}
-        onClick={(event) =>
-          this.props.handleToUpdate(this.state.del, this.state.selected)
-        }
-      >
-        Delete File/Files
-      </Button>
+      <Grid container justify="center">
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          className={classes.submit}
+          onClick={(event) =>
+            this.props.handleToUpdate(this.state.del, this.state.selected)
+          }
+        >
+          Delete File/Files
+        </Button>
+      </Grid>
     );
     return [button, list];
   }

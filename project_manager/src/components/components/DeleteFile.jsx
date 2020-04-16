@@ -1,7 +1,7 @@
 import React from "react";
 import { createStyles, withStyles } from "@material-ui/core/styles";
 import Listdelfile from "../assets/listdelfile";
-import { Grid, Paper } from "@material-ui/core";
+import { Paper } from "@material-ui/core";
 import { withAlert } from "react-alert";
 const useStyles = createStyles((theme) => ({
   avatar: {
@@ -56,27 +56,14 @@ class DeleteProject extends React.Component {
   render() {
     const { classes } = this.props;
     return (
-      <Grid
-        container
-        item
-        xs={12}
-        justify="center"
-        alignItems="center"
-        direction="column"
-      >
-        <Grid
-          container
-          xs={6}
-          justify="center"
-          className={classes.button}
-        ></Grid>
-        <Paper className={classes.root}>
-          <Listdelfile
-            file={this.state.files}
-            handleToUpdate={this.handleUpdate}
-          />
-        </Paper>
-      </Grid>
+      // <Grid container item xs={12} justify="center" direction="column">
+      <Paper className={classes.root}>
+        <Listdelfile
+          file={this.state.files}
+          handleToUpdate={this.handleUpdate}
+        />
+      </Paper>
+      // </Grid>
     );
   }
 }

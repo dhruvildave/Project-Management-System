@@ -32,7 +32,7 @@ class Query(ObjectType):
                        args={
                            'username': String(required=True),
                            'project_filter': String()
-                       })
+    })
     getProject = Field(Object.Project,
                        args={
                            'username': String(required=True),

@@ -57,46 +57,6 @@ class AddProject extends React.Component {
     } else {
       this.setState({ fetchmethod: "project" });
     }
-    this.setState({
-      notes: [
-        {
-          noteid: 1,
-          title: "Okay",
-          description: "hmmm this is one note",
-          color: "red",
-        },
-        {
-          noteid: 2,
-          title: "Okay",
-          description: "hmmm this is one note",
-          color: "blue",
-        },
-        {
-          noteid: 3,
-          title: "Okay",
-          description: "hmmm this is one note",
-          color: "green",
-        },
-        {
-          noteid: 1,
-          title: "Okay",
-          description: "hmmm this is one note",
-          color: "red",
-        },
-        {
-          noteid: 2,
-          title: "Okay",
-          description: "hmmm this is one note",
-          color: "blue",
-        },
-        {
-          noteid: 3,
-          title: "Okay",
-          description: "hmmm this is one note",
-          color: "green",
-        },
-      ],
-    });
 
     ///fetch notes here
   }

@@ -1,12 +1,23 @@
-mutation {
-  createUser(firstname:"Arpit",lastname:"Vaghela",username:"arpit91",emailid:"arpitvaghela@gmail.com",password:"Password1"){
-      msg
-      status
+mutation{
+  createUser(username:"arpit921",firstname:"Arpit",lastname:"Vaghela",password:"Password1",emailid:"arpitvaghela9210@gmail.com"){
+    status
+    msg
   }
 }
-
-mutation {
-  deleteUser(username:"arpit91"){
+mutation{
+  changePassword(username:"arpit921",newpassword:"Aa1", oldpassword:"Password1"){
+    status
+    msg
+  }
+}
+mutation{
+  changeName(username:"arpit921",newfirstname:"Alpha", newlastname:"Beta"){
+    status
+    msg
+  }
+}
+mutation{
+  deleteUser(username:"arpit921"){
     status
     msg
   }

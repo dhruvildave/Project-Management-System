@@ -64,6 +64,11 @@ class deleteUser(Mutation):
         return deleteUser(status=s, msg=m)
 
 
+class InputMember(InputObjectType):
+    username = String(required=True)
+    role = String()
+
+
 class createProject(Mutation):
     class Arguments:
         username = String(required=True)
@@ -71,7 +76,7 @@ class createProject(Mutation):
         longdescription = String()
         shortdescription = String()
         path = String()
-        members = List(List(String))
+        members = List(InputMember)
 
     status = Boolean(required=True)
     msg = String()
@@ -84,9 +89,12 @@ class createProject(Mutation):
                shortdescription=None,
                path=None,
                members=None):
+        usernames = [x.username for x in members]
+        roles = [x.role for x in members]
+        m = [[x, y] for x, y in zip(usernames, roles)]
         s, m = pg.executequery(
             "call create_project(%s,%s,%s,%s,%s,%s);",
-            [username, name, longdescription, shortdescription, path, members])
+            [username, name, longdescription, shortdescription, path, m])
         return createProject(status=s, msg=m)
 
 
@@ -104,19 +112,37 @@ class deleteProject(Mutation):
         return deleteProject(status=s, msg=m)
 
 
-class changeProjectName(Mutation):
+class editProject(Mutation):
     class Arguments:
         username = String(required=True)
         projectid = Int(required=True)
-        newname = String(required=True)
+        name = String(required=True)
+        shortdescription = String()
+        longdescription = String()
+        path = String()
+        members = List(InputMember)
 
     status = Boolean(required=True)
     msg = String()
 
-    def mutate(root, info, username, newname, projectid):
-        s, m = pg.executequery("CALL change_projectname(%s,%s,%s);",
-                               [username, newname, projectid])
-        return changeProjectName(status=s, msg=m)
+    def mutate(root,
+               info,
+               username,
+               name,
+               projectid,
+               shortdescription=None,
+               longdescription=None,
+               path=None,
+               members=None):
+        usernames = [x.username for x in members]
+        roles = [x.role for x in members]
+        m = [[x, y] for x, y in zip(usernames, roles)]
+
+        s, m = pg.executequery("call edit_project (%s,%s,%s,%s,%s,%s,%s);", [
+            username, projectid, name, shortdescription, longdescription, path,
+            m
+        ])
+        return editProject(status=s, msg=m)
 
 
 class changeProjectPath(Mutation):

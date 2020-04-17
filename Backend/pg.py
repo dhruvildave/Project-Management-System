@@ -9,7 +9,7 @@ import psycopg2 as db
 def executequery(sql, data):
     '''Establish connection'''
 
-    DSN = "dbname='pms' user='dhruvil' password='ab::12097Ef'"
+    DSN = "dbname='pms' user='arpit' host='localhost' password='1let2me3in'"
     try:
         with db.connect(DSN) as conn:
 

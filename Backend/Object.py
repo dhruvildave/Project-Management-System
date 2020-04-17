@@ -92,3 +92,55 @@ class Project(ObjectType):
 
     def resolve_members(parent, info):
         return parent.members
+
+
+class Task(ObjectType):
+
+    taskid = Int()
+    title = String()
+    description = String()
+    starttime = types.DateTime()
+    endtime = types.DateTime()
+    completiontime = types.DateTime()
+    status = String()
+    priority = String()
+    projectid = Int()
+    assignedby = String()
+    assignedto = List(User)
+    preqtask = List(Int)
+
+    def resolve_taskid(parent, info):
+        return parent.taskid
+
+    def resolve_title(parent, info):
+        return parent.title
+
+    def resolve_description(parent, info):
+        return parent.description
+
+    def resolve_starttime(parent, info):
+        return parent.time
+
+    def resolve_endtime(parent, info):
+        return parent.endtime
+
+    def resolve_completiontime(parent, info):
+        return parent.completiontime
+
+    def resolve_status(parent, info):
+        return parent.status
+
+    def resolve_priority(parent, info):
+        return parent.priority
+
+    def resolve_projectid(parent, info):
+        return parent.projectid
+
+    def resolve_assignedby(parent, info):
+        return query.f_getuser(parent.assignedby)
+
+    def resolve_assignedto(parent, info):
+        return [query.f_getuser(x) for x in parent.assignedto]
+
+    def resolve_preqtask(parent, info):
+        return parent.preqtask

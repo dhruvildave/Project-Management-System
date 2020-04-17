@@ -40,6 +40,17 @@ class Query(ObjectType):
                        })
     projectNotes = Field(List(Object.Note),
                          args={'projectid': Int(required=True)})
+    myTasks = Field(List(Object.Task),
+                    args={
+                        'username': String(required=True),
+                        'taskFilter': String()
+                    })
+    ProjectTasks = Field(List(Object.Task),
+                         args={
+                             'username': String(required=True),
+                             'projectid': Int(required=True),
+                             'taskFilter': String()
+                         })
 
     # our Resolver method takes the GraphQL context (root, info) as well as
     # Argument (name) for the Field and returns data for the query Response
@@ -58,8 +69,14 @@ class Query(ObjectType):
     def resolve_getProjects(root, info, username, projectid):
         return query.f_getproject(username, projectid)
 
-    def resolve_proectNotes(root, info, projectid):
+    def resolve_projectNotes(root, info, projectid):
         return query.f_projectNotes(projectid)
+
+    def resolve_myTasks(root, info, username, taskFilter=None):
+        return query.f_getmytask(username, taskFilter)
+
+    def resolve_ProjectTasks(root, info, username, projectid, taskFilter=None):
+        return query.f_getprojecttask(username, projectid, taskFilter)
 
 
 class Mutation(ObjectType):

@@ -526,7 +526,7 @@ END LOOP;
     IF preqtaskid IS NOT NULL THEN
         foreach p IN ARRAY preqtaskid LOOP
             INSERT INTO preqtask
-                VALUES (p, tid);
+                VALUES (tid, p);
         END LOOP;
     END IF;
 END
@@ -1195,28 +1195,40 @@ $$
 LANGUAGE plpgsql;
 
 -- # trigger => update project status to completed if all task are completed
-CREATE OR REPLACE FUNCTION check_projectstatus () RETURNS TRIGGER AS $check_projectstatus$
+CREATE OR REPLACE FUNCTION check_projectstatus ()
+    RETURNS TRIGGER
+    AS $check_projectstatus$
 BEGIN
     IF EXISTS (
-        SELECT *
-        FROM task
-        WHERE projectid = NEW.projectid AND status != 'completed'
-    ) THEN
-        UPDATE project
-        SET status = 'ongoing'
-        WHERE projectid = NEW.projectid;
-    ELSE
-        UPDATE project
-        SET status = 'completed'
-        WHERE projectid = NEW.projectid;
-    END IF;
+        SELECT
+            *
+        FROM
+            task
+        WHERE
+            projectid = NEW.projectid
+            AND status != 'completed') THEN
+    UPDATE
+        project
+    SET
+        status = 'ongoing'
+    WHERE
+        projectid = NEW.projectid;
+ELSE
+    UPDATE
+        project
+    SET
+        status = 'completed'
+    WHERE
+        projectid = NEW.projectid;
+END IF;
     RETURN new;
 END;
-$check_projectstatus$ LANGUAGE plpgsql;
+$check_projectstatus$
+LANGUAGE plpgsql;
 
-CREATE TRIGGER check_projectstatus AFTER INSERT OR UPDATE ON task
+CREATE TRIGGER check_projectstatus
+    AFTER INSERT OR UPDATE ON task
     EXECUTE FUNCTION check_projectstatus ();
-
 
 -- procedure => get project given pid and username
 CREATE OR REPLACE FUNCTION getproject (text, int)
@@ -1262,6 +1274,168 @@ WHERE
 GROUP BY
     projectid;
 END IF;
+    RETURN;
+END
+$$
+LANGUAGE plpgsql;
+
+-- # check if user is a member
+CREATE FUNCTION check_member (text, int)
+    RETURNS boolean
+    AS $$
+BEGIN
+    RETURN
+    SELECT
+        EXISTS (
+            SELECT
+                1
+            FROM
+                member
+            WHERE
+                projectid = $2
+                AND username = $1);
+END
+$$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION project_task (text, int, text = NULL)
+    RETURNS TABLE (
+        tid int,
+        t text,
+        des text,
+        st timestamp,
+        et timestamp,
+        ct timestamp,
+        s text,
+        p text,
+        pid int,
+        BY text,
+        assignedto text[],
+        preqid int[]
+    )
+    AS $$
+BEGIN
+    IF (
+        SELECT
+            check_member ($1, $2)) THEN
+        IF $3 IS NOT NULL THEN
+            RETURN query
+            SELECT
+                taskid,
+                title,
+                description,
+                starttime,
+                endtime,
+                completiontime,
+                status::text,
+                priority::text,
+                projectid,
+                assignedby,
+                array_agg(assignedto.username) AS assignedto,
+                array_agg(preqtask.preqtask) AS preqtask
+            FROM (task
+            NATURAL JOIN assignedto)
+        LEFT OUTER JOIN preqtask ON (assignedto.taskid = preqtask.task)
+    WHERE
+        projectid = $2
+        AND status = $3::status_type
+    GROUP BY
+        taskid;
+        ELSE
+            RETURN query
+            SELECT
+                taskid,
+                title,
+                description,
+                starttime,
+                endtime,
+                completiontime,
+                status::text,
+                priority::text,
+                projectid,
+                assignedby,
+                array_agg(assignedto.username) AS assignedto,
+                array_agg(preqtask.preqtask) AS preqtask
+            FROM (task
+            NATURAL JOIN assignedto)
+        LEFT OUTER JOIN preqtask ON (assignedto.taskid = preqtask.task)
+    WHERE
+        projectid = $2
+    GROUP BY
+        taskid;
+        END IF;
+    ELSE
+        RAISE exception 'user is not a member';
+    END IF;
+    RETURN;
+END
+$$
+LANGUAGE plpgsql;
+
+-- function my_task
+CREATE OR REPLACE FUNCTION my_task (text, text = NULL)
+    RETURNS TABLE (
+        tid int,
+        t text,
+        des text,
+        st timestamp,
+        et timestamp,
+        ct timestamp,
+        s text,
+        p text,
+        pid int,
+        BY text,
+        assignedto text[],
+        preqid int[]
+    )
+    AS $$
+BEGIN
+    IF $2 IS NOT NULL THEN
+        RETURN query
+        SELECT
+            taskid,
+            title,
+            description,
+            starttime,
+            endtime,
+            completiontime,
+            status::text,
+            priority::text,
+            projectid,
+            assignedby,
+            array_agg(assignedto.username) AS assignedto,
+            array_agg(preqtask.preqtask) AS preqtask
+        FROM (task
+        NATURAL JOIN assignedto)
+    LEFT OUTER JOIN preqtask ON (assignedto.taskid = preqtask.task)
+WHERE
+    assignedto.username = $1
+    AND status = $2::status_type
+GROUP BY
+    taskid;
+    ELSE
+        RETURN query
+        SELECT
+            taskid,
+            title,
+            description,
+            starttime,
+            endtime,
+            completiontime,
+            status::text,
+            priority::text,
+            projectid,
+            assignedby,
+            array_agg(assignedto.username) AS assignedto,
+            array_agg(preqtask.preqtask) AS preqtask
+        FROM (task
+        NATURAL JOIN assignedto)
+    LEFT OUTER JOIN preqtask ON (assignedto.taskid = preqtask.task)
+WHERE
+    assignedto.username = $1
+GROUP BY
+    taskid;
+    END IF;
     RETURN;
 END
 $$

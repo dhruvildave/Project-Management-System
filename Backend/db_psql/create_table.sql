@@ -52,7 +52,8 @@ CREATE TABLE IF NOT EXISTS project (
     "longdescription" text,
     createdon date NOT NULL, -- Date Of Creation
     "path" text, -- path refers to the path of git repository
-    createdby text REFERENCES users (username) ON DELETE CASCADE
+    createdby text REFERENCES users (username) ON DELETE CASCADE,
+    UNIQUE (name, createdby)
 );
 
 
@@ -387,6 +388,18 @@ $$
 LANGUAGE plpgsql;
 
 -- #9 procedure -> create project and add members
+--
+--
+-- {
+--   "data": {
+--     "createProject": {
+--       "status": false,
+--       "msg": "ERROR:  duplicate key value violates unique constraint \"member_pkey\"\nDETAIL:  Key (username, projectid)=(dhruvil91, 12) already exists.\nCONTEXT:  SQL statement \"INSERT INTO member\n            VALUES (mem[1]::text, pid, mem[2]::role_type)\"\nPL/pgSQL function create_project(text,text,text,text,text,text[]) line 11 at SQL statement\n"
+--     }
+--   }
+-- }
+--
+--
 CREATE OR REPLACE PROCEDURE create_project (usr text, name text, sd text, ld text, path text, members text[][]
 )
     AS $$

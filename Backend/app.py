@@ -1,15 +1,19 @@
 # Imports
+from graphene import ObjectType, String, Schema, Boolean, Field, List, NonNull
 from flask import Flask
 from flask_graphql import GraphQLView
+from flask_cors import CORS as cors
 import pg
-# initializing our app
-app = Flask(__name__)
-app.debug = True
 
-from graphene import ObjectType, String, Schema, Boolean, Field, List, NonNull
 import mutation
 import query
 import Object
+
+# initializing our app
+app = Flask(__name__)
+cors(app)
+app.debug = True
+
 
 
 class Query(ObjectType):
@@ -66,6 +70,7 @@ schema = Schema(query=Query, mutation=Mutation)
 
 
 @app.route('/')
+# @cors_origin()
 def index():
     return '<html><body><h1>Welcome API 2.0</h1><code>path: /graphql-api<code></body></html>'
 

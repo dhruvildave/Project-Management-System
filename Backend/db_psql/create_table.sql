@@ -720,6 +720,40 @@ $$
 LANGUAGE plpgsql;
 
 -- projectReport
+CREATE OR REPLACE FUNCTION gen_project_report (pid integer)
+    RETURNS TABLE (
+        KEY text,
+        value int
+    )
+    AS $$
+DECLARE
+    inactive int;
+    active int;
+BEGIN
+    SELECT
+        COUNT(*) INTO inactive
+    FROM
+        task t
+    WHERE
+        t.projectid = pid
+        AND status = 'inactive';
+    SELECT
+        COUNT(*) INTO active
+    FROM
+        task t
+    WHERE
+        t.projectid = pid
+        AND status = 'active';
+    CREATE TEMP TABLE report (
+        key text PRIMARY KEY,
+        value int
+    );
+INSERT INTO report
+    VALUES ("inactive", inactive), ("active", active);
+END;
+$$
+LANGUAGE plpgsql;
+
 SELECT
     COUNT(*)
 FROM

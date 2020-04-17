@@ -66,21 +66,27 @@ class deleteUser(Mutation):
 
 class createProject(Mutation):
     class Arguments:
-        name = String()
-        createdby = String()
+        username = String(required=True)
+        name = String(required=True)
+        longdescription = String()
+        shortdescription = String()
         path = String()
+        members = List(List(String))
 
     status = Boolean(required=True)
     msg = String()
 
-    def mutate(root, info, name, createdby, path=None):
+    def mutate(root,
+               info,
+               username,
+               name,
+               longdescription=None,
+               shortdescription=None,
+               path=None,
+               members=None):
         s, m = pg.executequery(
-            "INSERT INTO project(name, createdon, path, createdby) VALUES (%s, CURRENT_DATE, %s,%s);",
-            [
-                name,
-                path,
-                createdby,
-            ])
+            "call create_project(%s,%s,%s,%s,%s,%s);",
+            [username, name, longdescription, shortdescription, path, members])
         return createProject(status=s, msg=m)
 
 
@@ -126,21 +132,6 @@ class changeProjectPath(Mutation):
         s, m = pg.executequery("change_projectpath(%s,%s,%s);",
                                [username, newpath, projectid])
         return changeProjectName(status=s, msg=m)
-
-
-class addMembers(Mutation):
-    class Arguments:
-        username = String(required=True)
-        projectid = Int(required=True)
-        members = NonNull(List(NonNull(String)))
-
-    status = Boolean(required=True)
-    msg = String()
-
-    def mutate(root, info, username, members, projectid):
-        s, m = pg.executequery("CALL add_members(%s,%s,%s);",
-                               [username, members, projectid])
-        return addMembers(status=s, msg=m)
 
 
 class deleteMember(Mutation):
@@ -192,6 +183,41 @@ class addTask(Mutation):
                     startdate, enddate, priority, preqtaskid
                 ])
         return addTask(status=s, msg=m)
+
+
+class updateTask(Mutation):
+    class Arguments:
+        username = String(required=True)
+        taskid = Int(required=True)
+        title = String(required=True)
+        description = String()
+        starttime = types.DateTime()
+        endtime = types.DateTime()
+        priority = String()
+        preqtaskid = List(NonNull(Int))
+        assignedto = NonNull(List(NonNull(String)))
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(
+        root,
+        info,
+        username,
+        taskid,
+        title,
+        assignedto,
+        preqtaskid,
+        description=None,
+        startdate=None,
+        enddate=None,
+        priority=None,
+    ):
+        s, m = pg.executequery(
+            'call edit_task (%s,%s,%s,%s,%s,%s,%s,%s,%s::integer[]);', [
+                username, taskid, assignedto, title, description, startdate,
+                enddate, priority, preqtaskid
+            ])
 
 
 class deleteTask(Mutation):

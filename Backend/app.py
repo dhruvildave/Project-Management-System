@@ -1,24 +1,49 @@
 # Imports
+from graphene import ObjectType, String, Schema, Boolean, Field, List, NonNull
 from flask import Flask
 from flask_graphql import GraphQLView
+from flask_cors import CORS as cors
 import pg
+
+import mutation
+import query
+import Object
+
 # initializing our app
 app = Flask(__name__)
+cors(app)
 app.debug = True
-
-from graphene import ObjectType, String, Schema
-import mutation
 
 
 class Query(ObjectType):
     # this defines a Field `hello` in our Schema with a single Argument `name`
-    hello = String(name=String(default_value="stranger"))
-    goodbye = String()
+    authenticate = Field(Boolean,
+                         args={
+                             'username': String(required=True),
+                             'password': String(required=True)
+                         })
+
+    getUser = Field(Object.User, args={'username': String(required=True)})
+
+    myNotes = Field(List(Object.Note),
+                    args={'username': String(required=True)})
+
+    myProjects = Field(List(Object.Project),
+                       args={'username': String(required=True)})
 
     # our Resolver method takes the GraphQL context (root, info) as well as
     # Argument (name) for the Field and returns data for the query Response
-    def resolve_hello(root, info):
-        return 'Hello'
+    def resolve_authenticate(root, info, username, password):
+        return query.f_authenticate(username, password)
+
+    def resolve_getUser(root, info, username):
+        return query.f_getuser(username)
+
+    def resolve_myNotes(root, info, username):
+        return query.f_mynotes(username)
+
+    def resolve_myProjects(root, info, username):
+        return query.f_myprojects(username)
 
 
 class Mutation(ObjectType):
@@ -30,9 +55,9 @@ class Mutation(ObjectType):
     delete_project = mutation.deleteProject.Field()
     change_projectname = mutation.changeProjectName.Field()
     change_projectpath = mutation.changeProjectPath.Field()
-    add_member = mutation.addMembers.Field()
     delete_member = mutation.deleteMember.Field()
     add_task = mutation.addTask.Field()
+    update_task = mutation.updateTask.Field()
     delete_task = mutation.deleteTask.Field()
     complete_task = mutation.completeTask.Field()
     add_note = mutation.addNote.Field()
@@ -44,6 +69,7 @@ schema = Schema(query=Query, mutation=Mutation)
 
 
 @app.route('/')
+# @cors_origin()
 def index():
     return '<html><body><h1>Welcome API 2.0</h1><code>path: /graphql-api<code></body></html>'
 

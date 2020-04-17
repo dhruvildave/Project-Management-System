@@ -11,6 +11,18 @@ mutation {
     msg
   }
 }
+mutation{
+  createProject(username:"arpit921",
+    name:"Project2",
+    shortdescription:"description1",
+    longdescription:"description2",
+    members:[["kaushal-patil","leader"],["dhruvil-dave","leader"]]
+  ){
+    status
+    msg
+  }
+}
+
 mutation {
   changeName(newfirstname:"Alpha",newlastname:"Beta",username:"arpit91"){
       msg
@@ -42,5 +54,36 @@ mutation{
   addMember(projectid:2,username:"arpit-vaghela",members:["panth-pate","prachee-javiya"]){
     status
     msg
+  }
+}
+
+mutation{
+  addNote(title:"Note2",description:"Why ppl Y ???",username:"arpit921"){
+  status
+  msg
+}
+}
+
+{
+  myProjects(username:"arpit921"){
+    projectid
+    name
+    shortdescription
+    longdescription
+    createdon
+    path
+    createdby{
+      username
+      firstname
+      lastname
+    }
+    members{
+        user{
+          username
+          firstname
+          lastname
+        }
+        role
+    }
   }
 }

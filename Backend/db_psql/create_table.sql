@@ -440,7 +440,7 @@ BEGIN
         users
     WHERE
         username = usr;
-    IF pswmatch THEN
+    IF pswmatch AND newpswd !~ '(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,72}$' THEN
         UPDATE
             users
         SET

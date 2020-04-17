@@ -29,7 +29,10 @@ class Query(ObjectType):
                     args={'username': String(required=True)})
 
     myProjects = Field(List(Object.Project),
-                       args={'username': String(required=True)})
+                       args={
+                           'username': String(required=True),
+                           'project_filter': String()
+                       })
 
     # our Resolver method takes the GraphQL context (root, info) as well as
     # Argument (name) for the Field and returns data for the query Response
@@ -42,8 +45,8 @@ class Query(ObjectType):
     def resolve_myNotes(root, info, username):
         return query.f_mynotes(username)
 
-    def resolve_myProjects(root, info, username):
-        return query.f_myprojects(username)
+    def resolve_myProjects(root, info, username, project_filter=None):
+        return query.f_myprojects(username, project_filter)
 
 
 class Mutation(ObjectType):

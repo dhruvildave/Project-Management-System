@@ -42,8 +42,8 @@ Project = namedtuple("Project", [
 Member = namedtuple("Member", ['user', 'role'])
 
 
-def f_myprojects(username):
-    data = pg.executequery2('select * from myprojects(%s)', [username])
+def f_myprojects(username, f):
+    data = pg.executequery2('select * from myprojects(%s,%s)', [username, f])
 
     return [
         Project(x[0], x[1], x[2], x[3], x[4], x[5], x[6],

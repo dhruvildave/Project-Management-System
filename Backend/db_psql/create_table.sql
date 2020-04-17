@@ -596,7 +596,7 @@ $$
 LANGUAGE plpgsql;
 
 -- #13 procedure => (check if user is a leader and delete assignedto and preqtask where task is refered)
-CREATE OR REPLACE PROCEDURE deleteTask (tid int, usrname text
+CREATE OR REPLACE PROCEDURE delete_task (tid int, usrname text
 )
     AS $$
 DECLARE
@@ -1205,17 +1205,21 @@ BEGIN
         FROM
             task
         WHERE
-            projectid = OLD.projectid
+            projectid = NEW.projectid
             AND status != 'completed') THEN
     UPDATE
         project
     SET
-        status = 'ongoing';
+        status = 'ongoing'
+    WHERE
+        projectid = NEW.projectid;
 ELSE
     UPDATE
         project
     SET
-        status = 'complete';
+        status = 'completed'
+    WHERE
+        projectid = NEW.projectid;
 END IF;
     RETURN new;
 END
@@ -1223,5 +1227,5 @@ $$
 LANGUAGE plpgsql;
 
 CREATE TRIGGER project_status
-    AFTER INSERT ON task
+    AFTER INSERT OR UPDATE ON task
     EXECUTE PROCEDURE check_projectstatus ();

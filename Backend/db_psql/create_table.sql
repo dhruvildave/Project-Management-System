@@ -417,7 +417,7 @@ BEGIN
         VALUES (name, sd, ld, CURRENT_DATE, path, usr)
     RETURNING
         projectid INTO pid;
-    IF array_length(mem, 1) > 0 THEN
+    IF array_length(members, 1) > 0 THEN
         FOREACH mem slice 1 IN ARRAY members LOOP
             INSERT INTO member
                 VALUES (mem[1]::text, pid, mem[2]::role_type);
@@ -1230,3 +1230,52 @@ LANGUAGE plpgsql;
 CREATE TRIGGER project_status
     AFTER INSERT OR UPDATE ON task
     EXECUTE PROCEDURE check_projectstatus ();
+
+-- procedure => get project given pid and username
+CREATE OR REPLACE FUNCTION getproject (text, int)
+    RETURNS TABLE (
+        pid int,
+        projectname text,
+        sd text,
+        ld text,
+        DOC date,
+        projectpath text,
+        OWNER text,
+        members text[],
+        roles text[]
+    )
+    AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT
+            1
+        FROM
+            member
+        WHERE
+            username = $1
+            AND projectid = $2) THEN
+    RAISE exception 'user is not a member';
+ELSE
+    RETURN QUERY
+    SELECT
+        projectid AS pid,
+        name AS projectname,
+        shortdescription AS sd,
+        longdescription AS ld,
+        createdon AS DOC,
+        path AS projectpath,
+        createdby AS OWNER,
+        array_agg(username) AS members,
+        array_agg(ROLE)::text[] AS roles
+    FROM
+        project
+    NATURAL JOIN member
+WHERE
+    projectid = $2
+GROUP BY
+    projectid;
+END IF;
+    RETURN;
+END
+$$
+LANGUAGE plpgsql;

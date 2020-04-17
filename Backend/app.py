@@ -1,5 +1,5 @@
 # Imports
-from graphene import ObjectType, String, Schema, Boolean, Field, List, NonNull
+from graphene import ObjectType, String, Int, Schema, Boolean, Field, List, NonNull
 from flask import Flask
 from flask_graphql import GraphQLView
 from flask_cors import CORS as cors
@@ -33,6 +33,13 @@ class Query(ObjectType):
                            'username': String(required=True),
                            'project_filter': String()
                        })
+    getProject = Field(Object.Project,
+                       args={
+                           'username': String(required=True),
+                           'projectid': Int(required=True)
+                       })
+    projectNotes = Field(List(Object.Note),
+                         args={'projectid': Int(required=True)})
 
     # our Resolver method takes the GraphQL context (root, info) as well as
     # Argument (name) for the Field and returns data for the query Response
@@ -47,6 +54,12 @@ class Query(ObjectType):
 
     def resolve_myProjects(root, info, username, project_filter=None):
         return query.f_myprojects(username, project_filter)
+
+    def resolve_getProjects(root, info, username, projectid):
+        return query.f_getproject(username, projectid)
+
+    def resolve_proectNotes(root, info, projectid):
+        return query.f_projectNotes(projectid)
 
 
 class Mutation(ObjectType):

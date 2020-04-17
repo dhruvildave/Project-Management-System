@@ -143,27 +143,8 @@ mutation {
   }
 }
 
-mutation {
-  changeProjectname(
-    projectid: 2
-    newname: "The project"
-    username: "arpit-vaghela"
-  ) {
-    status
-    msg
-  }
-}
 
-mutation {
-  addMember(
-    projectid: 2
-    username: "arpit-vaghela"
-    members: ["panth-pate", "prachee-javiya"]
-  ) {
-    status
-    msg
-  }
-}
+
 
 mutation {
   addNote(title: "Note1", description: "Why ppl Y ???", username: "arpit91") {

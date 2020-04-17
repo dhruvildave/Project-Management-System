@@ -41,6 +41,11 @@ CREATE TABLE IF NOT EXISTS users (
     profilepic bytea
 );
 
+CREATE TYPE project_status AS enum (
+    'completed',
+    'ongoing'
+);
+
 
 /*
 insert into users values('username','fn','ln','pswd','email',null);
@@ -53,6 +58,7 @@ CREATE TABLE IF NOT EXISTS project (
     createdon date NOT NULL, -- Date Of Creation
     "path" text, -- path refers to the path of git repository
     createdby text REFERENCES users (username) ON DELETE CASCADE,
+    status project_status DEFAULT 'completed' NOT NULL,
     UNIQUE (name, createdby)
 );
 
@@ -398,6 +404,7 @@ LANGUAGE plpgsql;
 -- }
 --
 --
+
 CREATE OR REPLACE PROCEDURE create_project (usr text, name text, sd text, ld text, path text, members text[][]
 )
     AS $$
@@ -409,10 +416,12 @@ BEGIN
         VALUES (name, sd, ld, CURRENT_DATE, path, usr)
     RETURNING
         projectid INTO pid;
-    FOREACH mem slice 1 IN ARRAY members LOOP
-        INSERT INTO member
-            VALUES (mem[1]::text, pid, mem[2]::role_type);
-    END LOOP;
+    IF mem IS NOT NULL THEN
+        FOREACH mem slice 1 IN ARRAY members LOOP
+            INSERT INTO member
+                VALUES (mem[1]::text, pid, mem[2]::role_type);
+        END LOOP;
+    END IF;
 END
 $$
 LANGUAGE plpgsql;
@@ -1109,7 +1118,7 @@ WHERE
 --     columnid = 1;
 -- function my projects
 
-CREATE OR REPLACE FUNCTION myprojects (usr text)
+CREATE OR REPLACE FUNCTION myprojects (usr text, f text)
     RETURNS TABLE (
         pid int,
         projectname text,
@@ -1133,28 +1142,86 @@ DECLARE
         WHERE
             username = usern;
 BEGIN
-    FOR r IN cur1 (usr)
-    LOOP
-        RETURN query
-        SELECT
-            projectid AS pid,
-            name AS projectname,
-            shortdescription AS sd,
-            longdescription AS ld,
-            createdon AS DOC,
-            path AS projectpath,
-            createdby AS OWNER,
-            array_agg(username) AS members,
-            array_agg(ROLE)::text[] AS roles
-        FROM
-            project
-        NATURAL JOIN member
-    WHERE
-        projectid = r.pid
-    GROUP BY
-        projectid;
-    END LOOP;
+    IF f IS NOT NULL THEN
+        FOR r IN cur1 (usr)
+        LOOP
+            RETURN query
+            SELECT
+                projectid AS pid,
+                name AS projectname,
+                shortdescription AS sd,
+                longdescription AS ld,
+                createdon AS DOC,
+                path AS projectpath,
+                createdby AS OWNER,
+                array_agg(username) AS members,
+                array_agg(ROLE)::text[] AS roles
+            FROM
+                project
+            NATURAL JOIN member
+        WHERE
+            projectid = r.pid
+                AND status = f::project_status
+            GROUP BY
+                projectid;
+        END LOOP;
+    ELSE
+        FOR r IN cur1 (usr)
+        LOOP
+            RETURN query
+            SELECT
+                projectid AS pid,
+                name AS projectname,
+                shortdescription AS sd,
+                longdescription AS ld,
+                createdon AS DOC,
+                path AS projectpath,
+                createdby AS OWNER,
+                array_agg(username) AS members,
+                array_agg(ROLE)::text[] AS roles
+            FROM
+                project
+            NATURAL JOIN member
+        WHERE
+            projectid = r.pid
+        GROUP BY
+            projectid;
+        END LOOP;
+    END IF;
     RETURN;
 END
 $$
 LANGUAGE plpgsql;
+
+-- # trigger => update project status to completed if all task are completed
+CREATE FUNCTION check_projectstatus ()
+    RETURNS TRIGGER
+    AS $$
+BEGIN
+    RAISE notice 'trigger running';
+    IF EXISTS (
+        SELECT
+            1
+        FROM
+            task
+        WHERE
+            projectid = OLD.projectid
+            AND status != 'completed') THEN
+    UPDATE
+        project
+    SET
+        status = 'ongoing';
+ELSE
+    UPDATE
+        project
+    SET
+        status = 'onging';
+END IF;
+    RETURN new;
+END
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER project_status
+    AFTER INSERT ON task
+    EXECUTE PROCEDURE check_projectstatus ();

@@ -6,7 +6,7 @@ import psycopg2 as db
 def executequery(sql, data):
     '''Establish connection'''
 
-    DSN = 'dbname=pms user=dhruvil password=ab::12097Ef'
+    DSN = "dbname='pms' user='arpit' host='localhost' password='1let2me3in'"
     try:
         with db.connect(DSN) as conn:
 
@@ -14,12 +14,11 @@ def executequery(sql, data):
                 with conn.cursor() as cur:
                     cur.execute(sql, data)
                     print(cur.query)
-
             except db.IntegrityError as e:
                 return False, e.pgerror
             else:
                 return True, "Query Executed Succesfully"
-    except db.OperationalError as e:
+    except db.DatabaseError as e:
         return False, e.pgerror
 
 

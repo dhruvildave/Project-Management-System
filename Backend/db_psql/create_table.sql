@@ -322,22 +322,20 @@ LANGUAGE plpgsql;
 CREATE PROCEDURE delete_project (usr text, pid int
 )
     AS $$
-DECLARE
-    userrole text;
 BEGIN
-    SELECT
-        ROLE INTO userrole
-    FROM
-        member
-    WHERE
-        username = usr
-        AND projectid = pid;
-    IF userrole = 'leader' THEN
-        DELETE FROM project
-        WHERE projectid = pid;
-    ELSE
-        RAISE EXCEPTION 'user is not a leader';
-    END IF;
+    IF NOT EXISTS (
+        SELECT
+            1
+        FROM
+            project
+        WHERE
+            projectid = pid
+            AND createdby = usr) THEN
+    RAISE exception 'Project can only be deleted by the user who created it';
+ELSE
+    DELETE FROM project
+    WHERE projectid = pid;
+END IF;
 END
 $$
 LANGUAGE plpgsql;
@@ -502,10 +500,12 @@ RETURNING
 INSERT INTO assignedto
     VALUES (tid, m);
 END LOOP;
-    foreach p IN ARRAY preqtaskid LOOP
-        INSERT INTO preqtask
-            VALUES (p, tid);
-    END LOOP;
+    IF preqtaskid IS NOT NULL THEN
+        foreach p IN ARRAY preqtaskid LOOP
+            INSERT INTO preqtask
+                VALUES (p, tid);
+        END LOOP;
+    END IF;
 END
 $$
 LANGUAGE plpgsql;
@@ -617,17 +617,29 @@ BEGIN
         SELECT
             1
         FROM
-            assignedto
+            task
         WHERE
             taskid = tid
-            AND username = usr) THEN
-    UPDATE
-        task
-    SET
-        status = 'completed',
-        completiontime = NOW()
-    WHERE
-        taskid = tid;
+            AND status = 'completed') THEN
+    RAISE exception 'task already completed';
+END IF;
+            IF EXISTS (
+                SELECT
+                    1
+                FROM
+                    assignedto
+                WHERE
+                    taskid = tid
+                    AND username = usr) THEN
+            UPDATE
+                task
+            SET
+                status = 'completed',
+                completiontime = NOW()
+            WHERE
+                taskid = tid;
+        ELSE
+            RAISE exception 'task is not assigned to the user';
 END IF;
 END
 $$
@@ -1075,7 +1087,6 @@ WHERE
 --     project
 -- WHERE
 --     username = 'arpit';
-
 -- -- allNotes
 -- SELECT
 --     *
@@ -1083,8 +1094,8 @@ WHERE
 --     note
 -- WHERE
 --     columnid = 1;
-
 -- function my projects
+
 CREATE OR REPLACE FUNCTION myprojects (usr text)
     RETURNS TABLE (
         pid int,

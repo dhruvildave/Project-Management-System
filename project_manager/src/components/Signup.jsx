@@ -14,8 +14,9 @@ import Title from "./components/Title";
 import PropTypes from "prop-types";
 import { Redirect } from "react-router-dom";
 import Copyright from "./components/Copyright";
-import { gql } from "apollo-boost";
-// import { useMutation } from "@apollo/react-hooks";
+// import { gql } from "apollo-boost";
+import { execute, makePromise } from "apollo-link";
+import { createUser, link } from "./queries";
 
 const useStyles = createStyles((theme) => ({
   paper: {
@@ -37,26 +38,26 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const createUser = gql`
-  mutation(
-    $firstname: String!
-    $lastname: String!
-    $username: String!
-    $emailid: String!
-    $password: String!
-  ) {
-    createUser(
-      firstname: $firstname
-      lastname: $lastname
-      username: $username
-      emailid: $emailid
-      password: $password
-    ) {
-      msg
-      status
-    }
-  }
-`;
+// const createUser = gql`
+//   mutation(
+//     $firstname: String!
+//     $lastname: String!
+//     $username: String!
+//     $emailid: String!
+//     $password: String!
+//   ) {
+//     createUser(
+//       firstname: $firstname
+//       lastname: $lastname
+//       username: $username
+//       emailid: $emailid
+//       password: $password
+//     ) {
+//       msg
+//       status
+//     }
+//   }
+// `;
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -68,8 +69,9 @@ class SignUp extends React.Component {
       username: "",
       password: "",
       signup: false,
-      mutatatefunc: null,
-      data: [],
+      // mutatatefunc: null,
+      message: "",
+      // data: [],
     };
     this.handleClick = this.handleClick.bind(this);
   }
@@ -77,25 +79,32 @@ class SignUp extends React.Component {
   handleClick(event) {
     //call mutation query for graphql here
     event.preventDefault();
-    const { createApolloFetch } = require("apollo-fetch");
-
-    const fetch = createApolloFetch({
-      uri: "http://localhost:5000/graphql-api",
-    });
-
-    // You can also easily pass variables for dynamic arguments
-    fetch({
+    const operation = {
       query: createUser,
       variables: {
         firstname: this.state.first_name,
         lastname: this.state.last_name,
-        email: this.state.email,
+        emailid: this.state.email,
         username: this.state.username,
         password: this.state.password,
-      },
-    }).then((res) => {
-      console.log(res.data);
-    });
+      }, //optional
+    };
+
+    makePromise(execute(link, operation))
+      .then((data) => {
+        // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        this.setState({ message: data.data.createUser.msg });
+        this.setState({ signup: data.data.createUser.status });
+
+        // console.log(data.data.createUser.status);
+        // console.log(data.createUser.status);
+        console.log(this.state.signup);
+        console.log(this.state.message);
+      })
+      .catch((error) => console.log(`received error ${error}`));
+
+    // You can also easily pass variables for dynamic arguments
+
     // this.setState({ signup: signupsucess });
   }
   render() {

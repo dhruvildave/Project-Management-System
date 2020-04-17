@@ -14,6 +14,8 @@ import Title from "./components/Title";
 import PropTypes from "prop-types";
 import { Redirect } from "react-router-dom";
 import Copyright from "./components/Copyright";
+import { gql } from "apollo-boost";
+// import { useMutation } from "@apollo/react-hooks";
 
 const useStyles = createStyles((theme) => ({
   paper: {
@@ -35,6 +37,27 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+const createUser = gql`
+  mutation(
+    $firstname: String!
+    $lastname: String!
+    $username: String!
+    $emailid: String!
+    $password: String!
+  ) {
+    createUser(
+      firstname: $firstname
+      lastname: $lastname
+      username: $username
+      emailid: $emailid
+      password: $password
+    ) {
+      msg
+      status
+    }
+  }
+`;
+
 class SignUp extends React.Component {
   constructor(props) {
     super(props);
@@ -45,18 +68,38 @@ class SignUp extends React.Component {
       username: "",
       password: "",
       signup: false,
+      mutatatefunc: null,
+      data: [],
     };
     this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick(event) {
-    const signupsucess = true;
     //call mutation query for graphql here
-    this.setState({ signup: signupsucess });
+    event.preventDefault();
+    const { createApolloFetch } = require("apollo-fetch");
+
+    const fetch = createApolloFetch({
+      uri: "http://localhost:5000/graphql-api",
+    });
+
+    // You can also easily pass variables for dynamic arguments
+    fetch({
+      query: createUser,
+      variables: {
+        firstname: this.state.first_name,
+        lastname: this.state.last_name,
+        email: this.state.email,
+        username: this.state.username,
+        password: this.state.password,
+      },
+    }).then((res) => {
+      console.log(res.data);
+    });
+    // this.setState({ signup: signupsucess });
   }
   render() {
     const { classes } = this.props;
-
     if (this.state.signup) {
       return (
         <Redirect

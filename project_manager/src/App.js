@@ -16,6 +16,12 @@ import { positions, Provider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 import red from "@material-ui/core/colors/red";
 import blue from "@material-ui/core/colors/blue";
+// import { ApolloProvider } from "@apollo/react-hooks";
+// import ApolloClient from "apollo-boost";
+
+// const client = new ApolloClient({
+//   uri: "http://localhost:5000/graphql-api",
+// });
 
 const options = {
   timeout: 5000,
@@ -35,6 +41,7 @@ const theme = createMuiTheme({
 
 function App() {
   return (
+    // <ApolloProvider client={client}>
     <Provider template={AlertTemplate} {...options}>
       <ThemeProvider theme={theme}>
         <Router>

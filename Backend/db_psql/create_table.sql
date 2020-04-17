@@ -1195,41 +1195,28 @@ $$
 LANGUAGE plpgsql;
 
 -- # trigger => update project status to completed if all task are completed
-CREATE FUNCTION check_projectstatus ()
-    RETURNS TRIGGER
-    AS $$
+CREATE OR REPLACE FUNCTION check_projectstatus () RETURNS TRIGGER AS $check_projectstatus$
 BEGIN
-    RAISE notice 'trigger running';
     IF EXISTS (
-        SELECT
-            1
-        FROM
-            task
-        WHERE
-            projectid = NEW.projectid
-            AND status != 'completed') THEN
-    UPDATE
-        project
-    SET
-        status = 'ongoing'
-    WHERE
-        projectid = NEW.projectid;
-ELSE
-    UPDATE
-        project
-    SET
-        status = 'completed'
-    WHERE
-        projectid = NEW.projectid;
-END IF;
+        SELECT *
+        FROM task
+        WHERE projectid = NEW.projectid AND status != 'completed'
+    ) THEN
+        UPDATE project
+        SET status = 'ongoing'
+        WHERE projectid = NEW.projectid;
+    ELSE
+        UPDATE project
+        SET status = 'completed'
+        WHERE projectid = NEW.projectid;
+    END IF;
     RETURN new;
-END
-$$
-LANGUAGE plpgsql;
+END;
+$check_projectstatus$ LANGUAGE plpgsql;
 
-CREATE TRIGGER project_status
-    AFTER INSERT OR UPDATE ON task
-    EXECUTE PROCEDURE check_projectstatus ();
+CREATE TRIGGER check_projectstatus AFTER INSERT OR UPDATE ON task
+    EXECUTE FUNCTION check_projectstatus ();
+
 
 -- procedure => get project given pid and username
 CREATE OR REPLACE FUNCTION getproject (text, int)

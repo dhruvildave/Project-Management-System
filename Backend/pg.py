@@ -1,10 +1,12 @@
-import psycopg2 as db
 from collections import namedtuple
-# establish connection
+
+import psycopg2 as db
 
 
 def executequery(sql, data):
-    DSN = "dbname='pms' user='arpit' host='localhost' password='1let2me3in'"
+    '''Establish connection'''
+
+    DSN = 'dbname=pms user=dhruvil password=ab::12097Ef'
     try:
         with db.connect(DSN) as conn:
 

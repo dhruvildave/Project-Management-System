@@ -115,7 +115,8 @@ CREATE TABLE IF NOT EXISTS task (
     priority priority_type DEFAULT 'normal',
     assignedby text NOT NULL,
     projectid int NOT NULL,
-    FOREIGN KEY (assignedby, projectid) REFERENCES member (username, projectid) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (assignedby, projectid) REFERENCES member (username, projectid) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE (title, assignedby, projectid)
 );
 
 
@@ -416,7 +417,7 @@ BEGIN
         VALUES (name, sd, ld, CURRENT_DATE, path, usr)
     RETURNING
         projectid INTO pid;
-    IF mem IS NOT NULL THEN
+    IF array_length(mem, 1) > 0 THEN
         FOREACH mem slice 1 IN ARRAY members LOOP
             INSERT INTO member
                 VALUES (mem[1]::text, pid, mem[2]::role_type);

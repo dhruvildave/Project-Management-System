@@ -146,14 +146,25 @@ mutation {
 }
 
 mutation {
-  deleteProject(projectid: 1, username: "arpit91") {
+  createProject(name: "Projectx", username: "dhruvil91") {
     msg
     status
   }
 }
 
+mutation {
+  createProject(name: "Projectx", username: "kaushal91") {
+    msg
+    status
+  }
+}
 
-
+# mutation {
+#   deleteProject(projectid: 2, username: "arpit91") {
+#     msg
+#     status
+#   }
+# }
 
 mutation {
   addNote(title: "Note1", description: "Why ppl Y ???", username: "arpit91") {
@@ -164,6 +175,50 @@ mutation {
 
 mutation {
   addNote(title: "Note2", description: "Why ppl Z ???", username: "kaushal91") {
+    status
+    msg
+  }
+}
+
+mutation {
+  addTask(
+    assignedby: "arpit91"
+    assignedto: ["dhruvil91", "kaushal91"]
+    projectid: 3
+    title: "Shit left"
+  ) {
+    status
+    msg
+  }
+}
+
+mutation {
+  addTask(
+    assignedby: "arpit91"
+    assignedto: ["dhruvil91", "kaushal91"]
+    projectid: 4
+    title: "Shit left"
+  ) {
+    status
+    msg
+  }
+}
+
+mutation {
+  updateTask(
+    assignedto: ["dhruvil91"]
+    taskid: 3
+    username: "arpit91"
+    title: "Shit left"
+    preqtaskid: []
+  ) {
+    status
+    msg
+  }
+}
+
+mutation {
+  completeTask(taskid: 3, username: "dhruvil91") {
     status
     msg
   }

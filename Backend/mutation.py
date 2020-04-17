@@ -91,9 +91,11 @@ class createProject(Mutation):
                shortdescription=None,
                path=None,
                members=None):
-        usernames = [x.username for x in members]
-        roles = [x.role for x in members]
-        m = [[x, y] for x, y in zip(usernames, roles)]
+        usernames = [x.username
+                     for x in members] if members is not None else None
+        roles = [x.role for x in members] if members is not None else None
+        m = [[x, y] for x, y in zip(usernames, roles)
+             ] if usernames is not None and roles is not None else None
         s, m = pg.executequery(
             "call create_project(%s,%s,%s,%s,%s,%s);",
             [username, name, longdescription, shortdescription, path, m])

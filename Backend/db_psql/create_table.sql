@@ -108,8 +108,7 @@ CREATE TABLE IF NOT EXISTS task (
     priority priority_type DEFAULT 'normal',
     assignedby text NOT NULL,
     projectid int NOT NULL,
-    FOREIGN KEY (assignedby, projectid)
-        REFERENCES member (username, projectid) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (assignedby, projectid) REFERENCES member (username, projectid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -397,27 +396,21 @@ END
 $$
 LANGUAGE plpgsql;
 
--- #9 procedure -> add array of members only if all of them are a user
-CREATE OR REPLACE PROCEDURE add_members (usr text, members text[], pid int
+-- #9 procedure -> create project and add members
+CREATE OR REPLACE PROCEDURE create_project (usr text, name text, sd text, ld text, path text, members text[][]
 )
     AS $$
 DECLARE
-    mem text;
+    mem text[];
+    pid int;
 BEGIN
-    FOREACH mem IN ARRAY members LOOP
-        IF NOT EXISTS (
-            SELECT
-                1
-            FROM
-                users
-            WHERE
-                username = mem) THEN
-        RAISE EXCEPTION '% user doesnot exists', mem;
-    END IF;
-END LOOP;
-    FOREACH mem IN ARRAY members LOOP
+    INSERT INTO project (name, shortdescription, longdescription, createdon, path, createdby)
+        VALUES (name, sd, ld, CURRENT_DATE, path, usr)
+    RETURNING
+        projectid INTO pid;
+    FOREACH mem slice 1 IN ARRAY members LOOP
         INSERT INTO member
-            VALUES (mem, pid, 'member');
+            VALUES (mem[1]::text, pid, mem[2]::role_type);
     END LOOP;
 END
 $$
@@ -527,6 +520,69 @@ END
 $$
 LANGUAGE plpgsql;
 
+-- # procedure => update task if user is a leader and make changes in the assignedto and preqtask tables
+CREATE OR REPLACE PROCEDURE edit_task (usr text, tid int, assignedto text[], t text, des text, st timestamp, et timestamp, prior text, preqtaskid int[]
+)
+    AS $$
+DECLARE
+    m text;
+    pid int;
+    p int;
+BEGIN
+    SELECT
+        projectid INTO pid
+    FROM
+        task
+    WHERE
+        taskid = tid;
+    IF NOT EXISTS (
+        SELECT
+            1
+        FROM
+            member
+        WHERE
+            username = usr
+            AND projectid = pid
+            AND ROLE = 'leader') THEN
+    RAISE EXCEPTION '% user is not a leader', usr;
+END IF;
+    UPDATE
+        task
+    SET
+        title = t,
+        description = des,
+        starttime = st,
+        endtime = et,
+        priority = prior,
+        assignedby = usr
+    WHERE
+        taskid = tid;
+    DELETE FROM assignedto
+    WHERE taskid = tid;
+    foreach m IN ARRAY assignedto LOOP
+        IF NOT EXISTS (
+            SELECT
+                1
+            FROM
+                member
+            WHERE
+                username = m
+                AND projectid = pid) THEN
+        RAISE exception '% is not a member', m;
+    END IF;
+INSERT INTO assignedto
+    VALUES (tid, m);
+END LOOP;
+    DELETE FROM preqtask
+    WHERE task = tid;
+    foreach p IN ARRAY preqtaskid LOOP
+        INSERT INTO preqtask
+            VALUES (p, tid);
+    END LOOP;
+END
+$$
+LANGUAGE plpgsql;
+
 -- #13 procedure => (check if user is a leader and delete assignedto and preqtask where task is refered)
 CREATE OR REPLACE PROCEDURE deleteTask (tid int, usrname text
 )
@@ -621,7 +677,7 @@ CREATE OR REPLACE FUNCTION check_board ()
     AS $$
 BEGIN
     IF NEW.projectid IS NULL AND NEW.username IS NULL THEN
-        RAISE exception 'one of username or project id required';
+        RAISE exception 'one of username or project id is required';
         RETURN NULL;
     ELSE
         RETURN new;
@@ -658,61 +714,162 @@ ELSE
                     board
                 WHERE
                     projectid = pid), usr);
+END IF;
 END
 $$
 LANGUAGE plpgsql;
 
-
 -- projectReport
-SELECT COUNT(*)
-FROM task
-WHERE projectid = 1;
+SELECT
+    COUNT(*)
+FROM
+    task
+WHERE
+    projectid = 1;
 
-SELECT status, COUNT(1)
-FROM task
-WHERE projectid = 1
-GROUP BY status;
+SELECT
+    status,
+    COUNT(1)
+FROM
+    task
+WHERE
+    projectid = 1
+GROUP BY
+    status;
 
-SELECT COUNT(*)
-FROM task
-WHERE completiontime IS NOT NULL;
+SELECT
+    COUNT(*)
+FROM
+    task
+WHERE
+    completiontime IS NOT NULL;
 
-SELECT COUNT(*) as completedbeforedealine
-FROM task
-WHERE endtime <= completiontime;
+SELECT
+    COUNT(*) AS completedbeforedealine
+FROM
+    task
+WHERE
+    endtime <= completiontime;
 
-SELECT COUNT(*) as completedafterdealine
-FROM task
-WHERE endtime > completiontime;
+SELECT
+    COUNT(*) AS completedafterdealine
+FROM
+    task
+WHERE
+    endtime > completiontime;
 
 -- intervalReport
-SELECT COUNT(*)
-FROM task
-WHERE projectid = 1 AND starttime >= '2020-04-13' AND endtime <= '2020-04-18';
+SELECT
+    COUNT(*)
+FROM
+    task
+WHERE
+    projectid = 1
+    AND starttime >= '2020-04-13'
+    AND endtime <= '2020-04-18';
 
-SELECT status, COUNT(1)
-FROM task
-WHERE projectid = 1 AND starttime >= '2020-04-13' AND endtime <= '2020-04-18'
-GROUP BY status;
+SELECT
+    status,
+    COUNT(1)
+FROM
+    task
+WHERE
+    projectid = 1
+    AND starttime >= '2020-04-13'
+    AND endtime <= '2020-04-18'
+GROUP BY
+    status;
 
-SELECT COUNT(*)
-FROM task
-WHERE completiontime IS NOT NULL AND starttime >= '2020-04-13' AND endtime <= '2020-04-18';
+SELECT
+    COUNT(*)
+FROM
+    task
+WHERE
+    completiontime IS NOT NULL
+    AND starttime >= '2020-04-13'
+    AND endtime <= '2020-04-18';
 
-SELECT COUNT(*) as completedbeforedealine
-FROM task
-WHERE endtime <= completiontime AND starttime >= '2020-04-13' AND endtime <= '2020-04-18';
+SELECT
+    COUNT(*) AS completedbeforedealine
+FROM
+    task
+WHERE
+    endtime <= completiontime
+    AND starttime >= '2020-04-13'
+    AND endtime <= '2020-04-18';
 
-SELECT COUNT(*) as completedafterdealine
-FROM task
-WHERE endtime > completiontime AND starttime >= '2020-04-13' AND endtime <= '2020-04-18';
+SELECT
+    COUNT(*) AS completedafterdealine
+FROM
+    task
+WHERE
+    endtime > completiontime
+    AND starttime >= '2020-04-13'
+    AND endtime <= '2020-04-18';
 
 -- myProjects
-SELECT *
-FROM project
-WHERE username = 'arpit';
+SELECT
+    *
+FROM
+    project
+WHERE
+    username = 'arpit';
 
 -- allNotes
-SELECT *
-FROM note
-WHERE columnid = 1;
+SELECT
+    *
+FROM
+    note
+WHERE
+    columnid = 1;
+
+-- function my projects
+CREATE OR REPLACE FUNCTION myprojects (usr text)
+    RETURNS TABLE (
+        pid int,
+        projectname text,
+        sd text,
+        ld text,
+        DOC date,
+        projectpath text,
+        OWNER text,
+        members text[],
+        roles text[]
+    )
+    AS $$
+DECLARE
+    r Record;
+    cur1 CURSOR (usern text)
+    FOR
+        SELECT
+            projectid AS pid
+        FROM
+            member
+        WHERE
+            username = usern;
+BEGIN
+    FOR r IN cur1 (usr)
+    LOOP
+        RETURN query
+        SELECT
+            projectid AS pid,
+            name AS projectname,
+            shortdescription AS sd,
+            longdescription AS ld,
+            createdon AS DOC,
+            path AS projectpath,
+            createdby AS OWNER,
+            array_agg(username) AS members,
+            array_agg(ROLE)::text[] AS roles
+        FROM
+            project
+        NATURAL JOIN member
+    WHERE
+        projectid = r.pid
+    GROUP BY
+        projectid;
+    END LOOP;
+    RETURN;
+END
+$$
+LANGUAGE plpgsql;

@@ -51,6 +51,7 @@ class Query(ObjectType):
                              'projectid': Int(required=True),
                              'taskFilter': String()
                          })
+    getTask = Field(Object.Task, args={'taskid': Int(required=True)})
 
     # our Resolver method takes the GraphQL context (root, info) as well as
     # Argument (name) for the Field and returns data for the query Response
@@ -77,6 +78,9 @@ class Query(ObjectType):
 
     def resolve_ProjectTasks(root, info, username, projectid, taskFilter=None):
         return query.f_getprojecttask(username, projectid, taskFilter)
+
+    def resolve_getTask(root, info, taskid):
+        return query.f_gettask(taskid)
 
 
 class Mutation(ObjectType):

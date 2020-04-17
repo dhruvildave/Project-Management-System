@@ -78,10 +78,9 @@ def f_gettask(taskid):
     data = pg.executequery2(
         'SELECT taskid,title,description,starttime,endtime,completiontime,status::text,priority::text,projectid,assignedby,array_agg(assignedto.username) AS assignedto,array_agg(preqtask.preqtask) AS preqtask FROM (task NATURAL JOIN assignedto) LEFT OUTER JOIN preqtask ON (assignedto.taskid = preqtask.task) WHERE taskid = %s GROUP BY taskid;',
         [taskid])
-    return [
-        Task(x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10],
-             x[11]) for x in data
-    ]
+    x = data[0]
+    return Task(x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9],
+                x[10], x[11])
 
 
 def f_getmytask(username, task_filter):
@@ -105,4 +104,4 @@ def f_getprojecttask(username, pid, task_filter):
 
 
 if __name__ == "__main__":
-    print(f_myprojects('arpit921'))
+    print(f_gettask(1))

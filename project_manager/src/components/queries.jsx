@@ -93,6 +93,49 @@ export const getProject = gql`
     }
   }
 `;
+
+export const myTasks = gql`
+  query($username: String!, $taskFilter: String) {
+    myTasks(username: $username, taskFiler: $taskFilter) {
+      taskid
+      title
+      description
+      starttime
+      endtime
+      completiontime
+      status
+      priority
+      projectid
+      assignedby
+      assignedto
+      preqtask
+    }
+  }
+`;
+
+export const ProjectTask = gql`
+  query($username: String!, $projectid: Int!, $taskFiler: String) {
+    ProjectTasks(
+      username: $username
+      projectid: $projectid
+      taskFilter: $taskFilter
+    ) {
+      taskid
+      title
+      description
+      starttime
+      endtime
+      completiontime
+      status
+      priority
+      projectid
+      assignedby
+      assignedto
+      preqtask
+    }
+  }
+`;
+
 export const addNote = gql`
   mutation(
     $title: String!

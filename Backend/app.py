@@ -15,7 +15,6 @@ cors(app)
 app.debug = True
 
 
-
 class Query(ObjectType):
     # this defines a Field `hello` in our Schema with a single Argument `name`
     authenticate = Field(Boolean,

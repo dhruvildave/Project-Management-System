@@ -774,7 +774,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Project report with user
-CREATE OR REPLACE FUNCTION gen_user_report(pid int)
+CREATE OR REPLACE FUNCTION gen_userwise_report(pid int)
 RETURNS TABLE(key text, value int) AS $$
 DECLARE
     cursor1 cursor(pidc int) for select distinct username from member where projectid = pidc;

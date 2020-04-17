@@ -1,25 +1,3 @@
-<<<<<<< HEAD
-mutation{
-  createUser(username:"arpit921",firstname:"Arpit",lastname:"Vaghela",password:"Password1",emailid:"arpitvaghela9210@gmail.com"){
-    status
-    msg
-  }
-}
-mutation{
-  changePassword(username:"arpit921",newpassword:"Aa1", oldpassword:"Password1"){
-    status
-    msg
-  }
-}
-mutation{
-  changeName(username:"arpit921",newfirstname:"Alpha", newlastname:"Beta"){
-    status
-    msg
-  }
-}
-mutation{
-  deleteUser(username:"arpit921"){
-=======
 mutation {
   createUser(
     firstname: "Arpit"
@@ -42,7 +20,6 @@ mutation {
     password: "Password1"
   ) {
     msg
->>>>>>> 0c7aefdd3091fce7691b84a8b80319bdf4df9054
     status
   }
 }

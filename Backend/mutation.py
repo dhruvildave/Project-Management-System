@@ -147,21 +147,6 @@ class editProject(Mutation):
         return editProject(status=s, msg=m)
 
 
-class changeProjectPath(Mutation):
-    class Arguments:
-        username = String(required=True)
-        projectid = Int(required=True)
-        newpath = String(required=True)
-
-    status = Boolean(required=True)
-    msg = String()
-
-    def mutate(root, info, username, newpath, projectid):
-        s, m = pg.executequery("change_projectpath(%s,%s,%s);",
-                               [username, newpath, projectid])
-        return changeProjectName(status=s, msg=m)
-
-
 class deleteMember(Mutation):
     class Arguments:
         username = String(required=True)

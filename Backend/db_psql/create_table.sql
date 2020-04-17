@@ -143,7 +143,8 @@ CREATE TABLE IF NOT EXISTS note (
     color text,
     createdby text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
     createdat timestamp DEFAULT NOW() NOT NULL,
-    boardid int REFERENCES board (boardid) ON DELETE CASCADE ON UPDATE CASCADE
+    boardid int REFERENCES board (boardid) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE (title, description)
 );
 
 -- PL-Blocks
@@ -936,20 +937,20 @@ WHERE
     AND endtime <= '2020-04-18';
 
 -- myProjects
-SELECT
-    *
-FROM
-    project
-WHERE
-    username = 'arpit';
+-- SELECT
+--     *
+-- FROM
+--     project
+-- WHERE
+--     username = 'arpit';
 
--- allNotes
-SELECT
-    *
-FROM
-    note
-WHERE
-    columnid = 1;
+-- -- allNotes
+-- SELECT
+--     *
+-- FROM
+--     note
+-- WHERE
+--     columnid = 1;
 
 -- function my projects
 CREATE OR REPLACE FUNCTION myprojects (usr text)

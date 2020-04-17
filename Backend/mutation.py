@@ -1,4 +1,6 @@
-from graphene import Mutation, ObjectType, String, Boolean, Int, List, NonNull, types, InputObjectType
+from graphene import (Boolean, InputObjectType, Int, List, Mutation, NonNull,
+                      ObjectType, String, types)
+
 import pg
 
 

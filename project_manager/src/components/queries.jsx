@@ -22,3 +22,18 @@ export const createUser = gql`
     }
   }
 `;
+export const authenticate = gql`
+  query($username: String!, $password: String!) {
+    authenticate(username: $username, password: $password)
+  }
+`;
+
+export const getUser = gql`
+  query($username: String!) {
+    getUser(username: $username) {
+      firstname
+      lastname
+      email
+    }
+  }
+`;

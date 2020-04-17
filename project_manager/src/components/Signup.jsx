@@ -17,6 +17,7 @@ import Copyright from "./components/Copyright";
 // import { gql } from "apollo-boost";
 import { execute, makePromise } from "apollo-link";
 import { createUser, link } from "./queries";
+import { withAlert } from "react-alert";
 
 const useStyles = createStyles((theme) => ({
   paper: {
@@ -93,8 +94,14 @@ class SignUp extends React.Component {
     makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        console.log(data);
+        if (data.data.createUser.status === true) {
+          this.props.alert.success("Created User Succesfully");
+          this.setState({ signup: data.data.createUser.status });
+        } else {
+          this.props.alert.error(data.data.createUser.msg);
+        }
         this.setState({ message: data.data.createUser.msg });
-        this.setState({ signup: data.data.createUser.status });
 
         // console.log(data.data.createUser.status);
         // console.log(data.createUser.status);
@@ -238,4 +245,4 @@ SignUp.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(useStyles)(SignUp);
+export default withAlert()(withStyles(useStyles)(SignUp));

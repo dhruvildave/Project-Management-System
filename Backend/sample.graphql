@@ -153,6 +153,7 @@ mutation {
     msg
   }
 }
+
 mutation {
   addMember(
     projectid: 2
@@ -171,8 +172,15 @@ mutation {
   }
 }
 
+mutation {
+  addNote(title: "Note2", description: "Why ppl Z ???", username: "kaushal91") {
+    status
+    msg
+  }
+}
+
 {
-  myProjects(username: "arpit921") {
+  myProjects(username: "arpit91") {
     projectid
     name
     shortdescription

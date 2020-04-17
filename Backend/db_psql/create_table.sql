@@ -670,6 +670,7 @@ DECLARE
     inactive int;
     active int;
 BEGIN
+    DROP TABLE report;
     SELECT COUNT(*) INTO inactive
     FROM task t
     WHERE t.projectid = pid AND status = 'inactive';
@@ -685,8 +686,10 @@ BEGIN
 
     INSERT INTO report
     VALUES
-        ("inactive", inactive),
-        ("active", active);
+        ('inactive', inactive),
+        ('active', active);
+
+    RETURN QUERY SELECT * FROM report;
 END;
 $$ LANGUAGE plpgsql;
 

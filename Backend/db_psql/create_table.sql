@@ -1215,7 +1215,7 @@ ELSE
     UPDATE
         project
     SET
-        status = 'onging';
+        status = 'complete';
 END IF;
     RETURN new;
 END

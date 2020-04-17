@@ -1279,7 +1279,9 @@ END
 $$
 LANGUAGE plpgsql;
 
+-- copy from here and #12 line 488 add_task
 -- # check if user is a member
+
 CREATE FUNCTION check_member (text, int)
     RETURNS boolean
     AS $$

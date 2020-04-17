@@ -89,7 +89,10 @@ mutation {
     name: "Project1"
     shortdescription: "description1"
     longdescription: "description2"
-    members: [["kaushal-patil", "leader"], ["dhruvil-dave", "leader"]]
+    members: [
+      { username: "kaushal91", role: "leader" }
+      { username: "dhruvil91", role: "leader" }
+    ]
   ) {
     status
     msg
@@ -98,11 +101,14 @@ mutation {
 
 mutation {
   createProject(
-    username: "kaushal91"
-    name: "Project1"
+    username: "arpit91"
+    name: "Project2"
     shortdescription: "description1"
     longdescription: "description2"
-    members: [["kaushal-patil", "leader"], ["dhruvil-dave", "leader"]]
+    members: [
+      { username: "kaushal91", role: "member" }
+      { username: "dhruvil91", role: "leader" }
+    ]
   ) {
     status
     msg
@@ -111,11 +117,14 @@ mutation {
 
 mutation {
   createProject(
-    username: "arpit921"
+    username: "dhruvil91"
     name: "Project1"
     shortdescription: "description1"
     longdescription: "description2"
-    members: [["kaushal-patil", "leader"], ["dhruvil-dave", "leader"]]
+    members: [
+      { username: "kaushal91", role: "leader" }
+      { username: "arpit91", role: "leader" }
+    ]
   ) {
     status
     msg
@@ -130,7 +139,7 @@ mutation {
 }
 
 mutation {
-  createProject(name: "Project1", createdby: "arpit91") {
+  createProject(name: "Projectx", username: "arpit91") {
     msg
     status
   }

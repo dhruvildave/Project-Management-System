@@ -1,30 +1,42 @@
 DROP DATABASE IF EXISTS pms;
 
+
 CREATE DATABASE pms;
 
 \c pms
 DROP TABLE IF EXISTS users CASCADE;
 
+
 DROP TABLE IF EXISTS project CASCADE;
+
 
 DROP TABLE IF EXISTS member CASCADE;
 
+
 DROP TABLE IF EXISTS projectfiles CASCADE;
+
 
 DROP TABLE IF EXISTS task CASCADE;
 
+
 DROP TABLE IF EXISTS assignedto CASCADE;
 
+
 DROP TABLE IF EXISTS preqtask CASCADE;
+
 
 DROP TABLE IF EXISTS board CASCADE;
 
 -- DROP TABLE IF EXISTS col CASCADE;
+
 DROP TABLE IF EXISTS note CASCADE;
+
 
 DROP TYPE IF EXISTS role_type;
 
+
 DROP TYPE IF EXISTS status_type;
+
 
 DROP TYPE IF EXISTS priority_type;
 
@@ -32,130 +44,107 @@ DROP TYPE IF EXISTS priority_type;
 -- check if path provided for profilepic is an image in the frontend or backend
 -- firstname, lastname check -> case insensitive alphabetic string
 
-CREATE TABLE IF NOT EXISTS users (
-    username text CHECK (username ~ '^[a-z0-9_-]{3,16}$') PRIMARY KEY,
-    firstname text CHECK (firstname ~* '^[a-z]+$') NOT NULL,
-    lastname text CHECK (lastname ~* '^[a-z]+$') NOT NULL,
-    "password" text NOT NULL,
-    emailid text UNIQUE CHECK (emailid ~ '^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$') NOT NULL,
-    profilepic bytea
-);
-
+CREATE TABLE IF NOT EXISTS users (username text CHECK (username ~ '^[a-z0-9_-]{3,16}$') PRIMARY KEY,
+                                                                                                firstname text CHECK (firstname ~* '^[a-z]+$') NOT NULL,
+                                                                                                                                               lastname text CHECK (lastname ~* '^[a-z]+$') NOT NULL,
+                                                                                                                                                                                            "password" text NOT NULL,
+                                                                                                                                                                                                            emailid text UNIQUE CHECK (emailid ~ '^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$') NOT NULL,
+                                                                                                                                                                                                                                                                                                        profilepic bytea);
 
 /*
 insert into users values('username','fn','ln','pswd','email',null);
  */
-CREATE TABLE IF NOT EXISTS project (
-    projectid serial PRIMARY KEY,
-    "name" text NOT NULL,
-    "shortdescription" text,
-    "longdescription" text,
-    createdon date NOT NULL, -- Date Of Creation
-    "path" text, -- path refers to the path of git repository
-    createdby text REFERENCES users (username) ON DELETE CASCADE,
-    UNIQUE (name, createdby)
-);
-
+CREATE TABLE IF NOT EXISTS project
+    (projectid serial PRIMARY KEY,
+                              "name" text NOT NULL,
+                                          "shortdescription" text, "longdescription" text, createdon date NOT NULL, -- Date Of Creation
+ "path" text, -- path refers to the path of git repository
+ createdby text REFERENCES users (username) ON DELETE CASCADE,
+                                                      UNIQUE (name,
+                                                              createdby));
 
 /*
 insert into project (name,createdon,createdby) values ('Project1',CURRENT_DATE,'arpit');
  */
-CREATE TYPE role_type AS ENUM (
-    'leader',
-    'member'
-);
+CREATE TYPE role_type AS ENUM ('leader', 'member');
 
-CREATE TABLE IF NOT EXISTS member (
-    username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
-    projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-    "role" role_type,
-    PRIMARY KEY (username, projectid)
-);
 
+CREATE TABLE IF NOT EXISTS member
+    (username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
+                                                                projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+                                                                                                                                     "role" role_type,
+                                                                                                                                     PRIMARY KEY (username,
+                                                                                                                                                  projectid));
 
 /*
 insert into member where values ('un',pid,role)
  */
-CREATE TABLE IF NOT EXISTS projectfiles (
-    fileid serial PRIMARY KEY,
-    "filename" text CHECK ("filename" ~ '^[\w,\s-]+\.[A-Za-z]+$') NOT NULL,
-    "file" bytea NOT NULL,
-    lastupdated timestamp NOT NULL DEFAULT now(),
-    projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE
-);
+CREATE TABLE IF NOT EXISTS projectfiles
+    (fileid serial PRIMARY KEY,
+                           "filename" text CHECK ("filename" ~ '^[\w,\s-]+\.[A-Za-z]+$') NOT NULL,
+                                                                                         "file" bytea NOT NULL,
+                                                                                                      lastupdated timestamp NOT NULL DEFAULT now(),
+                                                                                                                                             projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE);
 
-CREATE TYPE status_type AS ENUM (
-    'inactive',
-    'active',
-    'working',
-    'completed'
-);
 
-CREATE TYPE priority_type AS ENUM (
-    'highest',
-    'high',
-    'normal',
-    'low'
-);
+CREATE TYPE status_type AS ENUM ('inactive', 'active', 'working', 'completed');
 
-CREATE TABLE IF NOT EXISTS task (
-    taskid serial PRIMARY KEY,
-    title text NOT NULL,
-    description text,
-    starttime timestamp DEFAULT NOW() CHECK (starttime <= endtime),
-    endtime timestamp,
-    status status_type DEFAULT 'active',
-    completiontime timestamp CHECK (starttime <= completiontime),
-    priority priority_type DEFAULT 'normal',
-    assignedby text NOT NULL,
-    projectid int NOT NULL,
-    FOREIGN KEY (assignedby, projectid) REFERENCES member (username, projectid) ON DELETE CASCADE ON UPDATE CASCADE
-);
 
+CREATE TYPE priority_type AS ENUM ('highest', 'high', 'normal', 'low');
+
+
+CREATE TABLE IF NOT EXISTS task
+    (taskid serial PRIMARY KEY,
+                           title text NOT NULL,
+                                      description text, starttime timestamp DEFAULT NOW() CHECK (starttime <= endtime), endtime timestamp,
+                                                                                                                                status status_type DEFAULT 'active',
+                                                                                                                                                           completiontime timestamp CHECK (starttime <= completiontime), priority priority_type DEFAULT 'normal',
+                                                                                                                                                                                                                                                        assignedby text NOT NULL,
+                                                                                                                                                                                                                                                                        projectid int NOT NULL,
+     FOREIGN KEY (assignedby,
+                  projectid) REFERENCES member (username, projectid) ON DELETE CASCADE ON UPDATE CASCADE);
 
 /*
 insert into task (title,description,starttime,endtime,assignedby,projectid)
 values('task1','just a task',null,null,'arpit',1);
  */
-CREATE TABLE IF NOT EXISTS assignedto (
-    taskid int REFERENCES task ON DELETE CASCADE ON UPDATE CASCADE,
-    username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
-    PRIMARY KEY (taskid, username)
-);
+CREATE TABLE IF NOT EXISTS assignedto
+    (taskid int REFERENCES task ON DELETE CASCADE ON UPDATE CASCADE,
+                                                            username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
+                                                                                                                       PRIMARY KEY (taskid,
+                                                                                                                                    username));
 
-CREATE TABLE IF NOT EXISTS preqtask (
-    task int REFERENCES task (taskid) ON DELETE CASCADE ON UPDATE CASCADE,
-    preqtask int REFERENCES task (taskid) ON DELETE CASCADE ON UPDATE CASCADE,
-    PRIMARY KEY (task, preqtask)
-);
 
-CREATE TABLE IF NOT EXISTS board (
-    boardid serial PRIMARY KEY,
-    title text NOT NULL,
-    "description" text,
-    username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
-    projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE
-);
+CREATE TABLE IF NOT EXISTS preqtask
+    (task int REFERENCES task (taskid) ON DELETE CASCADE ON UPDATE CASCADE,
+                                                                   preqtask int REFERENCES task (taskid) ON DELETE CASCADE ON UPDATE CASCADE,
+                                                                                                                                     PRIMARY KEY (task,
+                                                                                                                                                  preqtask));
 
-CREATE TABLE IF NOT EXISTS note (
-    noteid serial PRIMARY KEY,
-    title text NOT NULL,
-    "description" text,
-    color text,
-    createdby text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-    createdat timestamp DEFAULT NOW() NOT NULL,
-    boardid int REFERENCES board (boardid) ON DELETE CASCADE ON UPDATE CASCADE,
-    UNIQUE (title, description)
-);
+
+CREATE TABLE IF NOT EXISTS board
+    (boardid serial PRIMARY KEY,
+                            title text NOT NULL,
+                                       "description" text, username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
+                                                                                                                      projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE);
+
+
+CREATE TABLE IF NOT EXISTS note
+    (noteid serial PRIMARY KEY,
+                           title text NOT NULL,
+                                      "description" text, color text, createdby text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+                                                                                                                                                     createdat timestamp DEFAULT NOW() NOT NULL,
+                                                                                                                                                                                       boardid int REFERENCES board (boardid) ON DELETE CASCADE ON UPDATE CASCADE,
+                                                                                                                                                                                                                                                          UNIQUE (title,
+                                                                                                                                                                                                                                                                  description));
 
 -- PL-Blocks
 --#1 trigger to encrypt password before saving into db
 
 CREATE EXTENSION pgcrypto;
 
-CREATE OR REPLACE FUNCTION create_hash ()
-    RETURNS TRIGGER
-    AS $create_hash$
+
+CREATE OR REPLACE FUNCTION create_hash () RETURNS TRIGGER AS $create_hash$
 BEGIN
     --
     -- Store passwords securely
@@ -168,35 +157,34 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$create_hash$
-LANGUAGE plpgsql;
+$create_hash$ LANGUAGE plpgsql;
+
 
 CREATE TRIGGER create_hash
-    BEFORE INSERT OR UPDATE ON users
-    FOR EACH ROW
-    EXECUTE FUNCTION create_hash ();
+BEFORE
+INSERT
+OR
+UPDATE ON users
+FOR EACH ROW EXECUTE FUNCTION create_hash ();
 
 --#2 trigger=> to add the user who created the project as a member
-CREATE OR REPLACE FUNCTION add_leader ()
-    RETURNS TRIGGER
-    AS $add_leader$
+
+CREATE OR REPLACE FUNCTION add_leader () RETURNS TRIGGER AS $add_leader$
 BEGIN
     INSERT INTO member
         VALUES (NEW.createdby, NEW.projectid, 'leader');
     RETURN NEW;
 END
-$add_leader$
-LANGUAGE plpgsql;
+$add_leader$ LANGUAGE plpgsql;
 
-CREATE TRIGGER add_leader
-    AFTER INSERT ON project
-    FOR EACH ROW
-    EXECUTE FUNCTION add_leader ();
+
+CREATE TRIGGER add_leader AFTER
+INSERT ON project
+FOR EACH ROW EXECUTE FUNCTION add_leader ();
 
 -- #3 trigger only leader can assign task
-CREATE OR REPLACE FUNCTION add_task ()
-    RETURNS TRIGGER
-    AS $add_task$
+
+CREATE OR REPLACE FUNCTION add_task () RETURNS TRIGGER AS $add_task$
 DECLARE
     myrole role_type;
 BEGIN
@@ -214,18 +202,19 @@ BEGIN
         RETURN NULL;
     END IF;
 END
-$add_task$
-LANGUAGE plpgsql;
+$add_task$ LANGUAGE plpgsql;
+
 
 CREATE TRIGGER add_task
-    BEFORE INSERT OR UPDATE ON task
-    FOR EACH ROW
-    EXECUTE PROCEDURE add_task ();
+BEFORE
+INSERT
+OR
+UPDATE ON task
+FOR EACH ROW EXECUTE PROCEDURE add_task ();
 
 -- #4 procedure assigned to is a member
-CREATE PROCEDURE assigntask (tid int, un text
-)
-    AS $$
+
+CREATE PROCEDURE assigntask (tid int, un text) AS $$
 DECLARE
 BEGIN
     IF EXISTS (
@@ -248,13 +237,11 @@ ELSE
     RAISE EXCEPTION 'user is not a member of the project';
 END IF;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- #5 trigger update status of task(to active) when prereq task is completed
-CREATE OR REPLACE FUNCTION update_status ()
-    RETURNS TRIGGER
-    AS $$
+
+CREATE OR REPLACE FUNCTION update_status () RETURNS TRIGGER AS $$
 DECLARE
     r int;
     cur1 CURSOR (tid int)
@@ -294,18 +281,16 @@ DECLARE
     END IF;
             RETURN NEW;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_status
-    AFTER UPDATE ON task
-    FOR EACH ROW
-    EXECUTE FUNCTION update_status ();
+
+CREATE TRIGGER update_status AFTER
+UPDATE ON task
+FOR EACH ROW EXECUTE FUNCTION update_status ();
 
 -- #6 procedure => add preqtask and set task status to inactive
-CREATE PROCEDURE add_preqtask (taskid int, preqid int
-)
-    AS $$
+
+CREATE PROCEDURE add_preqtask (taskid int, preqid int) AS $$
 BEGIN
     INSERT INTO preqtask
         VALUES (taskid, preqid);
@@ -316,13 +301,11 @@ BEGIN
     WHERE
         task = taskid;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- #7 procedure => delete project only if the user doing it is a leader
-CREATE PROCEDURE delete_project (usr text, pid int
-)
-    AS $$
+
+CREATE PROCEDURE delete_project (usr text, pid int) AS $$
 BEGIN
     IF NOT EXISTS (
         SELECT
@@ -338,13 +321,11 @@ ELSE
     WHERE projectid = pid;
 END IF;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- #8 procedure => edit project (leader can remove other leaders but not the creator)
-CREATE OR REPLACE PROCEDURE edit_project (usr text, pid int, n text, sd text, ld text, p text, members text[][]
-)
-    AS $$
+
+CREATE OR REPLACE PROCEDURE edit_project (usr text, pid int, n text, sd text, ld text, p text, members text[][]) AS $$
 DECLARE
     userrole text;
     mem text[];
@@ -382,8 +363,7 @@ BEGIN
             VALUES (mem[1]::text, pid, mem[2]::role_type);
     END LOOP;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- #9 procedure -> create project and add members
 --
@@ -398,9 +378,8 @@ LANGUAGE plpgsql;
 -- }
 --
 --
-CREATE OR REPLACE PROCEDURE create_project (usr text, name text, sd text, ld text, path text, members text[][]
-)
-    AS $$
+
+CREATE OR REPLACE PROCEDURE create_project (usr text, name text, sd text, ld text, path text, members text[][]) AS $$
 DECLARE
     mem text[];
     pid int;
@@ -414,13 +393,11 @@ BEGIN
             VALUES (mem[1]::text, pid, mem[2]::role_type);
     END LOOP;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- #10procedure change password (authenticate the old password before adding the new one)
-CREATE PROCEDURE change_password (usr text, oldpswd text, newpswd text
-)
-    AS $$
+
+CREATE PROCEDURE change_password (usr text, oldpswd text, newpswd text) AS $$
 DECLARE
     pswmatch boolean;
 BEGIN
@@ -437,13 +414,11 @@ BEGIN
             PASSWORD = crypt(newpswd, gen_salt('bf'));
     END IF;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- #11 Procedure Delete member (delete memeber if user doing it is a leader and send error if member doesnot exist)
-CREATE OR REPLACE PROCEDURE delete_member (usrname text, mem text, pid int
-)
-    AS $$
+
+CREATE OR REPLACE PROCEDURE delete_member (usrname text, mem text, pid int) AS $$
 BEGIN
     IF EXISTS (
         SELECT
@@ -472,13 +447,11 @@ END IF;
             RAISE EXCEPTION '% is not a leader of the project', usrname;
 END IF;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- #12 Procedure => (add task with assigned to and prereq task values if user is a leader and members assigned to exists)
-CREATE OR REPLACE PROCEDURE add_task (assignedby text, assignedto text[], pid int, title text, description text, st timestamp, et timestamp, priority text, preqtaskid int[]
-)
-    AS $$
+
+CREATE OR REPLACE PROCEDURE add_task (assignedby text, assignedto text[], pid int, title text, description text, st timestamp, et timestamp, priority text, preqtaskid int[]) AS $$
 DECLARE
     tid int;
     m text;
@@ -520,13 +493,12 @@ END LOOP;
         END LOOP;
     END IF;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- # procedure => update task if user is a leader and make changes in the assignedto and preqtask tables
-CREATE OR REPLACE PROCEDURE edit_task (usr text, tid int, assignedto text[], t text, des text, st timestamp, et timestamp, prior text, preqtaskid int[]
-)
-    AS $$
+
+CREATE OR REPLACE PROCEDURE edit_task (usr text, tid int, assignedto text[], t text, des text, st timestamp, et timestamp,
+                                       prior text, preqtaskid int[]) AS $$
 DECLARE
     m text;
     pid int;
@@ -583,13 +555,11 @@ END LOOP;
             VALUES (p, tid);
     END LOOP;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- #13 procedure => (check if user is a leader and delete assignedto and preqtask where task is refered)
-CREATE OR REPLACE PROCEDURE deleteTask (tid int, usrname text
-)
-    AS $$
+
+CREATE OR REPLACE PROCEDURE deleteTask (tid int, usrname text) AS $$
 DECLARE
     pid int;
 BEGIN
@@ -618,13 +588,11 @@ ELSE
     RAISE exception '% is not a leader', usrname;
 END IF;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- #14 procedure =>(set staus to completed if task is assigned to user and also enter current timestamp)
-CREATE OR REPLACE PROCEDURE complete_task (tid int, usr text
-)
-    AS $$
+
+CREATE OR REPLACE PROCEDURE complete_task (tid int, usr text) AS $$
 BEGIN
     IF EXISTS (
         SELECT
@@ -655,13 +623,11 @@ END IF;
             RAISE exception 'task is not assigned to the user';
 END IF;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- #15 trigger => add a board for a user and each project
-CREATE OR REPLACE FUNCTION add_board ()
-    RETURNS TRIGGER
-    AS $$
+
+CREATE OR REPLACE FUNCTION add_board () RETURNS TRIGGER AS $$
 BEGIN
     IF TG_TABLE_NAME = 'project' THEN
         INSERT INTO board (title, projectid)
@@ -673,23 +639,21 @@ BEGIN
     END IF;
     RETURN NEW;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
-CREATE TRIGGER add_board
-    AFTER INSERT ON users
-    FOR EACH ROW
-    EXECUTE FUNCTION add_board ();
 
-CREATE TRIGGER add_board
-    AFTER INSERT ON project
-    FOR EACH ROW
-    EXECUTE FUNCTION add_board ();
+CREATE TRIGGER add_board AFTER
+INSERT ON users
+FOR EACH ROW EXECUTE FUNCTION add_board ();
+
+
+CREATE TRIGGER add_board AFTER
+INSERT ON project
+FOR EACH ROW EXECUTE FUNCTION add_board ();
 
 -- # 16 trigger => while insert in board rasie exception if both username and projectid is empty
-CREATE OR REPLACE FUNCTION check_board ()
-    RETURNS TRIGGER
-    AS $$
+
+CREATE OR REPLACE FUNCTION check_board () RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.projectid IS NULL AND NEW.username IS NULL THEN
         RAISE exception 'one of username or project id is required';
@@ -698,18 +662,17 @@ BEGIN
         RETURN new;
     END IF;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
+
 
 CREATE TRIGGER check_board
-    BEFORE INSERT ON board
-    FOR EACH ROW
-    EXECUTE FUNCTION check_board ();
+BEFORE
+INSERT ON board
+FOR EACH ROW EXECUTE FUNCTION check_board ();
 
 -- #17 Procedure => add note to project only if user is a member
-CREATE PROCEDURE add_note (usr text, pid int, title text, description text, color text
-)
-    AS $$
+
+CREATE PROCEDURE add_note (usr text, pid int, title text, description text, color text) AS $$
 BEGIN
     IF NOT EXISTS (
         SELECT
@@ -731,16 +694,11 @@ ELSE
                     projectid = pid), usr);
 END IF;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- projectReport
-CREATE OR REPLACE FUNCTION gen_project_report (pid integer)
-    RETURNS TABLE (
-        KEY text,
-        value int
-    )
-    AS $$
+
+CREATE OR REPLACE FUNCTION gen_project_report (pid integer) RETURNS TABLE (KEY text, value int) AS $$
 DECLARE
     inactive int;
     active int;
@@ -805,16 +763,11 @@ INSERT INTO report
         report;
     DROP TABLE IF EXISTS report;
 END;
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Project report with user
-CREATE OR REPLACE FUNCTION gen_userwise_report (pid int)
-    RETURNS TABLE (
-        KEY text,
-        value int
-    )
-    AS $$
+
+CREATE OR REPLACE FUNCTION gen_userwise_report (pid int) RETURNS TABLE (KEY text, value int) AS $$
 DECLARE
     cursor1 CURSOR (pidc int)
     FOR SELECT DISTINCT
@@ -931,16 +884,11 @@ INSERT INTO report
         report;
     DROP TABLE IF EXISTS report;
 END;
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- User report
-CREATE OR REPLACE FUNCTION gen_user_report (uname text)
-    RETURNS TABLE (
-        KEY text,
-        value int
-    )
-    AS $$
+
+CREATE OR REPLACE FUNCTION gen_user_report (uname text) RETURNS TABLE (KEY text, value int) AS $$
 DECLARE
     inactive int;
     active int;
@@ -1020,12 +968,9 @@ BEGIN
         task t
     WHERE
         t.taskid = (
-            SELECT
-                taskid
-            FROM
-                assignedto
-            WHERE
-                username = uname)
+            SELECT taskid
+            FROM assignedto
+            WHERE username = uname)
         AND status = 'completed'
         AND completiontime > endtime;
     CREATE TEMP TABLE report (
@@ -1041,55 +986,43 @@ INSERT INTO report
         report;
     DROP TABLE IF EXISTS report;
 END;
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- intervalReport
-SELECT
-    COUNT(*)
-FROM
-    task
-WHERE
-    projectid = 1
+
+SELECT COUNT(*)
+FROM task
+WHERE projectid = 1
     AND starttime >= '2020-04-13'
     AND endtime <= '2020-04-18';
 
-SELECT
-    status,
-    COUNT(1)
-FROM
-    task
-WHERE
-    projectid = 1
+
+SELECT status,
+       COUNT(1)
+FROM task
+WHERE projectid = 1
     AND starttime >= '2020-04-13'
     AND endtime <= '2020-04-18'
-GROUP BY
-    status;
+GROUP BY status;
 
-SELECT
-    COUNT(*)
-FROM
-    task
-WHERE
-    completiontime IS NOT NULL
+
+SELECT COUNT(*)
+FROM task
+WHERE completiontime IS NOT NULL
     AND starttime >= '2020-04-13'
     AND endtime <= '2020-04-18';
 
-SELECT
-    COUNT(*) AS completedbeforedealine
-FROM
-    task
-WHERE
-    endtime <= completiontime
+
+SELECT COUNT(*) AS completedbeforedealine
+FROM task
+WHERE endtime <= completiontime
     AND starttime >= '2020-04-13'
     AND endtime <= '2020-04-18';
 
-SELECT
-    COUNT(*) AS completedafterdealine
-FROM
-    task
-WHERE
-    endtime > completiontime
+
+SELECT COUNT(*) AS completedafterdealine
+FROM task
+WHERE endtime > completiontime
     AND starttime >= '2020-04-13'
     AND endtime <= '2020-04-18';
 
@@ -1109,19 +1042,7 @@ WHERE
 --     columnid = 1;
 -- function my projects
 
-CREATE OR REPLACE FUNCTION myprojects (usr text)
-    RETURNS TABLE (
-        pid int,
-        projectname text,
-        sd text,
-        ld text,
-        DOC date,
-        projectpath text,
-        OWNER text,
-        members text[],
-        roles text[]
-    )
-    AS $$
+CREATE OR REPLACE FUNCTION myprojects (usr text) RETURNS TABLE (pid int, projectname text, sd text, ld text, DOC date, projectpath text, OWNER text, members text[], roles text[]) AS $$
 DECLARE
     r Record;
     cur1 CURSOR (usern text)
@@ -1156,5 +1077,4 @@ BEGIN
     END LOOP;
     RETURN;
 END
-$$
-LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;

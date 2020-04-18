@@ -378,13 +378,7 @@ BEGIN
     ELSE
         RAISE EXCEPTION 'user is not a leader';
     END IF;
-    DELETE FROM member
-    WHERE projectid = pid
-        AND username != own;
-    if usr != own then
-    INSERT INTO member
-        VALUES (usr, pid, 'leader');
-    end if;
+
     if members is not null then
     FOREACH mem slice 1 IN ARRAY members LOOP
         INSERT INTO member
@@ -459,6 +453,12 @@ CREATE OR REPLACE PROCEDURE delete_member (usrname text, mem text, pid int
 )
     AS $$
 BEGIN
+    if not exists(select 1 from member where username = mem and projectid = pid) then
+    raise exception '% is not a member',mem;
+    end if;
+    if (select createdby from project where projectid = pid) = mem then
+    raise exception '% is the owner cannot be deleted',mem;
+    end if;
     IF EXISTS (
         SELECT
             1

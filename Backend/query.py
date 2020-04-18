@@ -135,5 +135,28 @@ def f_getProjectReportUserwise(pid):
     ]
 
 
+Analytics = namedtuple("Analytics", ["dates", "newTasks", "Taskcompleted"])
+
+
+def f_analytics(pid, startdate, enddate):
+    data = pg.executequery2(
+        "select * from daily_analytics(%s,%s::date,%s::date);",
+        [pid, startdate, enddate])
+    dates = [x[0] for x in data]
+    newtasks = [x[1] for x in data]
+    completedtasks = [x[2] for x in data]
+    return Analytics(dates, newtasks, completedtasks)
+
+
+def f_cum_analytics(pid, startdate, enddate):
+    data = pg.executequery2(
+        "select * from cumulative_daily_analytics(%s,%s::date,%s::date);",
+        [pid, startdate, enddate])
+    dates = [x[0] for x in data]
+    newtasks = [x[1] for x in data]
+    completedtasks = [x[2] for x in data]
+    return Analytics(dates, newtasks, completedtasks)
+
+
 if __name__ == "__main__":
-    print(f_getproject('dhruvil91', 2))
+    f_analytics(1, "2020-04-01", "2020-04-22")

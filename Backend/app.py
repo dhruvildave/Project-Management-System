@@ -1,5 +1,5 @@
 # Imports
-from graphene import ObjectType, String, Int, Schema, Boolean, Field, List, NonNull
+from graphene import ObjectType, String, Int, Schema, Boolean, Field, List, NonNull, types
 from flask import Flask
 from flask_graphql import GraphQLView
 from flask_cors import CORS as cors
@@ -63,6 +63,22 @@ class Query(ObjectType):
     getUserwiseProjectReport = Field(List(Object.UserReport),
                                      args={'projectid': Int(required=True)})
 
+    getProjectAnalytics = Field(Object.Analytics,
+                                args={
+                                    "projectid": Int(required=True),
+                                    "startdate": types.Date(required=True),
+                                    "enddate": types.Date(required=True),
+                                })
+    getCumulativeProjectAnalytics = Field(Object.Analytics,
+                                          args={
+                                              "projectid":
+                                              Int(required=True),
+                                              "startdate":
+                                              types.Date(required=True),
+                                              "enddate":
+                                              types.Date(required=True),
+                                          })
+
     # our Resolver method takes the GraphQL context (root, info) as well as
     # Argument (name) for the Field and returns data for the query Response
     def resolve_authenticate(root, info, username, password):
@@ -101,6 +117,13 @@ class Query(ObjectType):
     def resolve_getUserwiseProjectReport(root, info, projectid):
         return query.f_getProjectReportUserwise(projectid)
 
+    def resolve_getProjectAnalytics(root, info, projectid, startdate, enddate):
+        return query.f_analytics(projectid, startdate, enddate)
+
+    def resolve_getCumulativeProjectAnalytics(root, info, projectid, startdate,
+                                              enddate):
+        return query.f_cum_analytics(projectid, startdate, enddate)
+
 
 class Mutation(ObjectType):
     create_user = mutation.createUser.Field()
@@ -110,6 +133,7 @@ class Mutation(ObjectType):
     create_project = mutation.createProject.Field()
     edit_project = mutation.editProject.Field()
     delete_project = mutation.deleteProject.Field()
+    add_member = mutation.addMember.Field()
     delete_member = mutation.deleteMember.Field()
     add_task = mutation.addTask.Field()
     update_task = mutation.updateTask.Field()

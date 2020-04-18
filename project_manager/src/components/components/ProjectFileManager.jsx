@@ -61,7 +61,7 @@ class ProjectFileManager extends React.Component {
   }
   componentWillMount() {
     this.setState({ files: this.props.files, projectid: this.props.projectid });
-    this.setState({ states: this.props.stateforedit });
+    // this.setState({ states: this.props.stateforedit });
 
     // console.log(this.props.files);
   }
@@ -166,7 +166,7 @@ class ProjectFileManager extends React.Component {
                 </Typography>
                 <Typography variant="subtitle1">
                   {" "}
-                  {`Description:` + this.props.description}{" "}
+                  {`Description:` + this.props.longdescription}{" "}
                 </Typography>
                 <Typography variant="subtitle1">Project Members:</Typography>
                 <List className={classes.listroot}>
@@ -223,7 +223,7 @@ class ProjectFileManager extends React.Component {
           path={this.props.path}
           username={this.props.username}
           shortdescription={this.props.shortdescription}
-          description={this.props.description}
+          description={this.props.longdescription}
           members={this.props.members}
           handleToUpdate={this.handlePage}
         />

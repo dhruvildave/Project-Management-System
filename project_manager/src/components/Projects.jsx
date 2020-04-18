@@ -20,6 +20,9 @@ import AddProject from "./components/AddProject";
 import DeleteProject from "./components/DeleteProject";
 import { withAlert } from "react-alert";
 import NotesList from "./components/NotesList";
+import { execute, makePromise } from "apollo-link";
+import { myProjects, link } from "./queries";
+
 const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
@@ -73,35 +76,52 @@ class Projects extends React.Component {
     this.state = {
       username: "",
       authenticated: false,
-      pagename: "projects",
+      pagename: "",
       projectid: 42069,
       projectlist: {
         ongoing: [
           {
-            projectid: 1,
-            name: "AAAAAAAAAAAAAAAA",
-            date: "12-4-20",
-            path: "git:arpit-vaghela:a",
-            username: "arpit-vaghela",
-            description: "This is a longer detailed description",
-            shortdescription: "Something there",
+            projectid: "",
+            name: "",
+            shortdescription: "",
+            longdescription: "",
+            createdon: "",
+            path: "",
+            createdby: {
+              username: "",
+            },
+            members: {
+              user: {
+                username: "",
+              },
+              role: "",
+            },
           },
         ],
         completed: [
           {
-            projectid: 2,
-            name: "BBBBBBBBBBBBB",
-            date: "12-4-20",
-            path: "git:arpit-vaghela:a",
-            username: "arpit-vaghela",
-            description: "This is a longer detailed description",
-            shortdescription: "Something there",
+            projectid: "",
+            name: "",
+            shortdescription: "",
+            longdescription: "",
+            createdon: "",
+            path: "",
+            createdby: {
+              username: "",
+            },
+            members: {
+              user: {
+                username: "",
+              },
+              role: "",
+            },
           },
         ],
       },
     };
     this.handleToUpdate = this.handleToUpdate.bind(this);
     this.pageUpdate = this.pageUpdate.bind(this);
+    this.fetchdata = this.fetchdata.bind(this);
     // console.log(this.props.username);
     // console.log(this.props.location.state.username);
   }
@@ -137,15 +157,68 @@ class Projects extends React.Component {
       });
     }
   }
+  async fetchdata() {
+    let ongoing = [{}];
+    const operation1 = {
+      query: myProjects,
+      variables: {
+        username: this.props.location.state.username,
+        projectFilter: "ongoing",
+      }, //optional
+    };
 
-  componentDidMount() {
-    console.log(this.state.username);
-    console.log(this.state.authenticated);
-    console.log(this.state.pagename);
+    makePromise(execute(link, operation1))
+      .then((data) => {
+        // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        console.log(data);
+        if (data.data) {
+          ongoing = data.data.myProjects;
+          console.log(ongoing);
+        }
+      })
+      .catch((error) => this.props.alert.error(error));
+
+    let completed;
+    const operation = {
+      query: myProjects,
+      variables: {
+        username: this.props.location.state.username,
+        projectFilter: "completed",
+      }, //optional
+    };
+
+    makePromise(execute(link, operation))
+      .then((data) => {
+        // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        console.log(data);
+        completed = data.data.myProjects;
+        console.log(completed);
+        let projectlist = {
+          ongoing: ongoing,
+          completed: completed,
+        };
+        // console.log(projectlist);
+        this.setState({ projectlist: projectlist });
+        console.log(this.state.projectlist);
+        this.setState({ pagename: "projects" });
+      })
+      .catch((error) => this.props.alert.error(error));
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.state.pagename === "projects" &&
+      prevState.pagename !== "projects"
+    ) {
+      this.fetchdata();
+    }
+  }
+
+  async componentDidMount() {
+    await this.fetchdata();
   }
 
   render() {
-    console.log(this.state.pagename);
     if (this.state.authenticated === false) {
       return <h1>Not Authenticated Go to Login Page and Login</h1>;
     }

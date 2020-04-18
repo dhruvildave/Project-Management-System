@@ -32,7 +32,7 @@ class Query(ObjectType):
                        args={
                            'username': String(required=True),
                            'project_filter': String()
-                       })
+    })
     getProject = Field(Object.Project,
                        args={
                            'username': String(required=True),
@@ -44,13 +44,13 @@ class Query(ObjectType):
                     args={
                         'username': String(required=True),
                         'taskFilter': String()
-                    })
+    })
     ProjectTasks = Field(List(Object.Task),
                          args={
                              'username': String(required=True),
                              'projectid': Int(required=True),
                              'taskFilter': String()
-                         })
+    })
     getTask = Field(Object.Task, args={'taskid': Int(required=True)})
 
     getUserReport = Field(Object.UserReport,

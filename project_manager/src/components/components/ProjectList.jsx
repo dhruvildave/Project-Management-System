@@ -34,8 +34,18 @@ class ProjectList extends React.Component {
     this.setState({ projectid: someArg, redirect: 1 });
   }
 
-  componentDidUpdate() {
-    this.props.handleToUpdate(this.state.projectid, this.state.redirect);
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.projectid !== this.state.projectid) {
+      this.props.handleToUpdate(this.state.projectid, this.state.redirect);
+    }
+    if (prevProps.projectlist !== this.props.projectlist) {
+      this.setState({ projectlist: this.state.projectlist });
+    }
+  }
+
+  componentDidMount() {
+    this.setState({ projectlist: this.props.projectlist });
+    console.log(this.state.projectlist);
   }
   render() {
     const classes = useStyles();

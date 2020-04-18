@@ -153,7 +153,7 @@ class deleteMember(Mutation):
     class Arguments:
         username = String(required=True)
         member = String(required=True)
-        projectid = String(required=True)
+        projectid = Int(required=True)
 
     status = Boolean(required=True)
     msg = String()
@@ -306,8 +306,8 @@ class deleteNote(Mutation):
     msg = String()
 
     def mutate(root, info, username, noteid):
-        s, m = pg.executequery('delete from note where noteid = %s);',
-                               [noteid, username])
+        s, m = pg.executequery('delete from note where noteid = %s;',
+                               [noteid])
         return deleteNote(status=s, msg=m)
 
 

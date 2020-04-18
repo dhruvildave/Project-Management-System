@@ -1,6 +1,6 @@
 from graphene import (Boolean, InputObjectType, Int, List, Mutation, NonNull,
                       ObjectType, String, types)
-
+from graphene_file_upload.scalars import Upload
 import pg
 
 
@@ -306,8 +306,7 @@ class deleteNote(Mutation):
     msg = String()
 
     def mutate(root, info, username, noteid):
-        s, m = pg.executequery('delete from note where noteid = %s;',
-                               [noteid])
+        s, m = pg.executequery('delete from note where noteid = %s;', [noteid])
         return deleteNote(status=s, msg=m)
 
 
@@ -332,4 +331,21 @@ class editNote(Mutation):
         s, m = pg.executequery(
             'update note set title = %s description = %s color = %s createdby = %s where noteid = %s);',
             [title, description, color, username, noteid])
+        return editNote(status=s, msg=m)
+
+
+class UploadProjectFile(Mutation):
+    class Arguments:
+        file = Upload(required=True)
+        filename = String(required=True)
+        projectid = Int(required=True)
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(root, info, filename, file, projectid):
+        f = file.read()
+        s, m = pg.executequery(
+            'insert into projectfiles (filename,file,projectid) values(%s,%s,%s)',
+            [filename, f, projectid])
         return editNote(status=s, msg=m)

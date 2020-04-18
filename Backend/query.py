@@ -54,11 +54,12 @@ def f_myprojects(username, f):
 def f_getproject(username, projectid):
     data = pg.executequery2("select * from getproject(%s,%s)",
                             [username, projectid])
-
-    return [
-        Project(x[0], x[1], x[2], x[3], x[4], x[5], x[6],
-                [Member(i, j) for i, j in zip(x[7], x[8])]) for x in data
-    ]
+    x = data[0]
+    print(x)
+    p = Project(x[0], x[1], x[2], x[3], x[4], x[5], x[6],
+                [Member(i, j) for i, j in zip(x[7], x[8])])
+    print(p)
+    return p
 
 
 def f_projectNotes(projectid):
@@ -103,5 +104,36 @@ def f_getprojecttask(username, pid, task_filter):
     ]
 
 
+UserReport = namedtuple("UserReport", [
+    'username', 'inactive', 'active', 'working', 'completed',
+    'completed_before', 'completed_after', 'total'
+])
+
+Report = namedtuple("Report", [
+    'inactive', 'active', 'working', 'completed', 'completed_before',
+    'completed_after', 'total'
+])
+
+
+def f_getUserReport(username):
+    data = pg.executequery2("select * from gen_user_report(%s);", [username])
+    x = data[0]
+    return UserReport(username, x[0], x[1], x[2], x[3], x[4], x[5], x[6])
+
+
+def f_getProjectReport(pid):
+    data = pg.executequery2("select * from gen_project_report(%s)", [pid])
+    x = data[0]
+    return Report(x[0], x[1], x[2], x[3], x[4], x[5], x[6])
+
+
+def f_getProjectReportUserwise(pid):
+    data = pg.executequery2("select * from gen_userwise_report(%s)", [pid])
+    return [
+        UserReport(x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7])
+        for x in data
+    ]
+
+
 if __name__ == "__main__":
-    print(f_gettask(1))
+    print(f_getproject('dhruvil91', 2))

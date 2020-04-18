@@ -144,3 +144,69 @@ class Task(ObjectType):
 
     def resolve_preqtask(parent, info):
         return parent.preqtask
+
+
+class Report(ObjectType):
+    inactive = Int()
+    active = Int()
+    total = Int()
+    completed = Int()
+    completed_before = Int()
+    completed_after = Int()
+    working = Int()
+
+    def resolve_total(parent, info):
+        return parent.total
+
+    def resolve_active(parent, info):
+        return parent.active
+
+    def resolve_inactive(parent, info):
+        return parent.inactive
+
+    def resolve_working(parent, info):
+        return parent.working
+
+    def resolve_completed(parent, info):
+        return parent.completed
+
+    def resolve_completed_before(parent, info):
+        return parent.completed_before
+
+    def resolve_completed_after(parent, info):
+        return parent.completed_after
+
+
+class UserReport(ObjectType):
+    username = String()
+    inactive = Int()
+    active = Int()
+    working = Int()
+    completed = Int()
+    completed_before = Int()
+    completed_after = Int()
+    total = Int()
+
+    def resolve_username(parent, info):
+        return parent.username
+
+    def resolve_total(parent, info):
+        return parent.total
+
+    def resolve_active(parent, info):
+        return parent.active
+
+    def resolve_inactive(parent, info):
+        return parent.inactive
+
+    def resolve_working(parent, info):
+        return parent.working
+
+    def resolve_completed(parent, info):
+        return parent.completed
+
+    def resolve_completed_before(parent, info):
+        return parent.completed_before
+
+    def resolve_completed_after(parent, info):
+        return parent.completed_after

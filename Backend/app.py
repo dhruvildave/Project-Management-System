@@ -133,6 +133,7 @@ class Mutation(ObjectType):
     create_project = mutation.createProject.Field()
     edit_project = mutation.editProject.Field()
     delete_project = mutation.deleteProject.Field()
+    add_member = mutation.addMember.Field()
     delete_member = mutation.deleteMember.Field()
     add_task = mutation.addTask.Field()
     update_task = mutation.updateTask.Field()

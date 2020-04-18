@@ -138,15 +138,17 @@ class editProject(Mutation):
                longdescription=None,
                path=None,
                members=None):
-        usernames = [x.username for x in members]
-        roles = [x.role for x in members]
-        m = [[x, y] for x, y in zip(usernames, roles)]
+        usernames = [x.username
+                     for x in members] if members is not None else None
+        roles = [x.role for x in members] if members is not None else None
+        m = [[x, y] for x, y in zip(usernames, roles)
+             ] if usernames is not None else None
 
-        s, m = pg.executequery("call edit_project (%s,%s,%s,%s,%s,%s,%s);", [
+        s, msg = pg.executequery("call edit_project (%s,%s,%s,%s,%s,%s,%s);", [
             username, projectid, name, shortdescription, longdescription, path,
             m
         ])
-        return editProject(status=s, msg=m)
+        return editProject(status=s, msg=msg)
 
 
 class deleteMember(Mutation):
@@ -159,9 +161,25 @@ class deleteMember(Mutation):
     msg = String()
 
     def mutate(root, info, username, member, projectid):
-        s, m = pg.executequery("CALL delete_members(%s,%s,%s);",
+        s, m = pg.executequery("call delete_member (%s,%s,%s);",
                                [username, member, projectid])
         return deleteMember(status=s, msg=m)
+
+
+class addMember(Mutation):
+    class Arguments:
+        username = String(required=True)
+        member = String(required=True)
+        projectid = Int(required=True)
+        role = String()
+
+    status = Boolean(required=True)
+    msg = String()
+
+    def mutate(root, info, username, member, projectid, role=None):
+        s, m = pg.executequery("call add_member(%s,%s,%s,%s);",
+                               [username, member, projectid, role])
+        return addMember(status=s, msg=m)
 
 
 class addTask(Mutation):

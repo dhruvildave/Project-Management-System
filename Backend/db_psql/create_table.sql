@@ -385,10 +385,12 @@ BEGIN
     INSERT INTO member
         VALUES (usr, pid, 'leader');
     end if;
+    if members is not null then
     FOREACH mem slice 1 IN ARRAY members LOOP
         INSERT INTO member
             VALUES (mem[1]::text, pid, mem[2]::role_type);
     END LOOP;
+    end if;
 END
 $$
 LANGUAGE plpgsql;
@@ -451,7 +453,8 @@ END
 $$
 LANGUAGE plpgsql;
 
--- #11 Procedure Delete member (delete memeber if user doing it is a leader and send error if member doesnot exist)
+-- #11 Procedure delete member (delete memeber if user doing it is a leader and send error if member doesnot exist)
+
 CREATE OR REPLACE PROCEDURE delete_member (usrname text, mem text, pid int
 )
     AS $$
@@ -465,26 +468,39 @@ BEGIN
             username = usrname
             AND projectid = pid
             AND ROLE = 'leader') THEN
-    IF EXISTS (
-        SELECT
-            1
-        FROM
-            member
-        WHERE
-            username = mem
-            AND projectid = pid) THEN
+
     DELETE FROM member
     WHERE username = mem
         AND projectid = pid;
-ELSE
-    RAISE EXCEPTION '% is not a member of the project', mem;
-END IF;
         ELSE
             RAISE EXCEPTION '% is not a leader of the project', usrname;
 END IF;
 END
 $$
 LANGUAGE plpgsql;
+-- # procedure => add member
+
+create or replace procedure add_member(text,text,int,text = 'member')as $$
+BEGIN
+if $4 is null then $4 = 'member'; end if;
+IF EXISTS (
+        SELECT
+            1
+        FROM
+            member
+        WHERE
+            username = $1
+            AND projectid = $3
+            AND ROLE = 'leader') THEN
+
+    INSERT INTO member
+    VALUES  ($2,$3,$4::role_type);
+        ELSE
+            RAISE EXCEPTION '% is not a leader of the project', $1;
+END IF;
+END
+$$ LANGUAGE plpgsql;
+
 
 -- #12 Procedure => (add task with assigned to and prereq task values if user is a leader and members assigned to exists)
 CREATE OR REPLACE PROCEDURE add_task (assignedby text, assignedto text[], pid int, title text, description text, st timestamp, et timestamp, priority text, preqtaskid int[]

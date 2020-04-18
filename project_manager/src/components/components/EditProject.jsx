@@ -2,7 +2,7 @@ import React from "react";
 import { createStyles, withStyles } from "@material-ui/core/styles";
 import { Grid, TextField, Paper, Button } from "@material-ui/core";
 import { execute, makePromise } from "apollo-link";
-import { editProject, link } from "../queries";
+import { editProject, deleteMember, link } from "../queries";
 import { withAlert } from "react-alert";
 
 const useStyles = createStyles((theme) => ({
@@ -57,7 +57,15 @@ class EditProject extends React.Component {
     event.preventDefault();
     console.log("Clicker");
     console.log(this.state.members);
-    this.setState({ members: JSON.parse(this.state.memberstring) });
+    let message = "";
+    try {
+      if (this.state.memberstring !== "") {
+        message = JSON.parse(this.state.memberstring);
+      }
+    } catch (e) {
+      this.props.alert.error(e.message);
+    }
+    console.log(message);
     const operation = {
       query: editProject,
       variables: {
@@ -66,11 +74,18 @@ class EditProject extends React.Component {
         path: this.state.path,
         sd: this.state.shortdescription,
         username: this.state.username,
-        members: this.state.members,
+        members: message,
         projectid: this.state.projectid,
       }, //optional
     };
-
+    const operationdel = {
+      query: deleteMember,
+      variables: {
+        username: this.state.username,
+        projectid: this.state.projectid,
+        member: this.state.deletemember,
+      },
+    };
     makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
@@ -80,10 +95,23 @@ class EditProject extends React.Component {
         }
         if (data.data.editProject.status === true) {
           this.props.alert.success("Success on Editing project");
-          this.props.handleToUpdate();
+          // this.props.handleToUpdate();
         }
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) => this.props.alert.error(error.message));
+
+    makePromise(execute(link, operationdel))
+      .then((data) => {
+        if (data.data.deleteMember.status == false) {
+          this.props.alert.error(
+            "Failed Delete Member" + data.data.deleteMember.msg
+          );
+        }
+        if (data.data.deleteMember.status == true) {
+          this.props.alert.success("Succes on deleting");
+        }
+      })
+      .catch((error) => this.props.alert.error(error.message));
   }
   render() {
     const { classes } = this.props;
@@ -118,10 +146,7 @@ class EditProject extends React.Component {
                 id="description1"
                 name="description1"
                 label="Short Description 1"
-                value={
-                  (this.state.shortdescriptionhelperText =
-                    "Add previous members in eash edit and yourself")
-                }
+                value={this.state.shortdescription}
                 fullWidth
                 onChange={(event) =>
                   this.setState({ shortdescription: event.target.value })
@@ -177,8 +202,7 @@ class EditProject extends React.Component {
                 required
                 id="title"
                 name="titile"
-                label='Add Member : format [{"username":"ksp","role":"leader"},{}]'
-                helperText="Add previous members in eash edit and yourself"
+                label='Add/Edit Member : format [{"username":"ksp","role":"leader"},{}]'
                 fullWidth
                 value={this.state.memberstring}
                 onChange={(event) => {
@@ -197,7 +221,7 @@ class EditProject extends React.Component {
                 name="titile"
                 label="delete Member : add one username"
                 fullWidth
-                value={this.state.memberstring}
+                value={this.state.deletemember}
                 onChange={(event) => {
                   this.setState({
                     deletemember: event.target.value,
@@ -247,4 +271,4 @@ class EditProject extends React.Component {
   }
 }
 
-export default withStyles(useStyles)(EditProject);
+export default withAlert()(withStyles(useStyles)(EditProject));

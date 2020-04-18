@@ -69,6 +69,7 @@ class ProjectFileManager extends React.Component {
     this.setState({ fileid: someArg, viewname: "onefile" });
   }
   handlePage() {
+    this.props.handleToUpdate();
     this.setState({ viewname: "allfiles" });
   }
 
@@ -166,7 +167,7 @@ class ProjectFileManager extends React.Component {
                 </Typography>
                 <Typography variant="subtitle1">
                   {" "}
-                  {`Description:` + this.props.longdescription}{" "}
+                  {`Description:` + this.props.description}{" "}
                 </Typography>
                 <Typography variant="subtitle1">Project Members:</Typography>
                 <List className={classes.listroot}>
@@ -223,7 +224,7 @@ class ProjectFileManager extends React.Component {
           path={this.props.path}
           username={this.props.username}
           shortdescription={this.props.shortdescription}
-          description={this.props.longdescription}
+          description={this.props.description}
           members={this.props.members}
           handleToUpdate={this.handlePage}
         />

@@ -85,7 +85,7 @@ insert into member where values ('un',pid,role)
 CREATE TABLE IF NOT EXISTS projectfiles (
     fileid serial PRIMARY KEY,
     "filename" text CHECK ("filename" ~ '^[\w,\s-]+\.[A-Za-z]+$') NOT NULL,
-    "file" bytea NOT NULL,
+    "file" bytea,
     lastupdated timestamp NOT NULL DEFAULT now(),
     projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -382,8 +382,10 @@ BEGIN
     DELETE FROM member
     WHERE projectid = pid
         AND username != own;
+    if usr != own then
     INSERT INTO member
         VALUES (usr, pid, 'leader');
+    end if;
     FOREACH mem slice 1 IN ARRAY members LOOP
         INSERT INTO member
             VALUES (mem[1]::text, pid, mem[2]::role_type);
@@ -1409,3 +1411,65 @@ GROUP BY
 END
 $$
 LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION daily_analytics(pid int, d0 date, d1 date)
+RETURNS TABLE("date" date, num_start int, num_comp int)
+AS $$
+DECLARE
+    num_start int;
+    num_comp int;
+BEGIN
+    DROP TABLE IF EXISTS temp;
+    CREATE TABLE IF NOT EXISTS temp("date" date, num int, num_c int);
+    IF d1 > d0 THEN
+        FOR i in 0..(d1 - d0) - 1 LOOP
+            SELECT COUNT(*) INTO num_start
+            FROM task
+            WHERE starttime >= d0 + i AND starttime < d0 + i + 1;
+
+            SELECT COUNT(*) INTO num_comp
+            FROM task
+            WHERE completiontime >= d0 + i AND completiontime < d0 + i + 1;
+
+            INSERT INTO temp
+            VALUES
+                (d0 + i, num_start, num_comp);
+        END LOOP;
+    END IF;
+
+    RETURN QUERY
+    SELECT *
+    FROM temp;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cumulative_daily_analytics(pid int, d0 date, d1 date)
+RETURNS TABLE("date" date, num_start int, num_comp int)
+AS $$
+DECLARE
+    num_start int;
+    num_comp int;
+BEGIN
+    DROP TABLE IF EXISTS temp;
+    CREATE TABLE IF NOT EXISTS temp("date" date, num int, num_c int);
+    IF d1 > d0 THEN
+        FOR i in 0..(d1 - d0) - 1 LOOP
+            SELECT COUNT(*) INTO num_start
+            FROM task
+            WHERE starttime >= d0 AND starttime < d0 + i + 1;
+
+            SELECT COUNT(*) INTO num_comp
+            FROM task
+            WHERE completiontime >= d0 AND completiontime < d0 + i + 1;
+
+            INSERT INTO temp
+            VALUES
+                (d0 + i, num_start, num_comp);
+        END LOOP;
+    END IF;
+
+    RETURN QUERY
+    SELECT *
+    FROM temp;
+END;
+$$ LANGUAGE plpgsql;

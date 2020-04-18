@@ -138,12 +138,13 @@ class editProject(Mutation):
                longdescription=None,
                path=None,
                members=None):
-        usernames = [x.username
-                     for x in members] if members is not None else None
-        roles = [x.role for x in members] if members is not None else None
+        usernames = [x.username for x in members
+                     if x.username] if members is not None else None
+        roles = [x.role for x in members
+                 if x.role] if members is not None else None
         m = [[x, y] for x, y in zip(usernames, roles)
              ] if usernames is not None else None
-
+        print(m)
         s, msg = pg.executequery("call edit_project (%s,%s,%s,%s,%s,%s,%s);", [
             username, projectid, name, shortdescription, longdescription, path,
             m

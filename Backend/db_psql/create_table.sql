@@ -379,7 +379,7 @@ BEGIN
         RAISE EXCEPTION 'user is not a leader';
     END IF;
 
-    if members is not null then
+    if array_length(members, 1) > 0 then
     FOREACH mem slice 1 IN ARRAY members LOOP
         INSERT INTO member
             VALUES (mem[1]::text, pid, mem[2]::role_type);

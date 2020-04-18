@@ -1417,7 +1417,7 @@ DECLARE
     num int;
 BEGIN
     DROP TABLE IF EXISTS temp;
-    CREATE TEMP IF NOT EXISTS TABLE temp("date" date, num int);
+    CREATE TABLE IF NOT EXISTS temp("date" date, num int);
     IF d1 > d0 THEN
         FOR i in 0..(d1 - d0) - 1 LOOP
             SELECT COUNT(*) INTO num

@@ -123,7 +123,7 @@ class Projects extends React.Component {
     // this.fetchdata();
     // this.setState({ pagename: "projects" });
   }
-  fetchdata() {
+  async fetchdata() {
     let ongoing = [{}];
     const operation1 = {
       query: myProjects,
@@ -169,15 +169,15 @@ class Projects extends React.Component {
       .catch((error) => this.props.alert.error(error));
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(prevProps, prevState) {
     if (this.state.pagename !== prevState.pagename) {
       // this.setState({ loaded: 0 });
-      this.fetchdata();
+      await this.fetchdata();
     }
   }
 
-  componentDidMount() {
-    this.fetchdata();
+  async componentDidMount() {
+    await this.fetchdata();
     this.setState({ pagename: "projects" });
   }
 

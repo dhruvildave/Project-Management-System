@@ -102,13 +102,13 @@ class EditProject extends React.Component {
 
     makePromise(execute(link, operationdel))
       .then((data) => {
-        if (data.data.deleteMember.status == false) {
+        if (data.data.deleteMember.status === false) {
           this.props.alert.error(
             "Failed Delete Member" + data.data.deleteMember.msg
           );
         }
-        if (data.data.deleteMember.status == true) {
-          this.props.alert.success("Succes on deleting");
+        if (data.data.deleteMember.status === true) {
+          this.props.alert.success("Success on deleting");
         }
       })
       .catch((error) => this.props.alert.error(error.message));

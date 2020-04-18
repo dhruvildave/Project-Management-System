@@ -210,3 +210,18 @@ class UserReport(ObjectType):
 
     def resolve_completed_after(parent, info):
         return parent.completed_after
+
+
+class Analytics(ObjectType):
+    dates = List(types.Date)
+    newTasks = List(Int)
+    Taskcompleted = List(Int)
+
+    def resolve_dates(parent, info):
+        return parent.dates
+
+    def resolve_newTasks(parent, info):
+        return parent.newTasks
+
+    def resolve_Taskcompleted(parent, info):
+        return parent.Taskcompleted

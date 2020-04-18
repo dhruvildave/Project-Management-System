@@ -310,21 +310,20 @@ CREATE TRIGGER update_status
     EXECUTE FUNCTION update_status ();
 
 -- #6 procedure => add preqtask and set task status to inactive
-CREATE PROCEDURE add_preqtask (taskid int, preqid int
-)
+
+CREATE Function change_statuson_preqtask (
+) returns trigger
     AS $$
 BEGIN
-    INSERT INTO preqtask
-        VALUES (taskid, preqid);
-    UPDATE
-        task
-    SET
-        status = 'inactive'
-    WHERE
-        task = taskid;
+if (select status from task where taskid = NEW.preqtask) != 'completed' then
+update task set status = 'inactive' where taskid = NEW.task;
+end if;
+return new;
 END
 $$
 LANGUAGE plpgsql;
+
+create trigger task_status_to_inactive after insert or update on preqtask for each row execute function change_statuson_preqtask();
 
 -- #7 procedure => delete project only if the user doing it is a leader
 CREATE PROCEDURE delete_project (usr text, pid int
@@ -496,6 +495,8 @@ DECLARE
     m text;
     p int;
 BEGIN
+if st is null then st = now();
+end if;
     IF NOT EXISTS (
         SELECT
             1

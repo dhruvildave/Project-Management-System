@@ -747,47 +747,60 @@ LANGUAGE plpgsql;
 -- projectReport
 CREATE OR REPLACE FUNCTION gen_project_report (pid integer)
     RETURNS TABLE (
-        KEY text,
-        value int
+    inactive int,
+    active int,
+    working int,
+    completed int,
+    completed_before int,
+    completed_after int,
+    total int
     )
     AS $$
 DECLARE
-    inactive int;
-    active int;
-    working int;
-    completed_before int;
-    completed_after int;
-    total int;
+    i int;
+    a int;
+    w int;
+    c int;
+    cb int;
+    ca int;
+    t int;
 BEGIN
     SELECT
-        COUNT(*) INTO total
+        COUNT(*) INTO t
     FROM
         task t
     WHERE
         t.projectid = pid;
     SELECT
-        COUNT(*) INTO inactive
+        COUNT(*) INTO i
     FROM
         task t
     WHERE
         t.projectid = pid
         AND status = 'inactive';
     SELECT
-        COUNT(*) INTO active
+        COUNT(*) INTO a
     FROM
         task t
     WHERE
         t.projectid = pid
         AND status = 'active';
     SELECT
-        COUNT(*) INTO working
+        COUNT(*) INTO w
     FROM
         task t
     WHERE
         t.projectid = pid
         AND status = 'working';
     SELECT
-        COUNT(*) INTO completed_before
+        COUNT(*) INTO c
+    FROM
+        task t
+    WHERE
+        t.projectid = pid
+        AND status = 'completed';
+    SELECT
+        COUNT(*) INTO cb
     FROM
         task t
     WHERE
@@ -795,25 +808,17 @@ BEGIN
         AND status = 'completed'
         AND completiontime <= endtime;
     SELECT
-        COUNT(*) INTO completed_after
+        COUNT(*) INTO ca
     FROM
         task t
     WHERE
         t.projectid = pid
         AND status = 'completed'
         AND completiontime > endtime;
-    CREATE TEMP TABLE report (
-        key text PRIMARY KEY,
-        value int
-    );
-INSERT INTO report
-    VALUES ('inactive', inactive), ('active', active), ('working', working), ('completed_before', completed_before), ('completed_after', completed_after), ('total', total);
+
     RETURN QUERY
     SELECT
-        *
-    FROM
-        report;
-    DROP TABLE IF EXISTS report;
+        i,a,w,c,cb,ca,t;
 END;
 $$
 LANGUAGE plpgsql;
@@ -821,119 +826,71 @@ LANGUAGE plpgsql;
 -- Project report with user
 CREATE OR REPLACE FUNCTION gen_userwise_report (pid int)
     RETURNS TABLE (
-        KEY text,
-        value int
+        username text,
+        inactive int,
+        active int,
+        working int,
+        completed int,
+        completed_before int,
+        completed_after int,
+        total int
     )
     AS $$
 DECLARE
     cursor1 CURSOR (pidc int)
     FOR SELECT DISTINCT
-            username
+            member.username
         FROM
             member
         WHERE
             projectid = pidc;
-    inactive int;
-    active int;
-    working int;
-    completed_before int;
-    completed_after int;
-    total int;
+    i int;
+    a int;
+    w int;
+    c int;
+    cb int;
+    ca int;
+    t int;
 BEGIN
+
+    CREATE TEMP TABLE report (
+        member text,
+        inactive int,
+        active int,
+        working int,
+        completed int,
+        completed_before int,
+        completed_after int,
+        total int
+    );
     FOR r IN cursor1 (pid)
     LOOP
-        SELECT
-            COUNT(*) INTO total
-        FROM
-            task t
-        WHERE
-            t.taskid = (
-                SELECT
-                    taskid
-                FROM
-                    assignedto
-                WHERE
-                    r.username)
-            AND t.projectid = pid;
-        SELECT
-            COUNT(*) INTO inactive
-        FROM
-            task t
-        WHERE
-            t.taskid = (
-                SELECT
-                    taskid
-                FROM
-                    assignedto
-                WHERE
-                    r.username)
-            AND status = 'inactive'
-            AND t.projectid = pid;
-        SELECT
-            COUNT(*) INTO active
-        FROM
-            task t
-        WHERE
-            t.taskid = (
-                SELECT
-                    taskid
-                FROM
-                    assignedto
-                WHERE
-                    r.username)
-            AND status = 'active'
-            AND t.projectid = pid;
-        SELECT
-            COUNT(*) INTO working
-        FROM
-            task t
-        WHERE
-            t.taskid = (
-                SELECT
-                    taskid
-                FROM
-                    assignedto
-                WHERE
-                    r.username)
-            AND status = 'working'
-            AND t.projectid = pid;
-        SELECT
-            COUNT(*) INTO completed_before
-        FROM
-            task t
-        WHERE
-            t.taskid = (
-                SELECT
-                    taskid
-                FROM
-                    assignedto
-                WHERE
-                    r.username)
-            AND status = 'completed'
-            AND completiontime <= endtime
-            AND t.projectid = pid;
-        SELECT
-            COUNT(*) INTO completed_after
-        FROM
-            task t
-        WHERE
-            t.taskid = (
-                SELECT
-                    taskid
-                FROM
-                    assignedto
-                WHERE
-                    r.username)
-            AND status = 'completed'
-            AND completiontime > endtime
-            AND t.projectid = pid;
+        SELECT COUNT(*) INTO t FROM task t WHERE t.taskid in
+        (SELECT taskid FROM assignedto as a WHERE a.username = r.username) AND t.projectid = pid;
+
+        SELECT COUNT(*) INTO i FROM task t WHERE t.taskid in
+        (SELECT taskid FROM assignedto as a WHERE a.username = r.username) AND status = 'inactive' AND t.projectid = pid;
+
+        SELECT COUNT(*) INTO a FROM task t WHERE t.taskid in
+        (SELECT taskid FROM assignedto as a WHERE a.username = r.username) AND status = 'active' AND t.projectid = pid;
+
+        SELECT COUNT(*) INTO w FROM task t WHERE t.taskid in
+        (SELECT taskid FROM assignedto as a WHERE a.username = r.username) AND status = 'working' AND t.projectid = pid;
+
+        SELECT COUNT(*) INTO c FROM task t WHERE t.taskid in
+        (SELECT taskid FROM assignedto as a WHERE a.username = r.username) AND status = 'completed' AND t.projectid = pid;
+
+        SELECT COUNT(*) INTO cb FROM task t WHERE t.taskid in
+        (SELECT taskid FROM assignedto as a WHERE a.username = r.username) AND status = 'completed' AND completiontime <= endtime AND t.projectid = pid;
+
+        SELECT COUNT(*) INTO ca FROM task t WHERE t.taskid in
+        (SELECT taskid FROM assignedto as a WHERE a.username = r.username) AND status = 'completed' AND completiontime > endtime AND t.projectid = pid;
+
+        INSERT INTO report
+        VALUES (r.username,i,a,w,c,cb,ca,t);
+
     END LOOP;
-    CREATE TEMP TABLE report (
-        key text PRIMARY KEY,
-        value int
-    );
-INSERT INTO report
-    VALUES ('inactive', inactive), ('active', active), ('working', working), ('completed_before', completed_before), ('completed_after', completed_after), ('total', total);
+
     RETURN QUERY
     SELECT
         *
@@ -947,24 +904,30 @@ LANGUAGE plpgsql;
 -- User report
 CREATE OR REPLACE FUNCTION gen_user_report (uname text)
     RETURNS TABLE (
-        KEY text,
-        value int
+    inactive int,
+    active int,
+    working int,
+    completed int,
+    completed_before int,
+    completed_after int,
+    total int
     )
     AS $$
 DECLARE
-    inactive int;
-    active int;
-    working int;
-    completed_before int;
-    completed_after int;
-    total int;
+    i int;
+    a int;
+    w int;
+    c int;
+    cb int;
+    ca int;
+    t int;
 BEGIN
     SELECT
-        COUNT(*) INTO total
+        COUNT(*) INTO t
     FROM
         task t
     WHERE
-        t.taskid = (
+        t.taskid in (
             SELECT
                 taskid
             FROM
@@ -972,11 +935,11 @@ BEGIN
             WHERE
                 username = uname);
     SELECT
-        COUNT(*) INTO inactive
+        COUNT(*) INTO i
     FROM
         task t
     WHERE
-        t.taskid = (
+        t.taskid in (
             SELECT
                 taskid
             FROM
@@ -985,11 +948,11 @@ BEGIN
                 username = uname)
         AND status = 'inactive';
     SELECT
-        COUNT(*) INTO active
+        COUNT(*) INTO a
     FROM
         task t
     WHERE
-        t.taskid = (
+        t.taskid in (
             SELECT
                 taskid
             FROM
@@ -998,11 +961,11 @@ BEGIN
                 username = uname)
         AND status = 'active';
     SELECT
-        COUNT(*) INTO working
+        COUNT(*) INTO w
     FROM
         task t
     WHERE
-        t.taskid = (
+        t.taskid in (
             SELECT
                 taskid
             FROM
@@ -1010,12 +973,25 @@ BEGIN
             WHERE
                 username = uname)
         AND status = 'working';
-    SELECT
-        COUNT(*) INTO completed_before
+        SELECT
+        COUNT(*) INTO c
     FROM
         task t
     WHERE
-        t.taskid = (
+        t.taskid in (
+            SELECT
+                taskid
+            FROM
+                assignedto
+            WHERE
+                username = uname)
+        AND status = 'completed';
+    SELECT
+        COUNT(*) INTO cb
+    FROM
+        task t
+    WHERE
+        t.taskid in (
             SELECT
                 taskid
             FROM
@@ -1025,11 +1001,11 @@ BEGIN
         AND status = 'completed'
         AND completiontime <= endtime;
     SELECT
-        COUNT(*) INTO completed_after
+        COUNT(*) INTO ca
     FROM
         task t
     WHERE
-        t.taskid = (
+        t.taskid in (
             SELECT
                 taskid
             FROM
@@ -1038,18 +1014,9 @@ BEGIN
                 username = uname)
         AND status = 'completed'
         AND completiontime > endtime;
-    CREATE TEMP TABLE report (
-        key text PRIMARY KEY,
-        value int
-    );
-INSERT INTO report
-    VALUES ('inactive', inactive), ('active', active), ('working', working), ('completed_before', completed_before), ('completed_after', completed_after), ('total', total);
     RETURN QUERY
     SELECT
-        *
-    FROM
-        report;
-    DROP TABLE IF EXISTS report;
+       i,a,w,c,cb,ca,t;
 END;
 $$
 LANGUAGE plpgsql;

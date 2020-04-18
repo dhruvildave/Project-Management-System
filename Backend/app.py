@@ -53,6 +53,15 @@ class Query(ObjectType):
                          })
     getTask = Field(Object.Task, args={'taskid': Int(required=True)})
 
+    getUserReport = Field(Object.UserReport,
+                          args={
+                              'username': String(required=True),
+                          })
+    getProjectReport = Field(Object.Report,
+                             args={'projectid': Int(required=True)})
+    getUserwiseProjectReport = Field(List(Object.UserReport),
+                                     args={'projectid': Int(required=True)})
+
     # our Resolver method takes the GraphQL context (root, info) as well as
     # Argument (name) for the Field and returns data for the query Response
     def resolve_authenticate(root, info, username, password):
@@ -81,6 +90,15 @@ class Query(ObjectType):
 
     def resolve_getTask(root, info, taskid):
         return query.f_gettask(taskid)
+
+    def resolve_getUserReport(root, info, username):
+        return query.f_getUserReport(username)
+
+    def resolve_getProjectReport(root, info, projectid):
+        return query.f_getProjectReport(projectid)
+
+    def resolve_getUserwiseProjectReport(root, info, projectid):
+        return query.f_getProjectReportUserwise(projectid)
 
 
 class Mutation(ObjectType):

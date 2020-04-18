@@ -3,6 +3,7 @@ from graphene import ObjectType, String, Int, Schema, Boolean, Field, List, NonN
 from flask import Flask
 from flask_graphql import GraphQLView
 from flask_cors import CORS as cors
+from graphene_file_upload.flask import FileUploadGraphQLView
 import pg
 
 import mutation
@@ -32,7 +33,7 @@ class Query(ObjectType):
                        args={
                            'username': String(required=True),
                            'project_filter': String()
-    })
+                       })
     getProject = Field(Object.Project,
                        args={
                            'username': String(required=True),
@@ -44,13 +45,13 @@ class Query(ObjectType):
                     args={
                         'username': String(required=True),
                         'taskFilter': String()
-    })
+                    })
     ProjectTasks = Field(List(Object.Task),
                          args={
                              'username': String(required=True),
                              'projectid': Int(required=True),
                              'taskFilter': String()
-    })
+                         })
     getTask = Field(Object.Task, args={'taskid': Int(required=True)})
 
     getUserReport = Field(Object.UserReport,
@@ -76,7 +77,7 @@ class Query(ObjectType):
     def resolve_myProjects(root, info, username, project_filter=None):
         return query.f_myprojects(username, project_filter)
 
-    def resolve_getProjects(root, info, username, projectid):
+    def resolve_getProject(root, info, username, projectid):
         return query.f_getproject(username, projectid)
 
     def resolve_projectNotes(root, info, projectid):
@@ -117,6 +118,7 @@ class Mutation(ObjectType):
     add_note = mutation.addNote.Field()
     edit_note = mutation.editNote.Field()
     delete_note = mutation.deleteNote.Field()
+    upload_project_file = mutation.UploadProjectFile.Field()
 
 
 schema = Schema(query=Query, mutation=Mutation)
@@ -130,7 +132,7 @@ def index():
 
 app.add_url_rule(
     '/graphql-api',
-    view_func=GraphQLView.as_view(
+    view_func=FileUploadGraphQLView.as_view(
         'graphql',
         schema=schema,
         graphiql=True  # for having the GraphiQL interface

@@ -52,4 +52,4 @@ def outputfile(blob, path):
 
 
 if __name__ == "__main__":
-    outputfile(inputfile('requirement.txt'), 'r.txt')
+    print(executequery2("select * from getproject(%s,%s)", ['dhruvil91', 1]))

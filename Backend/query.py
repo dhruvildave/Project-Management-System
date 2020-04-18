@@ -54,11 +54,12 @@ def f_myprojects(username, f):
 def f_getproject(username, projectid):
     data = pg.executequery2("select * from getproject(%s,%s)",
                             [username, projectid])
-
-    return [
-        Project(x[0], x[1], x[2], x[3], x[4], x[5], x[6],
-                [Member(i, j) for i, j in zip(x[7], x[8])]) for x in data
-    ]
+    x = data[0]
+    print(x)
+    p = Project(x[0], x[1], x[2], x[3], x[4], x[5], x[6],
+                [Member(i, j) for i, j in zip(x[7], x[8])])
+    print(p)
+    return p
 
 
 def f_projectNotes(projectid):
@@ -135,4 +136,4 @@ def f_getProjectReportUserwise(pid):
 
 
 if __name__ == "__main__":
-    print(f_getProjectReportUserwise(2))
+    print(f_getproject('dhruvil91', 2))

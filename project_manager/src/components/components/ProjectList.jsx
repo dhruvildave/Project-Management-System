@@ -38,31 +38,19 @@ class ProjectList extends React.Component {
     if (prevState.projectid !== this.state.projectid) {
       this.props.handleToUpdate(this.state.projectid, this.state.redirect);
     }
-    console.log(this.props.projectlist);
-    if (this.state.projectlist !== prevState.projectlist) {
-      this.setState({ projectlist: this.props.projectlist, value: 0 });
-    }
   }
 
-  componentWillMount() {
-    this.setState({ projectlist: this.props.projectlist });
-  }
   componentDidMount() {
-    this.setState({ projectlist: this.props.projectlist, value: 0 });
-    // console.log(this.props.projectlist);
+    this.setState({ projectlist: this.props.projectlist });
+    console.log(this.state.projectlist);
   }
   render() {
     const classes = useStyles();
     let ListElement;
-    let projectson = this.state.projectlist.completed;
-
-    let listItems1 = projectson.map((projectson) => (
-      <Listelemproj project={projectson} handleToUpdate={this.handleToUpdate} />
-    ));
-
-    ListElement = <List className={classes.list}>{listItems1}</List>;
     if (this.state.value === 0) {
-      let projectson = this.state.projectlist.completed;
+      let projectson = this.state.projectlist.ongoing.concat(
+        this.state.projectlist.completed
+      );
 
       let listItems1 = projectson.map((projectson) => (
         <Listelemproj
@@ -84,8 +72,8 @@ class ProjectList extends React.Component {
       ListElement = <List className={classes.list}>{listItems1}</List>;
     }
     if (this.state.value === 2) {
-      let projectscom = this.state.projectlist.completed;
       // console.log(projectscom);
+      let projectscom = this.state.projectlist.completed;
       let listItems2 = projectscom.map((projectscom) => (
         <Listelemproj
           project={projectscom}
@@ -112,12 +100,6 @@ class ProjectList extends React.Component {
             <Tab label="Completed Projects" />
           </Tabs>
           {ListElement}
-          {projectson.map((projectson) => (
-            <Listelemproj
-              project={projectson}
-              handleToUpdate={this.handleToUpdate}
-            />
-          ))}
         </Paper>
       </Grid>
     );

@@ -1,6 +1,10 @@
 import React from "react";
 import { createStyles, withStyles } from "@material-ui/core/styles";
 import { Grid, TextField, Paper, Button } from "@material-ui/core";
+import { execute, makePromise } from "apollo-link";
+import { editProject, link } from "../queries";
+import { withAlert } from "react-alert";
+
 const useStyles = createStyles((theme) => ({
   avatar: {
     margin: theme.spacing(1),
@@ -20,16 +24,19 @@ const useStyles = createStyles((theme) => ({
 class EditProject extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      projectid: 42069,
-      name: "ProjectPage",
-      date: "",
-      path: "",
-      username: "",
-      shortdescription: "",
-      description: "",
-      files: [],
-      members: [],
+      projectid: this.props.projectid,
+      name: this.props.name,
+      date: this.props.date,
+      path: this.props.path,
+      username: this.props.username,
+      shortdescription: this.props.shortdescription,
+      description: this.props.description,
+      files: this.props.files,
+      members: this.props.members,
+      memberstring: "",
+      deletemember: "",
     };
     this.handleClick = this.handleClick.bind(this);
   }
@@ -43,14 +50,40 @@ class EditProject extends React.Component {
       shortdescription: this.props.shortdescription,
       description: this.props.description,
       members: this.props.members,
+      memberstring: "",
     });
   }
   handleClick(event) {
     event.preventDefault();
     console.log("Clicker");
     console.log(this.state.members);
-    //if success redirect back
-    this.props.handleToUpdate();
+    this.setState({ members: JSON.parse(this.state.memberstring) });
+    const operation = {
+      query: editProject,
+      variables: {
+        ld: this.state.longdescription,
+        name: this.state.name,
+        path: this.state.path,
+        sd: this.state.shortdescription,
+        username: this.state.username,
+        members: this.state.members,
+        projectid: this.state.projectid,
+      }, //optional
+    };
+
+    makePromise(execute(link, operation))
+      .then((data) => {
+        // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        console.log(data);
+        if (data.data.editProject.status === false) {
+          this.props.alert.error(data.data.editProject.msg);
+        }
+        if (data.data.editProject.status === true) {
+          this.props.alert.success("Success on Editing project");
+          this.props.handleToUpdate();
+        }
+      })
+      .catch((error) => console.log(error.message));
   }
   render() {
     const { classes } = this.props;
@@ -85,7 +118,10 @@ class EditProject extends React.Component {
                 id="description1"
                 name="description1"
                 label="Short Description 1"
-                value={this.state.shortdescription}
+                value={
+                  (this.state.shortdescriptionhelperText =
+                    "Add previous members in eash edit and yourself")
+                }
                 fullWidth
                 onChange={(event) =>
                   this.setState({ shortdescription: event.target.value })
@@ -141,14 +177,44 @@ class EditProject extends React.Component {
                 required
                 id="title"
                 name="titile"
-                label="Member : Enter members in json format [{'username':'ksp','role':'leader'},{}]"
+                label='Add Member : format [{"username":"ksp","role":"leader"},{}]'
+                helperText="Add previous members in eash edit and yourself"
                 fullWidth
-                value={this.state.members.toString}
+                value={this.state.memberstring}
                 onChange={(event) => {
                   this.setState({
-                    members: JSON.parse(event.target.value),
+                    memberstring: event.target.value,
                   });
                 }}
+                //
+                //   autoComplete="fname"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                id="title"
+                name="titile"
+                label="delete Member : add one username"
+                fullWidth
+                value={this.state.memberstring}
+                onChange={(event) => {
+                  this.setState({
+                    deletemember: event.target.value,
+                  });
+                }}
+                //
+                //   autoComplete="fname"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                id="title"
+                name="titile"
+                label="this shows previous member list"
+                fullWidth
+                value={JSON.stringify(this.state.members)}
                 //
                 //   autoComplete="fname"
               />

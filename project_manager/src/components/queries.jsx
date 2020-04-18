@@ -114,7 +114,7 @@ export const getProject = gql`
       longdescription
       createdon
       path
-      createby {
+      createdby {
         username
       }
       members {

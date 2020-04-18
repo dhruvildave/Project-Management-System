@@ -76,7 +76,7 @@ class Projects extends React.Component {
     this.state = {
       username: "",
       authenticated: false,
-      pagename: "empty",
+      pagename: "",
       projectid: 42069,
       loaded: 0,
       projectlist: [],
@@ -120,10 +120,10 @@ class Projects extends React.Component {
         authenticated: false,
       });
     }
-    this.fetchdata();
-    this.setState({ pagename: "projects" });
+    // this.fetchdata();
+    // this.setState({ pagename: "projects" });
   }
-  async fetchdata() {
+  fetchdata() {
     let ongoing = [{}];
     const operation1 = {
       query: myProjects,
@@ -139,7 +139,6 @@ class Projects extends React.Component {
         console.log(data);
         if (data.data) {
           ongoing = data.data.myProjects;
-          console.log(ongoing);
         }
       })
       .catch((error) => this.props.alert.error(error));
@@ -166,16 +165,12 @@ class Projects extends React.Component {
         // console.log(projectlist);
         this.setState({ projectlist: projectlist, loaded: 1 });
         console.log(this.state.projectlist);
-        this.setState({ pagename: "projects" });
       })
       .catch((error) => this.props.alert.error(error));
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (
-      this.state.pagename === "projects" &&
-      prevState.pagename !== "projects"
-    ) {
+    if (this.state.pagename !== prevState.pagename) {
       // this.setState({ loaded: 0 });
       this.fetchdata();
     }
@@ -203,10 +198,7 @@ class Projects extends React.Component {
     // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
     let aftermid = <NotesList username={this.state.username} />;
     if (this.state.pagename === "projects") {
-      if (
-        (this.state.projectlist.completed || this.state.projectlist.ongoing) &&
-        this.state.loaded === 1
-      ) {
+      if (this.state.projectlist.completed || this.state.projectlist.ongoing) {
         mid = (
           <>
             <Grid container item justify="center" direction="row">

@@ -106,7 +106,7 @@ export const myProjects = gql`
 `;
 
 export const getProject = gql`
-  query($username: String!, $projectFilter: String) {
+  query($username: String!, $projectid: Int!) {
     getProject(username: $username, projectid: $projectid) {
       projectid
       name
@@ -114,15 +114,22 @@ export const getProject = gql`
       longdescription
       createdon
       path
-      createby
-      members
+      createby {
+        username
+      }
+      members {
+        user {
+          username
+        }
+        role
+      }
     }
   }
 `;
 
 export const myTasks = gql`
   query($username: String!, $taskFilter: String) {
-    myTasks(username: $username, taskFiler: $taskFilter) {
+    myTasks(username: $username, taskFilter: $taskFilter) {
       taskid
       title
       description
@@ -133,7 +140,12 @@ export const myTasks = gql`
       priority
       projectid
       assignedby
-      assignedto
+      assignedto {
+        username
+        firstname
+        lastname
+        email
+      }
       preqtask
     }
   }

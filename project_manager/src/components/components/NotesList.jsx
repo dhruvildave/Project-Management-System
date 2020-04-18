@@ -30,7 +30,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-class AddProject extends React.Component {
+class NotesList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -182,4 +182,4 @@ class AddProject extends React.Component {
   }
 }
 
-export default withAlert()(withStyles(useStyles)(AddProject));
+export default withAlert()(withStyles(useStyles)(NotesList));

@@ -144,6 +144,7 @@ export default function Header(props) {
               pagename: "projects",
             },
           }}
+          // onClick={() => window.location.reload()}
         >
           <ListItem button>
             <ListItemIcon>

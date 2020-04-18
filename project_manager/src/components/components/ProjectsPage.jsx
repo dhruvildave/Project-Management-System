@@ -9,6 +9,9 @@ import Copyright from "./Copyright";
 import ProjectFileManager from "./ProjectFileManager";
 import TaskManagerProj from "./TaskManagerProj";
 import NotesList from "./NotesList";
+import { execute, makePromise } from "apollo-link";
+import { getProject, link } from "../queries";
+import { withAlert } from "react-alert";
 const useStyles = createStyles((theme) => ({
   root: {
     display: "flex",
@@ -68,12 +71,41 @@ class ProjectsPage extends React.Component {
       path: "",
       username: "",
       shortdescription: "",
-      description:
+      longdescription:
         "Chal Hai ayyarrr idhhar kuchsdnisavue rbvaeuyvgiekru vbveryguviuaegivg evhaegivygeyg vkeviuaegvcvvbwaryvgauyv vabuiusvyd auy waygci",
       files: [],
       members: [],
+      createdby: {
+        username: "",
+      },
+      loaded: 0,
+      tasks: {
+        ongoing: [],
+        all: [],
+        current: [],
+        inactive: [],
+        working: [],
+      },
     };
+    this.fetchData = this.fetchData.bind(this);
   }
+
+  async fetchData() {
+    const operation1 = {
+      query: getProject,
+      variables: {
+        username: this.state.username,
+        projectid: this.state.projectid,
+      }, //optional
+    };
+    await makePromise(execute(link, operation1))
+      .then((data) => {
+        // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        console.log(data);
+      })
+      .catch((error) => this.props.alert.error(error.toString()));
+  }
+
   componentWillMount() {
     if (this.props.projectid !== undefined) {
       this.setState({
@@ -82,8 +114,6 @@ class ProjectsPage extends React.Component {
       this.setState({ username: this.props.username });
     }
 
-    console.log("Mounting Project Page");
-    console.log(this.state.projectid);
     this.setState({
       files: [
         { fileid: 1, filename: "Okay 1", lastupdated: "12-35-3566" },
@@ -98,60 +128,19 @@ class ProjectsPage extends React.Component {
           lastupdated: "12-35-3566",
         },
       ],
-      tasks: [
-        {
-          taskid: 1,
-          title: "Task1",
-          description: "Description1",
-          starttime: "12-14-2000",
-          endtime: "45-36-2777",
-          status: "active",
-          priority: "normal",
-        },
-        {
-          taskid: 2,
-          title: "Task2",
-          description: "Description2",
-          starttime: "12-14-2000",
-          endtime: "45-36-2777",
-          status: "active",
-          priority: "normal",
-        },
-        {
-          taskid: 3,
-          title: "Task3",
-          description: "Description3",
-          starttime: "12-14-2000",
-          endtime: "45-36-2777",
-          status: "active",
-          priority: "normal",
-        },
-      ],
-      members: [
-        {
-          username: "Something",
-          role: "leader",
-        },
-        {
-          username: "Something",
-          role: "leader",
-        },
-        {
-          username: "Something",
-          role: "leader",
-        },
-        {
-          username: "Something",
-          role: "leader",
-        },
-      ],
+      tasks: {
+        ongoing: [],
+        all: [],
+        current: [],
+        inactive: [],
+        working: [],
+      },
     });
+    this.fetchData();
 
     // console.log(this.state.tasks);
   }
-  componentDidMount() {
-    // fetch rest of the data here
-  }
+  componentDidMount() {}
 
   render() {
     let projectmid, notes, tasks;
@@ -192,6 +181,7 @@ class ProjectsPage extends React.Component {
       <TaskManagerProj
         username={this.state.username}
         projid={this.state.projectid}
+        tasks={this.state.tasks}
       />
     );
 
@@ -218,4 +208,4 @@ class ProjectsPage extends React.Component {
   }
 }
 
-export default withStyles(useStyles)(ProjectsPage);
+export default withAlert()(withStyles(useStyles)(ProjectsPage));

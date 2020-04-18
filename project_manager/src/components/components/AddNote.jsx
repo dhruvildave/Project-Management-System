@@ -28,12 +28,17 @@ class AddNote extends React.Component {
       title: "",
       description: "",
       color: "",
-      fetchmethod: "user",
+      fetchmethod: "",
       projectid: this.props.projectid,
     };
     this.handleClick = this.handleClick.bind(this);
   }
 
+  componentWillMount() {
+    if (this.props.fetchmethod) {
+      this.setState({ fetchmethod: this.props.fetchmethod });
+    }
+  }
   handleClick() {
     //call mutation here
     console.log("do this");
@@ -62,7 +67,8 @@ class AddNote extends React.Component {
           }
         })
         .catch((error) => this.props.alert.error(error));
-    } else {
+    }
+    if (this.state.fetchmethod === "project") {
       // eslint-disable-next-line
       {
         console.log(this.state.projectid);
@@ -87,7 +93,7 @@ class AddNote extends React.Component {
             if (data.data.addNote.status === true) {
               this.props.alert.success("Success on adding note");
               this.props.handleToUpdate();
-              this.console.log(this.state.projectid);
+              console.log(this.state.projectid);
             }
           })
           .catch((error) => this.props.alert.error(error));

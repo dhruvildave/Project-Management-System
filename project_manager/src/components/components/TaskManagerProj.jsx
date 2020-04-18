@@ -89,60 +89,7 @@ class TaskManagerProj extends React.Component {
       });
     }
     this.setState({
-      tasks: {
-        completed: [
-          {
-            projectid: 1,
-            taskid: 1,
-            title: "Something",
-            description: "tou have to make sthis",
-            starttime: "12-2-5555",
-            endtime: "2-45-4566",
-            status_type: "active",
-            completiontime: "2-3-5555",
-            priority_type: "normal",
-            assignedby: "arpitvagehal",
-          },
-          {
-            projectid: 1,
-            taskid: 1,
-            title: "Something",
-            description: "tou have to make sthis",
-            starttime: "12-2-5555",
-            endtime: "2-45-4566",
-            status_type: "active",
-            completiontime: "2-3-5555",
-            priority_type: "normal",
-            assignedby: "arpitvagehal",
-          },
-        ],
-        ongoing: [
-          {
-            projectid: 1,
-            taskid: 1,
-            title: "Something",
-            description: "tou have to make sthis",
-            starttime: "12-2-5555",
-            endtime: "2-45-4566",
-            status_type: "active",
-            completiontime: "2-3-5555",
-            priority_type: "normal",
-            assignedby: "arpitvagehal",
-          },
-          {
-            projectid: 1,
-            taskid: 1,
-            title: "Something",
-            description: "tou have to make sthis",
-            starttime: "12-2-5555",
-            endtime: "2-45-4566",
-            status_type: "active",
-            completiontime: "2-3-5555",
-            priority_type: "normal",
-            assignedby: "arpitvagehal",
-          },
-        ],
-      },
+      tasks: this.props.tasks,
     });
     // fetch all tasks here
   }

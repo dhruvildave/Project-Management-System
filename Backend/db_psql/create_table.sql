@@ -1410,7 +1410,7 @@ END
 $$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION daily_start_analytics(pid int, d0 date, d1 date)
+CREATE OR REPLACE FUNCTION cumulative_daily_start_analytics(pid int, d0 date, d1 date)
 RETURNS TABLE("date" date, num int)
 AS $$
 DECLARE
@@ -1422,7 +1422,7 @@ BEGIN
         FOR i in 0..(d1 - d0) - 1 LOOP
             SELECT COUNT(*) INTO num
             FROM task
-            WHERE starttime >= d0 + i AND starttime < d0 + i + 1;
+            WHERE starttime >= d0 AND starttime < d0 + i + 1;
 
             INSERT INTO temp
             VALUES

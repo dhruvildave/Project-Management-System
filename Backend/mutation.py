@@ -336,14 +336,14 @@ class editNote(Mutation):
 
 class UploadProjectFile(Mutation):
     class Arguments:
-        file = Upload(required=True)
+        file = Upload()
         filename = String(required=True)
         projectid = Int(required=True)
 
     status = Boolean(required=True)
     msg = String()
 
-    def mutate(root, info, filename, file, projectid):
+    def mutate(root, info, filename, projectid, file=None):
         f = file.read()
         s, m = pg.executequery(
             'insert into projectfiles (filename,file,projectid) values(%s,%s,%s)',

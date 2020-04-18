@@ -85,7 +85,7 @@ insert into member where values ('un',pid,role)
 CREATE TABLE IF NOT EXISTS projectfiles (
     fileid serial PRIMARY KEY,
     "filename" text CHECK ("filename" ~ '^[\w,\s-]+\.[A-Za-z]+$') NOT NULL,
-    "file" bytea NOT NULL,
+    "file" bytea,
     lastupdated timestamp NOT NULL DEFAULT now(),
     projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -382,8 +382,10 @@ BEGIN
     DELETE FROM member
     WHERE projectid = pid
         AND username != own;
+    if usr != own then
     INSERT INTO member
         VALUES (usr, pid, 'leader');
+    end if;
     FOREACH mem slice 1 IN ARRAY members LOOP
         INSERT INTO member
             VALUES (mem[1]::text, pid, mem[2]::role_type);

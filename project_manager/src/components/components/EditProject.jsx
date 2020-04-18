@@ -143,7 +143,7 @@ class EditProject extends React.Component {
                 name="titile"
                 label="Member : Enter members in json format [{'username':'ksp','role':'leader'},{}]"
                 fullWidth
-                value={this.state.members[0].username}
+                value={this.state.members.toString}
                 onChange={(event) => {
                   this.setState({
                     members: JSON.parse(event.target.value),

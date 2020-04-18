@@ -27,6 +27,12 @@ class AddProject extends React.Component {
       path: "",
       description: "",
       shortdescription: "",
+      members: [
+        {
+          username: "",
+          role: "",
+        },
+      ],
     };
     this.handleClick = this.handleClick.bind(this);
   }
@@ -118,6 +124,23 @@ class AddProject extends React.Component {
                 onChange={(event) =>
                   this.setState({ date: event.target.value })
                 }
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                id="title"
+                name="titile"
+                label="Member : Enter members in json format [{'username':'ksp','role':'leader'},{}]"
+                fullWidth
+                value={this.state.members.toString()}
+                onChange={(event) => {
+                  this.setState({
+                    members: JSON.parse(event.target.value),
+                  });
+                }}
+                //
+                //   autoComplete="fname"
               />
             </Grid>
           </Grid>

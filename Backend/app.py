@@ -44,13 +44,13 @@ class Query(ObjectType):
                     args={
                         'username': String(required=True),
                         'taskFilter': String()
-                    })
+    })
     ProjectTasks = Field(List(Object.Task),
                          args={
                              'username': String(required=True),
                              'projectid': Int(required=True),
                              'taskFilter': String()
-                         })
+    })
     getTask = Field(Object.Task, args={'taskid': Int(required=True)})
 
     # our Resolver method takes the GraphQL context (root, info) as well as

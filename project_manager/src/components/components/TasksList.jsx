@@ -78,7 +78,9 @@ class TaskList extends React.Component {
           variant="fullWidth"
         >
           <Tab label="All Tasks" />
-          <Tab label="Current Tasks" />
+          <Tab label="Active Tasks" />
+          <Tab label="Inactive Tasks" />
+          <Tab label="Working Tasks" />
           <Tab label="Completed Tasks" />
         </Tabs>
         {ListElement}

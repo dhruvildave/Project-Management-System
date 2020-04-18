@@ -51,8 +51,27 @@ export const myNotes = gql`
   }
 `;
 
+export const getTask = gql`
+  query($taskid: Int!) {
+    getTask(taskid: $taskid) {
+      taskid
+      title
+      description
+      starttime
+      endtime
+      completiontime
+      status
+      priority
+      projectid
+      assignedby
+      assignedto
+      preqtask
+    }
+  }
+`;
+
 export const projectNotes = gql`
-  query($projectid: String!) {
+  query($projectid: Int!) {
     projectNotes(projectid: $projectid) {
       noteid
       title
@@ -73,8 +92,15 @@ export const myProjects = gql`
       longdescription
       createdon
       path
-      createby
-      members
+      createdby {
+        username
+      }
+      members {
+        user {
+          username
+        }
+        role
+      }
     }
   }
 `;
@@ -142,12 +168,14 @@ export const addNote = gql`
     $color: String!
     $description: String!
     $username: String!
+    $projectid: Int
   ) {
     addNote(
       title: $title
       color: $color
       description: $description
       username: $username
+      projectid: $projectid
     ) {
       status
       msg
@@ -192,10 +220,7 @@ export const createProject = gql`
     $path: String
     $sd: String
     $username: String!
-    $members: [{
-      username:String!
-      role:String
-    }]
+    $members: [InputMember]
   ) {
     createProject(
       longdescription: $ld
@@ -227,10 +252,7 @@ export const editProject = gql`
     $path: String
     $sd: String
     $username: String!
-    $members:[{
-      username:String!
-      role:String
-    }]
+    $members: [InputMember]
     $projectid: Int!
   ) {
     editProject(
@@ -249,18 +271,13 @@ export const editProject = gql`
 `;
 
 export const deleteProject = gql`
-mutation(
-  $projectid:Int!,
-  $username:String!
-){
-  deleteProject(
-    projectid:Int!,
-    username:String!
-  ){
-    status
-    msg
+  mutation($projectid: Int!, $username: String!) {
+    deleteProject(projectid: $projectid, username: $username) {
+      status
+      msg
+    }
   }
-}`;
+`;
 
 export const deleteMember = gql`
   mutation($member: String!, $projectid: Int!, $username: String!) {
@@ -348,27 +365,27 @@ export const completeTask = gql`
 `;
 
 export const changePassword = gql`
-mutation($newpassword:String!,
-  $oldpassword:String!,
-  $username:String!){
-    changePassword(newpassword:$newpassword,
-      oldpassword:$oldpassword
-      username:$username){
-        status
-        msg
-      }
+  mutation($newpassword: String!, $oldpassword: String!, $username: String!) {
+    changePassword(
+      newpassword: $newpassword
+      oldpassword: $oldpassword
+      username: $username
+    ) {
+      status
+      msg
+    }
   }
-}`;
+`;
 
 export const changeName = gql`
-mutation($newfirstname:String!,
-  $newlastname:String!,
-  $username:String!){
-    changePassword(newfirstname:$newfirstname,
-      newlastname:$newlastname
-      username:$username){
-        status
-        msg
-      }
+  mutation($newfirstname: String!, $newlastname: String!, $username: String!) {
+    changePassword(
+      newfirstname: $newfirstname
+      newlastname: $newlastname
+      username: $username
+    ) {
+      status
+      msg
+    }
   }
-}`;
+`;

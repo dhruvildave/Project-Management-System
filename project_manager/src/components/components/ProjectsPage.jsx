@@ -83,6 +83,7 @@ class ProjectsPage extends React.Component {
     }
 
     console.log("Mounting Project Page");
+    console.log(this.state.projectid);
     this.setState({
       files: [
         { fileid: 1, filename: "Okay 1", lastupdated: "12-35-3566" },
@@ -164,9 +165,9 @@ class ProjectsPage extends React.Component {
     const fixedHeightPaper2 = clsx(
       classes.paper,
       classes.fixedHeight,
-      classes.background,
-      classes.maxheightpaper
+      classes.background
     );
+
     projectmid = (
       <ProjectFileManager
         files={this.state.files}
@@ -182,7 +183,10 @@ class ProjectsPage extends React.Component {
     );
 
     notes = (
-      <NotesList username={this.state.username} projid={this.state.projectid} />
+      <NotesList
+        username={this.state.username}
+        projectid={this.state.projectid}
+      />
     );
     tasks = (
       <TaskManagerProj

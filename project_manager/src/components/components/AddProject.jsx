@@ -41,6 +41,10 @@ class AddProject extends React.Component {
   }
   handleClick(event) {
     // event.preventDefault();
+    this.setState({
+      members: JSON.parse(this.state.members),
+    });
+
     const operation = {
       query: createProject,
       variables: {
@@ -154,10 +158,7 @@ class AddProject extends React.Component {
                 label="Member : Enter members in json format [{'username':'ksp','role':'leader'},{}]"
                 fullWidth
                 onChange={(event) => {
-                  this.setState({
-                    members: JSON.parse(event.target.value),
-                  });
-                  console.log(JSON.parse(event.target.value));
+                  this.setState({ members: event.target.value });
                 }}
                 //
                 //   autoComplete="fname"

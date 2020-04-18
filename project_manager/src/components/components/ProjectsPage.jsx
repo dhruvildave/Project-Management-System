@@ -65,11 +65,11 @@ class ProjectsPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      projectid: 42069,
+      projectid: this.props.projectid,
       name: "ProjectPage",
       date: "",
       path: "",
-      username: "",
+      username: this.props.username,
       shortdescription: "",
       longdescription:
         "Chal Hai ayyarrr idhhar kuchsdnisavue rbvaeuyvgiekru vbveryguviuaegivg evhaegivygeyg vkeviuaegvcvvbwaryvgauyv vabuiusvyd auy waygci",
@@ -94,16 +94,26 @@ class ProjectsPage extends React.Component {
     const operation1 = {
       query: getProject,
       variables: {
-        username: this.state.username,
-        projectid: this.state.projectid,
+        username: this.props.username,
+        projectid: this.props.projectid,
       }, //optional
     };
     await makePromise(execute(link, operation1))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
         console.log(data);
+        this.setState({
+          name: data.data.getProject.name,
+          createdon: data.data.getProject.createdon,
+          createdby: data.data.getProject.createdby.username,
+          path: data.data.getProject.path,
+          shortdescription: data.data.getProject.shortdescription,
+          longdescription: data.data.getProject.longdescription,
+          members: data.data.getProject.members,
+          loaded: 1,
+        });
       })
-      .catch((error) => this.props.alert.error(error.toString()));
+      .catch((error) => console.log(error));
   }
 
   componentWillMount() {
@@ -157,19 +167,21 @@ class ProjectsPage extends React.Component {
       classes.background
     );
 
-    projectmid = (
-      <ProjectFileManager
-        files={this.state.files}
-        projectid={this.state.projectid}
-        members={this.state.members}
-        description={this.state.description}
-        shortdescription={this.state.shortdescription}
-        date={this.state.date}
-        path={this.state.path}
-        name={this.state.name}
-        username={this.state.username}
-      />
-    );
+    if (this.state.loaded === 1) {
+      projectmid = (
+        <ProjectFileManager
+          files={this.state.files}
+          projectid={this.state.projectid}
+          members={this.state.members}
+          description={this.state.description}
+          shortdescription={this.state.shortdescription}
+          date={this.state.createdon}
+          path={this.state.path}
+          name={this.state.name}
+          username={this.state.username}
+        />
+      );
+    }
 
     notes = (
       <NotesList

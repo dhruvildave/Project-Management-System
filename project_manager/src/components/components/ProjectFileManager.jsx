@@ -76,7 +76,7 @@ class ProjectFileManager extends React.Component {
     if (this.setState.viewname === "back") {
       this.props.handleToUpdate();
     }
-    console.log(this.state.states);
+    // console.log(this.state.states);
   }
   handleClose() {
     this.setState({
@@ -180,7 +180,7 @@ class ProjectFileManager extends React.Component {
                             </Avatar>
                           </ListItemAvatar>
                           <ListItemText
-                            primary={members.username}
+                            primary={members.user.username}
                             secondary={members.role}
                           />
                         </ListItem>

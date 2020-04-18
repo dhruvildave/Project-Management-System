@@ -1514,6 +1514,58 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION daily_completion_analytics(pid int, d0 date, d1 date)
+RETURNS TABLE("date" date, num int)
+AS $$
+DECLARE
+    num int;
+BEGIN
+    DROP TABLE IF EXISTS temp;
+    CREATE TABLE IF NOT EXISTS temp("date" date, num int);
+    IF d1 > d0 THEN
+        FOR i in 0..(d1 - d0) - 1 LOOP
+            SELECT COUNT(*) INTO num
+            FROM task
+            WHERE completiontime >= d0 + i AND completiontime < d0 + i + 1;
+
+            INSERT INTO temp
+            VALUES
+                (d0 + i, num);
+        END LOOP;
+    END IF;
+
+    RETURN QUERY
+    SELECT *
+    FROM temp;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cumulative_daily_completion_analytics(pid int, d0 date, d1 date)
+RETURNS TABLE("date" date, num int)
+AS $$
+DECLARE
+    num int;
+BEGIN
+    DROP TABLE IF EXISTS temp;
+    CREATE TABLE IF NOT EXISTS temp("date" date, num int);
+    IF d1 > d0 THEN
+        FOR i in 0..(d1 - d0) - 1 LOOP
+            SELECT COUNT(*) INTO num
+            FROM task
+            WHERE completiontime >= d0 AND completiontime < d0 + i + 1;
+
+            INSERT INTO temp
+            VALUES
+                (d0 + i, num);
+        END LOOP;
+    END IF;
+
+    RETURN QUERY
+    SELECT *
+    FROM temp;
+END;
+$$ LANGUAGE plpgsql;
+
 -- do $$
 -- begin
 --     for i in 1..('2020-01-10'::date - '2020-01-05'::date)

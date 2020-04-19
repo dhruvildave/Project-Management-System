@@ -1273,7 +1273,6 @@ CREATE FUNCTION check_member (text, int)
     AS $$
 BEGIN
     RETURN
-    SELECT
         EXISTS (
             SELECT
                 1
@@ -1490,3 +1489,40 @@ BEGIN
     FROM temp;
 END;
 $$ LANGUAGE plpgsql;
+
+create or replace procedure delete_file(text,int) as $$
+declare pid int;
+BEGIN
+    select projectid into pid from projectfiles where fileid = $2;
+
+if not exists (select 1 from projectfiles where fileid = $2) then
+    raise exception 'file doesnot exist';
+end if;
+IF (SELECT check_member ($1,pid)) THEN
+    delete from projectfiles where fileid = $2;
+    else raise exception '% is not a member',$1;
+    end if;
+END
+$$ LANGUAGE plpgsql;
+
+-- get files given username and projectid
+
+create or replace function getfiles(text,int) returns setof projectfiles as $$
+begin
+IF (SELECT check_member ($1,$2)) then
+    return query select * from projectfiles where projectid = $2;
+else raise exception '% is not a member',$1;
+end if;
+end
+$$ LANGUAGE plpgsql;
+
+-- trigger to auto add last-updated value in the projectfiles table
+create function update_lastupdated_files() returns trigger as $$
+begin
+NEW.lastupdated = NOW();
+return NEW;
+end
+$$LANGUAGE plpgsql;
+
+create trigger update_lastupdated_files before insert or update on projectfiles
+for each row execute function update_lastupdated_files();

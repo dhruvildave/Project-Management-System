@@ -144,7 +144,6 @@ class editProject(Mutation):
                  if x.role] if members is not None else None
         m = [[x, y] for x, y in zip(usernames, roles)
              ] if usernames is not None else None
-        print(m)
         s, msg = pg.executequery("call edit_project (%s,%s,%s,%s,%s,%s,%s);", [
             username, projectid, name, shortdescription, longdescription, path,
             m
@@ -211,11 +210,11 @@ class addTask(Mutation):
                preqtaskid=None):
         if not priority:
             priority = 'normal'
-            s, m = pg.executequery(
-                "call add_task (%s,%s,%s,%s,%s,%s,%s,%s,%s);", [
-                    assignedby, assignedto, projectid, title, description,
-                    startdate, enddate, priority, preqtaskid
-                ])
+
+        s, m = pg.executequery("call add_task (%s,%s,%s,%s,%s,%s,%s,%s,%s);", [
+            assignedby, assignedto, projectid, title, description, startdate,
+            enddate, priority, preqtaskid
+        ])
         return addTask(status=s, msg=m)
 
 
@@ -363,7 +362,10 @@ class UploadProjectFile(Mutation):
     msg = String()
 
     def mutate(root, info, filename, projectid, file=None):
-        f = file.read()
+        if file is not None:
+            f = file.read()
+        else:
+            f = None
         s, m = pg.executequery(
             'insert into projectfiles (filename,file,projectid) values(%s,%s,%s)',
             [filename, f, projectid])

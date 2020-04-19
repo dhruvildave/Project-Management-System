@@ -135,27 +135,23 @@ def f_getProjectReportUserwise(pid):
     ]
 
 
-Analytics = namedtuple("Analytics", ["dates", "newTasks", "Taskcompleted"])
+Analytics = namedtuple("Analytics", ["date", "newTask", "Taskcompleted"])
 
 
 def f_analytics(pid, startdate, enddate):
     data = pg.executequery2(
         "select * from daily_analytics(%s,%s::date,%s::date);",
         [pid, startdate, enddate])
-    dates = [x[0] for x in data]
-    newtasks = [x[1] for x in data]
-    completedtasks = [x[2] for x in data]
-    return Analytics(dates, newtasks, completedtasks)
+
+    return [Analytics(x[0], x[1], x[2]) for x in data]
 
 
 def f_cum_analytics(pid, startdate, enddate):
     data = pg.executequery2(
         "select * from cumulative_daily_analytics(%s,%s::date,%s::date);",
         [pid, startdate, enddate])
-    dates = [x[0] for x in data]
-    newtasks = [x[1] for x in data]
-    completedtasks = [x[2] for x in data]
-    return Analytics(dates, newtasks, completedtasks)
+
+    return [Analytics(x[0], x[1], x[2]) for x in data]
 
 
 File = namedtuple("File",
@@ -168,4 +164,4 @@ def f_getfiles(username, pid):
 
 
 if __name__ == "__main__":
-    f_analytics(1, "2020-04-01", "2020-04-22")
+    print(f_analytics(1, "2020-04-01", "2020-04-22"))

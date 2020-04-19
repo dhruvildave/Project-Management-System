@@ -63,13 +63,13 @@ class Query(ObjectType):
     getUserwiseProjectReport = Field(List(Object.UserReport),
                                      args={'projectid': Int(required=True)})
 
-    getProjectAnalytics = Field(Object.Analytics,
+    getProjectAnalytics = Field(List(Object.Analytics),
                                 args={
                                     "projectid": Int(required=True),
                                     "startdate": types.Date(required=True),
                                     "enddate": types.Date(required=True),
                                 })
-    getCumulativeProjectAnalytics = Field(Object.Analytics,
+    getCumulativeProjectAnalytics = Field(List(Object.Analytics),
                                           args={
                                               "projectid":
                                               Int(required=True),

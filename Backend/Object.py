@@ -214,27 +214,28 @@ class UserReport(ObjectType):
 
 
 class Analytics(ObjectType):
-    dates = List(types.Date)
-    newTasks = List(Int)
-    Taskcompleted = List(Int)
+    date = types.Date()
+    newTask = Int()
+    Taskcompleted = Int()
 
-    def resolve_dates(parent, info):
-        return parent.dates
+    def resolve_date(parent, info):
+        return parent.date
 
-    def resolve_newTasks(parent, info):
-        return parent.newTasks
+    def resolve_newTask(parent, info):
+        return parent.newTask
 
     def resolve_Taskcompleted(parent, info):
         return parent.Taskcompleted
 
+
 class File(ObjectType):
-    fileid=  Int()
+    fileid = Int()
     filename = String()
     file = Upload()
     lastupdated = types.DateTime()
     projectid = Int()
 
-    def resolve_fileid(parent,info):
+    def resolve_fileid(parent, info):
         return parent.fileid
 
     def resolve_filename(parent, info):

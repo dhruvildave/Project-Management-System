@@ -36,26 +36,14 @@
   This is a project management system written using \href{https://reactjs.org/}{React.js} for frontend, \href{https://flask.palletsprojects.com/en/1.1.x/}{Flask} and \href{https://graphql.org/}{GraphQL} for backend and \href{https://www.postgresql.org/}{PostgreSQL} as database. This project was made as a part of subjects Database Management Systems (CSE250) and Database Management Systems Lab (CSE251). This project allows users to have an entire project management functionalities like creating projects, adding members, adding tasks, adding and managing boards, notes etc. in one place like the one provided by popular platforms like GitHub, GitLab etc.
 
   To run the project, do the following steps:
-\begin{verbatim}
-cd Backend/
-pip install -r requirements.txt
-flask run &
-psql
-\i init.sql
-\i create_table.sql
-\i tables.sql
-\i triggers.sql
-\i procedures.sql
-\i functions.sql
-\i minorfunctions.sql
-\q
-cd ../project_manager/
-npm install
-npm start
-  \end{verbatim}
 \end{abstract}
 
 \newpage
+\section{ER Diagram}
+\begin{center}
+  \includegraphics[scale=0.3]{ERD.png}
+\end{center}
+
 \section{Table Design}
 \begin{table}[htbp]
   \caption{Users}
@@ -1586,4 +1574,26 @@ end if;
 END
 $$ LANGUAGE plpgsql;
 \end{verbatim}
+
+\newpage
+\section{Screenshots}
+When user gets created, the password is stored as hash
+
+\includegraphics[scale=0.25]{./create_has.png}
+\newpage
+New project also creates new board
+
+\includegraphics[scale=0.25]{./project0.png}
+\newpage
+When new task gets created, status changes to ongoing from completed
+
+\includegraphics[scale=0.25]{./project1.png}
+
+\newpage
+New board for each project
+
+\includegraphics[scale=0.25]{./insert_board.png}
+
+\textbf{Other features will be shown practically}
+
 \end{document}

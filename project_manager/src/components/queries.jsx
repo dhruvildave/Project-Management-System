@@ -321,7 +321,7 @@ export const addTask = gql`
     $assignedby: String!
     $assignedto: [String!]!
     $description: String
-    $endtime: DateTime
+    $enddate: DateTime
     $preqtaskid: [Int!]
     $priority: String
     $projectid: Int!
@@ -331,7 +331,7 @@ export const addTask = gql`
       assignedby: $assignedby
       assignedto: $assignedto
       description: $description
-      endtime: $endtime
+      enddate: $enddate
       preqtaskid: $preqtaskid
       priority: $priority
       projectid: $projectid
@@ -348,9 +348,7 @@ export const updateTask = gql`
     $assignedto: [String!]!
     $description: String
     $endtime: DateTime
-    $preqtaskid: [Int!]
     $priority: String
-    $starttime: DateTime
     $taskid: Int!
     $title: String!
     $username: String!
@@ -359,9 +357,7 @@ export const updateTask = gql`
       assignedto: $assignedto
       description: $description
       endtime: $endtime
-      preqtaskid: $preqtaskid
       priority: $priority
-      starttime: $starttime
       taskid: $taskid
       title: $title
       username: $username
@@ -412,6 +408,78 @@ export const changeName = gql`
     ) {
       status
       msg
+    }
+  }
+`;
+
+export const getUserReport = gql`
+  query($username: String!) {
+    getUserReport(username: $username) {
+      username
+      inactive
+      active
+      working
+      completed
+      completedBefore
+      completedAfter
+      total
+    }
+  }
+`;
+
+export const getProjectReport = gql`
+  query($projectid: Int!) {
+    getProjectReport(projectid: $projectid) {
+      inacitve
+      active
+      total
+      completed
+      completedBefore
+      completedAfter
+      working
+    }
+  }
+`;
+export const getUserwiseProjectReport = gql`
+  query($projectid: Int!) {
+    getUserwiseProjectReport(projectid: $projectid) {
+      UserReport {
+        username
+        inactive
+        working
+        completed
+        completedBefore
+        completedAfter
+        total
+      }
+    }
+  }
+`;
+
+export const getProjectAnalytics = gql`
+  query($projectid: Int!, $startdate: Date!, $enddate: Date!) {
+    getProjectAnalytics(
+      projectid: $projectid
+      startdate: $startdate
+      enddate: $enddate
+    ) {
+      dates
+      newTasks
+      Taskcompleted
+    }
+  }
+`;
+
+export const getCumulativeProjectAnalytics = gql`
+  query($projectid: Int!, $startdate: Date!, $enddate: Date!) {
+    getProjectAnalytics(
+      projectid: $projectid
+      startdate: $startdate
+      enddate: $enddate
+    ) {
+      dates
+      newTasks
+      Taskcompleted
     }
   }
 `;

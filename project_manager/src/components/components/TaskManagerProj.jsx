@@ -220,6 +220,7 @@ class TaskManagerProj extends React.Component {
         <DeleteTask
           username={this.state.username}
           projectid={this.state.projectid}
+          tasks={this.state.tasks.all}
           handleToUpdate={this.pageUpdate}
         />
       );

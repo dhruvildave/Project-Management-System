@@ -240,7 +240,23 @@ class TaskView extends React.Component {
       </Paper>
     );
     if (this.state.viewname === "edittask") {
-      mid = <EditTask states={this.state} handleToUpdate={this.pageUpdate} />;
+      mid = (
+        <EditTask
+          username={this.state.username}
+          projectid={this.state.projectid}
+          taskid={this.state.taskid}
+          title={this.state.title}
+          description={this.state.description}
+          starttime={this.state.starttime}
+          endtime={this.state.endtime}
+          status_type={this.state.status_type}
+          priority_type={this.state.priority_type}
+          assignedby={this.state.assignedby}
+          assignedto={this.state.assignedto}
+          preqtaskid={this.state.preqtask}
+          handleToUpdate={this.pageUpdate}
+        />
+      );
       low = null;
     }
     return [mid, low];

@@ -39,8 +39,8 @@ class AddTask extends React.Component {
       priority_type: "",
       status_type: "",
       task_title: "",
-      startdate: "2000-11-15" + "T07:13:05+00:00",
-      enddate: "2000-11-15" + "T07:13:05+00:00",
+      startdate: "2000-11-15",
+      enddate: "2000-11-15",
       description: "",
       assignedto: [],
       loaded: "",
@@ -87,12 +87,12 @@ class AddTask extends React.Component {
       this.setState({ username: this.props.username });
     }
     let today = new Date();
-    let dd = String(today.getDate()).padStart(2, "0");
+    let dd = String(today.getDate() + 1).padStart(2, "0");
     let mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
     let yyyy = today.getFullYear();
     today = yyyy + "-" + mm + "-" + dd;
-    this.setState({ startdate: today + "T07:13:05+00:00" });
-    this.setState({ enddate: today + "T07:13:05+00:00" });
+    this.setState({ startdate: today + "T07:45:05.567947" });
+    this.setState({ enddate: today + "T07:45:05.567947" });
   }
   async handleClick(event) {
     console.log(this.state.enddate);
@@ -103,7 +103,7 @@ class AddTask extends React.Component {
         assignedby: this.state.username,
         assignedto: this.state.assignedto,
         description: this.state.description,
-        endtime: this.state.enddate,
+        enddate: this.state.enddate,
         preqtaskid: this.state.preqid,
         priority: this.state.priority_type,
         projectid: this.state.projectid,
@@ -141,18 +141,20 @@ class AddTask extends React.Component {
     var dd = String(today.getDate()).padStart(2, "0");
     var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
     var yyyy = today.getFullYear();
-    const status_type = [
-      { value: "active", label: "active" },
-      { value: "inactive", label: "inactive" },
-      { value: "working", label: "working" },
-    ];
+
+    var tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    var dd1 = String(tomorrow.getDate()).padStart(2, "0");
+    var mm1 = String(tomorrow.getMonth() + 1).padStart(2, "0"); //January is 0!
+    var yyyy1 = tomorrow.getFullYear();
+    today = yyyy + "-" + mm + "-" + dd;
+    tomorrow = yyyy1 + "-" + mm1 + "-" + dd1;
     const priority_type = [
       { value: "highest", label: "highest" },
       { value: "high", label: "high" },
       { value: "normal", label: "normal" },
       { value: "low", label: "low" },
     ];
-    today = yyyy + "-" + mm + "-" + dd;
 
     let listtask;
     if (this.state.loaded === 1) {
@@ -197,28 +199,8 @@ class AddTask extends React.Component {
                   //   autoComplete="billing address-line2"
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  select
-                  id="status_type"
-                  name="status_type"
-                  label="status_type"
-                  value={this.state.status_type}
-                  fullWidth
-                  onChange={(event) =>
-                    this.setState({ status_type: event.target.value })
-                  }
-                  //   autoComplete="billing address-level2"
-                >
-                  {status_type.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={12} sm={6}>
+
+              <Grid item xs={12}>
                 <TextField
                   required
                   select
@@ -251,7 +233,7 @@ class AddTask extends React.Component {
                   inputProps={{ readOnly: true }}
                   onChange={(event) =>
                     this.setState({
-                      startdate: event.target.value + "T07:13:05+00:00",
+                      startdate: event.target.value + "T07:45:05.567947",
                     })
                   }
                 />
@@ -262,12 +244,12 @@ class AddTask extends React.Component {
                   id="date"
                   name="date"
                   label="EndDate"
-                  defaultValue={today}
+                  defaultValue={tomorrow}
                   fullWidth
                   onChange={(event) => {
-                    console.log(event.target.value + "T07:13:05+00:00");
+                    console.log(event.target.value + "T07:45:05.567947");
                     this.setState({
-                      enddate: event.target.value + "T07:13:05+00:00",
+                      enddate: event.target.value + "T07:45:05.567947",
                     });
                   }}
                 />

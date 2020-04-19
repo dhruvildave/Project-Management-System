@@ -4,7 +4,8 @@ CREATE OR REPLACE FUNCTION create_hash () RETURNS TRIGGER AS $create_hash$
 BEGIN
     --
     -- Store passwords securely
-    -- password should have 1 lowercase letter, 1 uppercase letter, 1 number, and be 8 to 72 characters long
+    -- password should have 1 lowercase letter, 1 uppercase letter, 1 number
+    -- and be 8 to 72 characters long
     --
     IF NEW.password !~ '(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,72}$' THEN
         RAISE EXCEPTION 'Please enter a strong password';
@@ -66,15 +67,15 @@ CREATE TRIGGER add_leader
 
  -- Trigger #4 (on projectfiles) -> automatically update the lastupdated value in projectfiels
 
-create function update_lastupdated_files() returns trigger as $$
-begin
-    NEW.lastupdated = NOW();
-    return NEW;
-end
+CREATE OR REPLACE FUNCTION update_lastupdated_files() RETURNS TRIGGER AS $$
+BEGIN
+    NEW.lastupdated = now();
+    RETURN NEW;
+END;
 $$LANGUAGE plpgsql;
 
-create trigger update_lastupdated_files before insert or update on projectfiles
-for each row execute function update_lastupdated_files();
+CREATE TRIGGER update_lastupdated_files BEFORE INSERT OR UPDATE ON projectfiles
+    FOR EACH ROW EXECUTE FUNCTION update_lastupdated_files();
 
 -- Trigger #5 (on board) -> must have one of username or projectid
 CREATE OR REPLACE FUNCTION check_board ()
@@ -98,19 +99,19 @@ CREATE TRIGGER check_board
 
 -- Trigger #6 (on preqtask) -> on add or update preqtask set status of task to inactive if preqtask is not complete
 
-CREATE Function change_statuson_preqtask (
-) returns trigger
+CREATE FUNCTION change_statuson_preqtask () returns trigger
     AS $$
 BEGIN
-if (select status from task where taskid = NEW.preqtask) != 'completed' then
-update task set status = 'inactive' where taskid = NEW.task;
-end if;
-return new;
-END
+    if (select status from task where taskid = NEW.preqtask) != 'completed' then
+        update task set status = 'inactive' where taskid = NEW.task;
+    end if;
+    return new;
+END;
 $$
 LANGUAGE plpgsql;
 
-create trigger task_status_to_inactive after insert or update on preqtask for each row execute function change_statuson_preqtask();
+create trigger task_status_to_inactive after insert or update on preqtask
+    for each row execute function change_statuson_preqtask();
 
 -- Trigger #7 (on Task) -> only leader can assign task
 CREATE OR REPLACE FUNCTION chk_task_assignedbyleader ()

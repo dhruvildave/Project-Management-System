@@ -936,8 +936,6 @@ CREATE OR REPLACE FUNCTION gen_user_report (uname text)
     total int
     )
     AS $$
-    if not exists (select 1 from users where username = uname) then raise exception '% user doesnot exists',uname;
-    end if;
 DECLARE
     i int;
     a int;
@@ -947,6 +945,9 @@ DECLARE
     ca int;
     t int;
 BEGIN
+
+    if not exists (select 1 from users where username = uname) then raise exception '% user doesnot exists',uname;
+    end if;
     SELECT
         COUNT(*) INTO t
     FROM

@@ -148,7 +148,7 @@ class Tasks extends React.Component {
   handleToUpdate(taskid) {
     this.setState({ taskid: taskid, pagename: "viewtask" });
   }
-  async componentWillMount() {
+  componentWillMount() {
     if (this.props.username !== undefined) {
       this.setState({
         username: this.props.username,
@@ -166,11 +166,11 @@ class Tasks extends React.Component {
         authenticated: false,
       });
     }
-    await this.fetchalldata();
   }
-  componentDidMount() {
+  async componentDidMount() {
     console.log(this.state.username);
     console.log(this.state.authenticated);
+    await this.fetchalldata();
   }
 
   render() {

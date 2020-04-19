@@ -96,7 +96,8 @@ class Projects extends React.Component {
       this.setState({ projectid: projectid1, pagename: "projectpage" });
     }
   }
-  pageUpdate() {
+  async pageUpdate() {
+    await this.fetchdata();
     this.setState({ pagename: "projects" });
   }
   componentWillMount() {
@@ -133,7 +134,7 @@ class Projects extends React.Component {
       }, //optional
     };
 
-    makePromise(execute(link, operation1))
+    await makePromise(execute(link, operation1))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
         console.log(data);
@@ -152,7 +153,7 @@ class Projects extends React.Component {
       }, //optional
     };
 
-    makePromise(execute(link, operation))
+    await makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
         console.log(data);
@@ -167,13 +168,6 @@ class Projects extends React.Component {
         console.log(this.state.projectlist);
       })
       .catch((error) => this.props.alert.error(error));
-  }
-
-  async componentDidUpdate(prevProps, prevState) {
-    if (this.state.pagename !== prevState.pagename) {
-      // this.setState({ loaded: 0 });
-      await this.fetchdata();
-    }
   }
 
   async componentDidMount() {

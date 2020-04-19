@@ -64,8 +64,22 @@ export const getTask = gql`
       priority
       projectid
       assignedby
-      assignedto
+      assignedto {
+        username
+      }
       preqtask
+    }
+  }
+`;
+
+export const preqTask = gql`
+  query($taskid: Int!) {
+    getTask(taskid: $taskid) {
+      taskid
+      title
+      description
+      status
+      priority
     }
   }
 `;

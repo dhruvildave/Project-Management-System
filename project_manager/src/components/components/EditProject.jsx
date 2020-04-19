@@ -57,16 +57,17 @@ class EditProject extends React.Component {
     event.preventDefault();
     console.log("Clicker");
     console.log(this.state.members);
-    let message = "";
+    let message = [
+      {
+        username: "",
+        role: "",
+      },
+    ];
     try {
       if (this.state.memberstring !== "") {
-        message = [
-          {
-            username: "",
-            role: "",
-          },
-        ];
+        message = JSON.parse(this.state.memberstring);
       }
+      console.log(message);
     } catch (e) {
       this.props.alert.error(e.message);
     }
@@ -74,7 +75,7 @@ class EditProject extends React.Component {
     const operation = {
       query: editProject,
       variables: {
-        ld: this.state.longdescription,
+        ld: this.state.description,
         name: this.state.name,
         path: this.state.path,
         sd: this.state.shortdescription,

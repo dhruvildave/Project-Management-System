@@ -57,9 +57,9 @@ class AddTask extends React.Component {
     const operation1 = {
       query: ProjectTasks,
       variables: {
-        username: this.state.username,
+        username: this.props.username,
         taskFilter: null,
-        projectid: this.state.projectid,
+        projectid: this.props.projectid,
         tasklist: [],
       }, //optional
     };

@@ -82,7 +82,8 @@ class TaskManagerProj extends React.Component {
     this.fetchTasksFilter = this.fetchTasksFilter.bind(this);
     this.fetchalldata = this.fetchalldata.bind(this);
   }
-  pageUpdate() {
+  async pageUpdate() {
+    await this.fetchalldata();
     this.setState({ viewname: "alltasklist" });
   }
   handleToUpdate(taskid) {

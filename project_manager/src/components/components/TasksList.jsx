@@ -39,7 +39,7 @@ class TaskList extends React.Component {
     // console.log(this.state.tasklist);
   }
   render() {
-    const { classes } = this.props;
+    const classes = useStyles();
     let ListElement;
     if (this.state.value === 0) {
       let taskall = this.state.tasklist.all;

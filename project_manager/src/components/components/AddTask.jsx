@@ -32,15 +32,15 @@ const useStyles = createStyles((theme) => ({
 class AddTask extends React.Component {
   constructor(props) {
     super(props);
-    var today = new Date().now;
+
     this.state = {
       username: this.props.username,
       projectid: this.props.projectid,
       priority_type: "",
       status_type: "",
       task_title: "",
-      startdate: today,
-      enddate: today,
+      startdate: "2000-11-15" + "T07:13:05+00:00",
+      enddate: "2000-11-15" + "T07:13:05+00:00",
       description: "",
       assignedto: [],
       loaded: "",
@@ -86,8 +86,16 @@ class AddTask extends React.Component {
     if (this.props.username !== undefined) {
       this.setState({ username: this.props.username });
     }
+    let today = new Date();
+    let dd = String(today.getDate()).padStart(2, "0");
+    let mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+    let yyyy = today.getFullYear();
+    today = yyyy + "-" + mm + "-" + dd;
+    this.setState({ startdate: today + "T07:13:05+00:00" });
+    this.setState({ enddate: today + "T07:13:05+00:00" });
   }
   async handleClick(event) {
+    console.log(this.state.enddate);
     // event.preventDefault();
     const operation = {
       query: addTask,
@@ -99,7 +107,6 @@ class AddTask extends React.Component {
         preqtaskid: this.state.preqid,
         priority: this.state.priority_type,
         projectid: this.state.projectid,
-        starttime: this.state.startdate,
         title: this.state.task_title,
       }, //optional
     };
@@ -243,7 +250,9 @@ class AddTask extends React.Component {
                   fullWidth
                   inputProps={{ readOnly: true }}
                   onChange={(event) =>
-                    this.setState({ startdate: event.target.value })
+                    this.setState({
+                      startdate: event.target.value + "T07:13:05+00:00",
+                    })
                   }
                 />
               </Grid>
@@ -255,9 +264,12 @@ class AddTask extends React.Component {
                   label="EndDate"
                   defaultValue={today}
                   fullWidth
-                  onChange={(event) =>
-                    this.setState({ enddate: event.target.value })
-                  }
+                  onChange={(event) => {
+                    console.log(event.target.value + "T07:13:05+00:00");
+                    this.setState({
+                      enddate: event.target.value + "T07:13:05+00:00",
+                    });
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>

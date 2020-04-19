@@ -511,8 +511,7 @@ DECLARE
     m text;
     p int;
 BEGIN
-if st is null then st = now();
-end if;
+ st = now();
     IF NOT EXISTS (
         SELECT
             1

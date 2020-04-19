@@ -119,7 +119,7 @@ class Task(ObjectType):
         return parent.description
 
     def resolve_starttime(parent, info):
-        return parent.time
+        return parent.starttime
 
     def resolve_endtime(parent, info):
         return parent.endtime

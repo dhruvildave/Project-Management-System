@@ -189,8 +189,8 @@ class addTask(Mutation):
         projectid = Int(required=True)
         title = String(required=True)
         description = String()
-        starttime = types.DateTime()
-        endtime = types.DateTime()
+        startdate = types.DateTime()
+        enddate = types.DateTime()
         priority = String()
         preqtaskid = List(NonNull(Int))
 

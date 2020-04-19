@@ -148,7 +148,9 @@ class AddProject extends React.Component {
                 fullWidth
                 inputProps={{ readOnly: true }}
                 onChange={(event) =>
-                  this.setState({ date: event.target.value })
+                  this.setState({
+                    date: event.target.value + "T07:13:05+00:00",
+                  })
                 }
               />
             </Grid>

@@ -325,7 +325,6 @@ export const addTask = gql`
     $preqtaskid: [Int!]
     $priority: String
     $projectid: Int!
-    $starttime: DateTime
     $title: String!
   ) {
     addTask(
@@ -336,7 +335,6 @@ export const addTask = gql`
       preqtaskid: $preqtaskid
       priority: $priority
       projectid: $projectid
-      starttime: $starttime
       title: $title
     ) {
       status

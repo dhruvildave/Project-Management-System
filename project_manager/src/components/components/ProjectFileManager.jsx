@@ -66,7 +66,7 @@ class ProjectFileManager extends React.Component {
     // console.log(this.props.files);
   }
   handleToUpdate(someArg) {
-    this.setState({ fileid: someArg, viewname: "onefile" });
+    this.setState({ fileid: someArg });
   }
   handlePage() {
     this.props.handleToUpdate();

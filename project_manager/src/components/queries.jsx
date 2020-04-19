@@ -430,7 +430,7 @@ export const getUserReport = gql`
 export const getProjectReport = gql`
   query($projectid: Int!) {
     getProjectReport(projectid: $projectid) {
-      inacitve
+      inactive
       active
       total
       completed

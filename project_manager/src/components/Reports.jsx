@@ -119,7 +119,7 @@ class Reports extends React.Component {
     await makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         let a = data.data.getProjectReport;
         this.setState({
           pactive: a.active,
@@ -148,7 +148,7 @@ class Reports extends React.Component {
     await makePromise(execute(link, operation1))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         if (data.data) {
           ongoing = data.data.myProjects;
         }
@@ -167,9 +167,9 @@ class Reports extends React.Component {
     await makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         completed = data.data.myProjects;
-        console.log(completed);
+        // console.log(completed);
         // console.log(projectlist);
         this.setState({
           projectlist: ongoing.concat(completed),
@@ -191,7 +191,7 @@ class Reports extends React.Component {
     await makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         let a = data.data.getUserReport;
         this.setState({
           active: a.active,

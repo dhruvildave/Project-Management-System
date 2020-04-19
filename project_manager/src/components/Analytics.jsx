@@ -92,7 +92,7 @@ class Analytics extends React.Component {
     await makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         this.setState({ datapa: data.data.getProjectAnalytics });
       })
       .catch((error) => this.props.alert.error(error));
@@ -108,7 +108,7 @@ class Analytics extends React.Component {
     await makePromise(execute(link, operation2))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         this.setState({ datapca: data.data.getCumulativeProjectAnalytics });
       })
       .catch((error) => this.props.alert.error(error));
@@ -140,8 +140,8 @@ class Analytics extends React.Component {
     }
   }
   async componentDidMount() {
-    console.log(this.state.username);
-    console.log(this.state.authenticated);
+    // console.log(this.state.username);
+    // console.log(this.state.authenticated);
     await this.fetchProjects();
   }
 
@@ -158,7 +158,7 @@ class Analytics extends React.Component {
     await makePromise(execute(link, operation1))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         if (data.data) {
           ongoing = data.data.myProjects;
         }
@@ -177,15 +177,15 @@ class Analytics extends React.Component {
     await makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         completed = data.data.myProjects;
-        console.log(completed);
+        // console.log(completed);
         // console.log(projectlist);
         this.setState({
           projectlist: ongoing.concat(completed),
           loaded: 1,
         });
-        console.log(this.state.projectlist);
+        // console.log(this.state.projectlist);
       })
       .catch((error) => this.props.alert.error(error));
   }

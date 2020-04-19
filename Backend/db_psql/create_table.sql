@@ -1526,3 +1526,17 @@ $$LANGUAGE plpgsql;
 
 create trigger update_lastupdated_files before insert or update on projectfiles
 for each row execute function update_lastupdated_files();
+
+-- procedure upload file add new file or replace existing if filename and projectid are same
+create or replace procedure upload_file(text,int,bytea = Null) as $$
+DECLARE
+    fid int;
+BEGIN
+if exists(select 1 from projectfiles where filename = $1 and projectid = $2) then
+        select fileid into fid from projectfiles where filename = $1 and projectid = $2;
+        update projectfiles set filename = $1 , file =$3 where fileid = fid;
+else
+    insert into projectfiles (filename,file,projectid) values($1,$3,$2);
+end if;
+END
+$$ LANGUAGE plpgsql;

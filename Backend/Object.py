@@ -1,4 +1,5 @@
 from graphene import ObjectType, String, Field, Int, types, List
+from graphene_file_upload.scalars import Upload
 import query
 
 
@@ -225,3 +226,22 @@ class Analytics(ObjectType):
 
     def resolve_Taskcompleted(parent, info):
         return parent.Taskcompleted
+
+class File(ObjectType):
+    fileid=  Int()
+    filename = String()
+    file = Upload()
+    lastupdated = types.DateTime()
+    projectid = Int()
+
+    def resolve_fileid(parent,info):
+        return parent.fileid
+
+    def resolve_filename(parent, info):
+        return parent.filename
+
+    def resolve_fileid(parent, info):
+        return parent.fileid
+
+    def resolve_fileid(parent, info):
+        return parent.fileid

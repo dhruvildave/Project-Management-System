@@ -239,7 +239,7 @@ class updateTask(Mutation):
         taskid,
         title,
         assignedto,
-        preqtaskid,
+        preqtaskid=None,
         description=None,
         startdate=None,
         enddate=None,

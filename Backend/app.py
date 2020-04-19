@@ -78,6 +78,11 @@ class Query(ObjectType):
                                               "enddate":
                                               types.Date(required=True),
                                           })
+    getProjectFiles = Field(List(Object.File),
+                            args={
+                                'username': String(required=True),
+                                "projectid": Int(required=True)
+                            })
 
     # our Resolver method takes the GraphQL context (root, info) as well as
     # Argument (name) for the Field and returns data for the query Response
@@ -123,6 +128,9 @@ class Query(ObjectType):
     def resolve_getCumulativeProjectAnalytics(root, info, projectid, startdate,
                                               enddate):
         return query.f_cum_analytics(projectid, startdate, enddate)
+
+    def resolve_getProjectFiles(root, info, username, projectid):
+        return query.f_getfiles(username, projectid)
 
 
 class Mutation(ObjectType):

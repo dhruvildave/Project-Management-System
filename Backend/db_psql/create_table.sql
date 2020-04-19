@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS project (
     "longdescription" text,
     createdon date NOT NULL, -- Date Of Creation
     "path" text, -- path refers to the path of git repository
-    createdby text REFERENCES users (username) ON DELETE CASCADE,
+    createdby text REFERENCES users (username)NOT NULL ON DELETE CASCADE,
     status project_status DEFAULT 'completed' NOT NULL,
     UNIQUE (name, createdby)
 );
@@ -72,7 +72,7 @@ CREATE TYPE role_type AS ENUM (
 );
 
 CREATE TABLE IF NOT EXISTS member (
-    username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
+    username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
     projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
     "role" role_type,
     PRIMARY KEY (username, projectid)
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS projectfiles (
     "filename" text CHECK ("filename" ~ '^[\w,\s-]+\.[A-Za-z]+$') NOT NULL,
     "file" bytea,
     lastupdated timestamp NOT NULL DEFAULT now(),
-    projectid int REFERENCES project ON DELETE CASCADE ON UPDATE CASCADE
+    projectid int REFERENCES project NOT NULL ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TYPE status_type AS ENUM (
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS task (
     priority priority_type DEFAULT 'normal',
     assignedby text NOT NULL,
     projectid int NOT NULL,
-    FOREIGN KEY (assignedby, projectid) REFERENCES member (username, projectid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (assignedby, projectid) REFERENCES member (username, projectid) NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
     UNIQUE (title, assignedby, projectid)
 );
 
@@ -125,14 +125,14 @@ insert into task (title,description,starttime,endtime,assignedby,projectid)
 values('task1','just a task',null,null,'arpit',1);
  */
 CREATE TABLE IF NOT EXISTS assignedto (
-    taskid int REFERENCES task ON DELETE CASCADE ON UPDATE CASCADE,
-    username text REFERENCES users ON DELETE CASCADE ON UPDATE CASCADE,
+    taskid int REFERENCES task NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
+    username text REFERENCES users NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (taskid, username)
 );
 
 CREATE TABLE IF NOT EXISTS preqtask (
-    task int REFERENCES task (taskid) ON DELETE CASCADE ON UPDATE CASCADE,
-    preqtask int REFERENCES task (taskid) ON DELETE CASCADE ON UPDATE CASCADE,
+    task int REFERENCES task (taskid) NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
+    preqtask int REFERENCES task (taskid) NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (task, preqtask)
 );
 
@@ -149,9 +149,9 @@ CREATE TABLE IF NOT EXISTS note (
     title text NOT NULL,
     "description" text,
     color text,
-    createdby text REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+    createdby text REFERENCES users (username) NOT NULL ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
     createdat timestamp DEFAULT NOW() NOT NULL,
-    boardid int REFERENCES board (boardid) ON DELETE CASCADE ON UPDATE CASCADE,
+    boardid int REFERENCES board (boardid) NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
     UNIQUE (title, description)
 );
 

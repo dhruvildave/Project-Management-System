@@ -401,7 +401,7 @@ export const changePassword = gql`
 
 export const changeName = gql`
   mutation($newfirstname: String!, $newlastname: String!, $username: String!) {
-    changePassword(
+    changeName(
       newfirstname: $newfirstname
       newlastname: $newlastname
       username: $username
@@ -463,8 +463,8 @@ export const getProjectAnalytics = gql`
       startdate: $startdate
       enddate: $enddate
     ) {
-      dates
-      newTasks
+      date
+      newTask
       Taskcompleted
     }
   }
@@ -472,13 +472,13 @@ export const getProjectAnalytics = gql`
 
 export const getCumulativeProjectAnalytics = gql`
   query($projectid: Int!, $startdate: Date!, $enddate: Date!) {
-    getProjectAnalytics(
+    getCumulativeProjectAnalytics(
       projectid: $projectid
       startdate: $startdate
       enddate: $enddate
     ) {
-      dates
-      newTasks
+      date
+      newTask
       Taskcompleted
     }
   }

@@ -188,7 +188,7 @@ class Dashboard extends React.Component {
     makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         if (data.data.getUser) {
           this.setState({
             firstname: data.data.getUser.firstname,
@@ -202,8 +202,8 @@ class Dashboard extends React.Component {
       .catch((error) => this.props.alert.error(`received error ${error}`));
   }
   componentDidMount() {
-    console.log(this.state.username);
-    console.log(this.state.authenticated);
+    // console.log(this.state.username);
+    // console.log(this.state.authenticated);
   }
   render() {
     if (this.state.authenticated === false) {

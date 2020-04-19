@@ -16,7 +16,7 @@ import backgrondimage from "./img/background.jpg";
 import { execute, makePromise } from "apollo-link";
 import { myProjects, getProjectReport, getUserReport, link } from "./queries";
 import Listprojrep from "./assets/listprojrep";
-import PieChart from "./PieChart";
+import PC from "./PieChart";
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -119,7 +119,7 @@ class Reports extends React.Component {
     await makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         let a = data.data.getProjectReport;
         this.setState({
           pactive: a.active,
@@ -148,7 +148,7 @@ class Reports extends React.Component {
     await makePromise(execute(link, operation1))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         if (data.data) {
           ongoing = data.data.myProjects;
         }
@@ -167,9 +167,9 @@ class Reports extends React.Component {
     await makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         completed = data.data.myProjects;
-        console.log(completed);
+        // console.log(completed);
         // console.log(projectlist);
         this.setState({
           projectlist: ongoing.concat(completed),
@@ -191,7 +191,7 @@ class Reports extends React.Component {
     await makePromise(execute(link, operation))
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
-        console.log(data);
+        // console.log(data);
         let a = data.data.getUserReport;
         this.setState({
           active: a.active,
@@ -255,7 +255,7 @@ class Reports extends React.Component {
           <br></br>
           <Typography variant="h6">Visual PieChart</Typography>
           {/* <PieChart /> */}
-          <PieChart
+          <PC
             data={[
               {
                 name: "Active",
@@ -351,7 +351,7 @@ class Reports extends React.Component {
                           </Typography>
                           <br></br>
                           <Typography variant="h6">Visual PieChart</Typography>
-                          <PieChart
+                          <PC
                             data={[
                               {
                                 name: "Active",

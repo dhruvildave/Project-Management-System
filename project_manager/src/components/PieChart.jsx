@@ -17,16 +17,16 @@ const COLORS = [
   "FE0349",
 ];
 
-export default class Example extends PureComponent {
+export default class PC extends PureComponent {
   render() {
     return (
-      <PieChart width={400} height={400} onMouseEnter={this.onPieEnter}>
+      <PieChart width={600} height={600} onMouseEnter={this.onPieEnter}>
         <Pie
           data={this.props.data}
-          cx={200}
-          cy={200}
+          cx={300}
+          cy={300}
           innerRadius={60}
-          outerRadius={80}
+          outerRadius={120}
           fill="#8884d8"
           paddingAngle={5}
           dataKey="value"

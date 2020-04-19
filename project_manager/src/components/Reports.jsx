@@ -16,7 +16,7 @@ import backgrondimage from "./img/background.jpg";
 import { execute, makePromise } from "apollo-link";
 import { myProjects, getProjectReport, getUserReport, link } from "./queries";
 import Listprojrep from "./assets/listprojrep";
-import PieChart from "./PieChart";
+import PC from "./PieChart";
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -255,7 +255,7 @@ class Reports extends React.Component {
           <br></br>
           <Typography variant="h6">Visual PieChart</Typography>
           {/* <PieChart /> */}
-          <PieChart
+          <PC
             data={[
               {
                 name: "Active",
@@ -351,7 +351,7 @@ class Reports extends React.Component {
                           </Typography>
                           <br></br>
                           <Typography variant="h6">Visual PieChart</Typography>
-                          <PieChart
+                          <PC
                             data={[
                               {
                                 name: "Active",

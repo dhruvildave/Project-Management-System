@@ -10,8 +10,9 @@ import Copyright from "./components/Copyright";
 import Footer from "./components/Footer";
 import clsx from "clsx";
 import NotesList from "./components/NotesList";
-import { Typography, TextField } from "@material-ui/core";
+import { Typography, TextField, Button } from "@material-ui/core";
 import { execute, makePromise } from "apollo-link";
+import Recharts from "./Recharts";
 import {
   myProjects,
   getProjectAnalytics,
@@ -64,6 +65,7 @@ class Analytics extends React.Component {
       datapca: {},
       innerpagename: "projectsel",
       loaded: 0,
+      loadedstate: 1,
       startdate: "2010-10-10",
       enddate: "2010-10-10",
       projectlist: [],
@@ -77,6 +79,7 @@ class Analytics extends React.Component {
   // this.handleClick = this.handleClick.bind(this);
 
   async handleProjectSelection(projectid, projectname) {
+    this.setState({ loadedstate: 0 });
     const operation = {
       query: getProjectAnalytics,
       variables: {
@@ -90,8 +93,31 @@ class Analytics extends React.Component {
       .then((data) => {
         // console.log(`received data ${JSON.stringify(data, null, 2)}`)
         console.log(data);
+        this.setState({ datapa: data.data.getProjectAnalytics });
       })
       .catch((error) => this.props.alert.error(error));
+    const operation2 = {
+      query: getCumulativeProjectAnalytics,
+      variables: {
+        projectid: projectid,
+        startdate: this.state.startdate,
+        enddate: this.state.enddate,
+        // projectFilter: "completed",
+      }, //optional
+    };
+    await makePromise(execute(link, operation2))
+      .then((data) => {
+        // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        console.log(data);
+        this.setState({ datapca: data.data.getCumulativeProjectAnalytics });
+      })
+      .catch((error) => this.props.alert.error(error));
+
+    this.setState({
+      innerpagename: "projectanalytics",
+      projectname: projectname,
+      loadedstate: 1,
+    });
   }
 
   componentWillMount() {
@@ -183,6 +209,39 @@ class Analytics extends React.Component {
       );
     }
 
+    if (
+      this.state.innerpagename === "projectanalytics" &&
+      this.state.loadedstate === 1
+    ) {
+      midpage = (
+        <>
+          <Grid item xs={12}>
+            <Typography variant="h5">
+              {`Project Analytics ` + this.state.projectname}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Recharts data={this.state.datapa} />
+          </Grid>
+          <Grid item xs={12}>
+            <Recharts data={this.state.datapca} />
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              onClick={() => this.setState({ innerpagename: "projectsel" })}
+            >
+              Back
+            </Button>
+          </Grid>
+        </>
+      );
+    }
+
     return (
       <div className={classes.root}>
         <CssBaseline />
@@ -211,7 +270,7 @@ class Analytics extends React.Component {
                         type="date"
                         id="date"
                         name="date"
-                        label="Start Date"
+                        helperText="Start Date"
                         fullWidth
                         onChange={(event) => {
                           this.setState({
@@ -225,7 +284,7 @@ class Analytics extends React.Component {
                         type="date"
                         id="date"
                         name="date"
-                        label="End Date"
+                        helperText="End Date"
                         fullWidth
                         onChange={(event) => {
                           this.setState({

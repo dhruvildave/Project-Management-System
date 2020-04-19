@@ -783,6 +783,10 @@ DECLARE
     ca int;
     t int;
 BEGIN
+
+    if not exists (select 1 from project where projectid = pid) then raise exception 'Project doesnot exists';
+    end if;
+
     SELECT
         COUNT(*) INTO t
     FROM
@@ -870,7 +874,8 @@ DECLARE
     ca int;
     t int;
 BEGIN
-
+    if not exists (select 1 from project where projectid = pid) then raise exception 'Project doesnot exists';
+    end if;
     CREATE TEMP TABLE report (
         member text,
         inactive int,
@@ -931,6 +936,8 @@ CREATE OR REPLACE FUNCTION gen_user_report (uname text)
     total int
     )
     AS $$
+    if not exists (select 1 from users where username = uname) then raise exception '% user doesnot exists',uname;
+    end if;
 DECLARE
     i int;
     a int;

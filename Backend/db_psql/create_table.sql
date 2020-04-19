@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS project (
     "longdescription" text,
     createdon date NOT NULL, -- Date Of Creation
     "path" text, -- path refers to the path of git repository
-    createdby text REFERENCES users (username)NOT NULL ON DELETE CASCADE,
+    createdby text NOT NULL REFERENCES users (username)ON DELETE CASCADE ,
     status project_status DEFAULT 'completed' NOT NULL,
     UNIQUE (name, createdby)
 );
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS projectfiles (
     "filename" text CHECK ("filename" ~ '^[\w,\s-]+\.[A-Za-z]+$') NOT NULL,
     "file" bytea,
     lastupdated timestamp NOT NULL DEFAULT now(),
-    projectid int REFERENCES project NOT NULL ON DELETE CASCADE ON UPDATE CASCADE
+    projectid int REFERENCES project  ON DELETE CASCADE ON UPDATE CASCADE NOT NULL
 );
 
 CREATE TYPE status_type AS ENUM (
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS task (
     priority priority_type DEFAULT 'normal',
     assignedby text NOT NULL,
     projectid int NOT NULL,
-    FOREIGN KEY (assignedby, projectid) REFERENCES member (username, projectid) NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (assignedby, projectid) REFERENCES member (username, projectid) ON DELETE CASCADE ON UPDATE CASCADE ,
     UNIQUE (title, assignedby, projectid)
 );
 
@@ -125,14 +125,14 @@ insert into task (title,description,starttime,endtime,assignedby,projectid)
 values('task1','just a task',null,null,'arpit',1);
  */
 CREATE TABLE IF NOT EXISTS assignedto (
-    taskid int REFERENCES task NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
-    username text REFERENCES users NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
+    taskid int REFERENCES task  ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+    username text REFERENCES users  ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
     PRIMARY KEY (taskid, username)
 );
 
 CREATE TABLE IF NOT EXISTS preqtask (
-    task int REFERENCES task (taskid) NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
-    preqtask int REFERENCES task (taskid) NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
+    task int REFERENCES task (taskid)  ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+    preqtask int REFERENCES task (taskid)  ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
     PRIMARY KEY (task, preqtask)
 );
 
@@ -149,9 +149,9 @@ CREATE TABLE IF NOT EXISTS note (
     title text NOT NULL,
     "description" text,
     color text,
-    createdby text REFERENCES users (username) NOT NULL ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+    createdby text REFERENCES users (username)  ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
     createdat timestamp DEFAULT NOW() NOT NULL,
-    boardid int REFERENCES board (boardid) NOT NULL ON DELETE CASCADE ON UPDATE CASCADE,
+    boardid int REFERENCES board (boardid)  ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
     UNIQUE (title, description)
 );
 
@@ -201,9 +201,9 @@ CREATE TRIGGER add_leader
     EXECUTE FUNCTION add_leader ();
 
 -- #3 trigger only leader can assign task
-CREATE OR REPLACE FUNCTION add_task ()
+CREATE OR REPLACE FUNCTION chk_task_assignedbyleader ()
     RETURNS TRIGGER
-    AS $add_task$
+    AS $$
 DECLARE
     myrole role_type;
 BEGIN
@@ -221,13 +221,13 @@ BEGIN
         RETURN NULL;
     END IF;
 END
-$add_task$
+$$
 LANGUAGE plpgsql;
 
-CREATE TRIGGER add_task
+CREATE TRIGGER chk_task_assignedbyleader
     BEFORE INSERT OR UPDATE ON task
     FOR EACH ROW
-    EXECUTE PROCEDURE add_task ();
+    EXECUTE PROCEDURE chk_task_assignedbyleader ();
 
 -- #4 procedure assigned to is a member
 CREATE PROCEDURE assigntask (tid int, un text
@@ -309,7 +309,7 @@ CREATE TRIGGER update_status
     FOR EACH ROW
     EXECUTE FUNCTION update_status ();
 
--- #6 procedure => add preqtask and set task status to inactive
+-- #6 trigger => add preqtask and set task status to inactive
 
 CREATE Function change_statuson_preqtask (
 ) returns trigger
@@ -390,18 +390,6 @@ $$
 LANGUAGE plpgsql;
 
 -- #9 procedure -> create project and add members
---
---
--- {
---   "data": {
---     "createProject": {
---       "status": false,
---       "msg": "ERROR:  duplicate key value violates unique constraint \"member_pkey\"\nDETAIL:  Key (username, projectid)=(dhruvil91, 12) already exists.\nCONTEXT:  SQL statement \"INSERT INTO member\n            VALUES (mem[1]::text, pid, mem[2]::role_type)\"\nPL/pgSQL function create_project(text,text,text,text,text,text[]) line 11 at SQL statement\n"
---     }
---   }
--- }
---
---
 
 CREATE OR REPLACE PROCEDURE create_project (usr text, name text, sd text, ld text, path text, members text[][]
 )
@@ -512,17 +500,6 @@ DECLARE
     p int;
 BEGIN
  st = now();
-    IF NOT EXISTS (
-        SELECT
-            1
-        FROM
-            member
-        WHERE
-            username = assignedby
-            AND projectid = pid
-            AND ROLE = 'leader') THEN
-    RAISE EXCEPTION '% user is not a leader', assignedby;
-END IF;
 INSERT INTO task (title, description, starttime, endtime, assignedby, projectid,priority)
     VALUES (title, description, st, et, assignedby, pid,pr::priority_type)
 RETURNING
@@ -924,7 +901,7 @@ END;
 $$
 LANGUAGE plpgsql;
 
--- User report
+--Function gen User report
 CREATE OR REPLACE FUNCTION gen_user_report (uname text)
     RETURNS TABLE (
     inactive int,
@@ -1242,7 +1219,7 @@ CREATE TRIGGER check_projectstatus
     FOR EACH ROW
     EXECUTE FUNCTION check_projectstatus ();
 
--- procedure => get project given pid and username
+-- function => get project given pid and username
 CREATE OR REPLACE FUNCTION getproject (text, int)
     RETURNS TABLE (
         pid int,
@@ -1454,6 +1431,7 @@ END
 $$
 LANGUAGE plpgsql;
 
+-- function daily analytics values
 CREATE OR REPLACE FUNCTION daily_analytics(pid int, d0 date, d1 date)
 RETURNS TABLE("date" date, num_start int, num_comp int)
 AS $$
@@ -1485,6 +1463,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- function cumulative analytics value
 CREATE OR REPLACE FUNCTION cumulative_daily_analytics(pid int, d0 date, d1 date)
 RETURNS TABLE("date" date, num_start int, num_comp int)
 AS $$
@@ -1515,7 +1494,7 @@ BEGIN
     FROM temp;
 END;
 $$ LANGUAGE plpgsql;
-
+-- procedure delete file
 create or replace procedure delete_file(text,int) as $$
 declare pid int;
 BEGIN

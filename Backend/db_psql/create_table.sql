@@ -503,7 +503,7 @@ $$ LANGUAGE plpgsql;
 
 
 -- #12 Procedure => (add task with assigned to and prereq task values if user is a leader and members assigned to exists)
-CREATE OR REPLACE PROCEDURE add_task (assignedby text, assignedto text[], pid int, title text, description text, st timestamp, et timestamp, priority text, preqtaskid int[]
+CREATE OR REPLACE PROCEDURE add_task (assignedby text, assignedto text[], pid int, title text, description text, st timestamp, et timestamp, pr text, preqtaskid int[]
 )
     AS $$
 DECLARE
@@ -523,8 +523,8 @@ BEGIN
             AND ROLE = 'leader') THEN
     RAISE EXCEPTION '% user is not a leader', assignedby;
 END IF;
-INSERT INTO task (title, description, starttime, endtime, assignedby, projectid)
-    VALUES (title, description, st, et, assignedby, pid)
+INSERT INTO task (title, description, starttime, endtime, assignedby, projectid,priority)
+    VALUES (title, description, st, et, assignedby, pid,pr::priority_type)
 RETURNING
     taskid INTO tid;
     foreach m IN ARRAY assignedto LOOP
@@ -584,7 +584,7 @@ END IF;
         description = des,
         starttime = st,
         endtime = et,
-        priority = prior,
+        priority = prior::priority_type,
         assignedby = usr
     WHERE
         taskid = tid;
@@ -604,12 +604,12 @@ END IF;
 INSERT INTO assignedto
     VALUES (tid, m);
 END LOOP;
-    DELETE FROM preqtask
-    WHERE task = tid;
+if array_length(preqtaskid, 1) > 0 then
     foreach p IN ARRAY preqtaskid LOOP
         INSERT INTO preqtask
             VALUES (p, tid);
     END LOOP;
+end if;
 END
 $$
 LANGUAGE plpgsql;

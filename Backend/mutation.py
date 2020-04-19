@@ -250,6 +250,7 @@ class updateTask(Mutation):
                 username, taskid, assignedto, title, description, startdate,
                 enddate, priority, preqtaskid
             ])
+        return updateTask(status=s, msg=m)
 
 
 class deleteTask(Mutation):

@@ -158,5 +158,14 @@ def f_cum_analytics(pid, startdate, enddate):
     return Analytics(dates, newtasks, completedtasks)
 
 
+File = namedtuple("File",
+                  ["fileid", "filename", "file", "lastupdated", "projectid"])
+
+
+def f_getfiles(username, pid):
+    data = pg.executequery2("select * from getfiles(%s,%s);", [username, pid])
+    return [File(x[0], x[1], x[2], x[3], x[4]) for x in data]
+
+
 if __name__ == "__main__":
     f_analytics(1, "2020-04-01", "2020-04-22")

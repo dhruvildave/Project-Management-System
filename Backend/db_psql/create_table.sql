@@ -511,8 +511,7 @@ DECLARE
     m text;
     p int;
 BEGIN
-if st is null then st = now();
-end if;
+ st = now();
     IF NOT EXISTS (
         SELECT
             1
@@ -1184,29 +1183,47 @@ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION check_projectstatus ()
     RETURNS TRIGGER
     AS $check_projectstatus$
+DECLARE
+    num_completed int;
+    num_total int;
 BEGIN
-    IF EXISTS (
-        SELECT
-            *
-        FROM
-            task
-        WHERE
-            projectid = NEW.projectid
-            AND status != 'completed') THEN
-    UPDATE
-        project
-    SET
-        status = 'ongoing'
-    WHERE
-        projectid = NEW.projectid;
-ELSE
-    UPDATE
-        project
-    SET
-        status = 'completed'
-    WHERE
-        projectid = NEW.projectid;
-END IF;
+    IF TG_OP = 'UPDATE' THEN
+        SELECT COUNT(*) INTO num_total
+        FROM task t
+        WHERE projectid = OLD.projectid;
+
+        SELECT COUNT(*) INTO num_completed
+        FROM task t
+        WHERE projectid = OLD.projectid AND status = 'completed';
+
+        IF num_total = num_completed THEN
+            UPDATE project
+            SET status = 'completed'
+            WHERE projectid = OLD.projectid;
+        ELSE
+            UPDATE project
+            SET status = 'ongoing'
+            WHERE projectid = OLD.projectid;
+        END IF;
+    ELSIF TG_OP = 'INSERT' THEN
+        SELECT COUNT(*) INTO num_total
+        FROM task t
+        WHERE projectid = NEW.projectid;
+
+        SELECT COUNT(*) INTO num_completed
+        FROM task t
+        WHERE projectid = NEW.projectid AND status = 'completed';
+
+        IF num_total = num_completed THEN
+            UPDATE project
+            SET status = 'completed'
+            WHERE projectid = NEW.projectid;
+        ELSE
+            UPDATE project
+            SET status = 'ongoing'
+            WHERE projectid = NEW.projectid;
+        END IF;
+    END IF;
     RETURN new;
 END;
 $check_projectstatus$
@@ -1214,6 +1231,7 @@ LANGUAGE plpgsql;
 
 CREATE TRIGGER check_projectstatus
     AFTER INSERT OR UPDATE ON task
+    FOR EACH ROW
     EXECUTE FUNCTION check_projectstatus ();
 
 -- procedure => get project given pid and username

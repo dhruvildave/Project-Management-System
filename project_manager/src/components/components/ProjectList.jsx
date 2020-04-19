@@ -84,7 +84,7 @@ class ProjectList extends React.Component {
     }
 
     return (
-      <Grid conatiner justify="center" xs={12}>
+      <Grid container justify="center" xs={12}>
         {" "}
         <Paper className={classes.root}>
           <Tabs

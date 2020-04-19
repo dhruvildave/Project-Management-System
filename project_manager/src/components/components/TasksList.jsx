@@ -39,7 +39,7 @@ class TaskList extends React.Component {
     // console.log(this.state.tasklist);
   }
   render() {
-    const { classes } = this.props;
+    const classes = useStyles();
     let ListElement;
     if (this.state.value === 0) {
       let taskall = this.state.tasklist.all;
@@ -86,7 +86,7 @@ class TaskList extends React.Component {
         alignItems="center"
         direction="column"
       >
-        <Paper className={classes.root}>
+        <Paper>
           <Tabs
             value={this.state.value}
             onChange={(event, value) => this.setState({ value: value })}

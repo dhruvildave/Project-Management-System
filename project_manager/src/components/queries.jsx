@@ -64,8 +64,22 @@ export const getTask = gql`
       priority
       projectid
       assignedby
-      assignedto
+      assignedto {
+        username
+      }
       preqtask
+    }
+  }
+`;
+
+export const preqTask = gql`
+  query($taskid: Int!) {
+    getTask(taskid: $taskid) {
+      taskid
+      title
+      description
+      status
+      priority
     }
   }
 `;
@@ -311,7 +325,6 @@ export const addTask = gql`
     $preqtaskid: [Int!]
     $priority: String
     $projectid: Int!
-    $starttime: DateTime
     $title: String!
   ) {
     addTask(
@@ -322,7 +335,6 @@ export const addTask = gql`
       preqtaskid: $preqtaskid
       priority: $priority
       projectid: $projectid
-      starttime: $starttime
       title: $title
     ) {
       status

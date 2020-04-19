@@ -130,16 +130,16 @@ class ProjectsPage extends React.Component {
 
     this.setState({
       files: [
-        { fileid: 1, filename: "Okay 1", lastupdated: "12-35-3566" },
+        { fileid: 1, filename: "Okay 1", lastupdated: "2020-04-04" },
         {
           fileid: 2,
           filename: "Okay 2",
-          lastupdated: "12-35-3566",
+          lastupdated: "2020-04-04",
         },
         {
           fileid: 3,
           filename: "Okay 3",
-          lastupdated: "12-35-3566",
+          lastupdated: "2020-04-04",
         },
       ],
       tasks: {

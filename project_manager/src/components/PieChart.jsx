@@ -20,11 +20,11 @@ const COLORS = [
 export default class PC extends PureComponent {
   render() {
     return (
-      <PieChart width={600} height={600} onMouseEnter={this.onPieEnter}>
+      <PieChart width={400} height={400} onMouseEnter={this.onPieEnter}>
         <Pie
           data={this.props.data}
-          cx={300}
-          cy={300}
+          cx={200}
+          cy={200}
           innerRadius={60}
           outerRadius={120}
           fill="#8884d8"

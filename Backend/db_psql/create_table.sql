@@ -1273,7 +1273,6 @@ CREATE FUNCTION check_member (text, int)
     AS $$
 BEGIN
     RETURN
-    SELECT
         EXISTS (
             SELECT
                 1

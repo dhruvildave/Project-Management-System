@@ -60,7 +60,12 @@ class EditProject extends React.Component {
     let message = "";
     try {
       if (this.state.memberstring !== "") {
-        message = JSON.parse(this.state.memberstring);
+        message = [
+          {
+            username: "",
+            role: "",
+          },
+        ];
       }
     } catch (e) {
       this.props.alert.error(e.message);

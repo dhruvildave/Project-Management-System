@@ -152,7 +152,7 @@ export const myTasks = gql`
 `;
 
 export const ProjectTasks = gql`
-  query($username: String!, $projectid: Int!, $taskFiler: String) {
+  query($username: String!, $projectid: Int!, $taskFilter: String) {
     ProjectTasks(
       username: $username
       projectid: $projectid

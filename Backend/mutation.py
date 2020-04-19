@@ -210,11 +210,11 @@ class addTask(Mutation):
                preqtaskid=None):
         if not priority:
             priority = 'normal'
-            s, m = pg.executequery(
-                "call add_task (%s,%s,%s,%s,%s,%s,%s,%s,%s);", [
-                    assignedby, assignedto, projectid, title, description,
-                    startdate, enddate, priority, preqtaskid
-                ])
+        s, m = pg.executequery(
+            "call add_task (%s,%s,%s,%s,%s,%s,%s,%s,%s);", [
+                assignedby, assignedto, projectid, title, description,
+                startdate, enddate, priority, preqtaskid
+            ])
         return addTask(status=s, msg=m)
 
 

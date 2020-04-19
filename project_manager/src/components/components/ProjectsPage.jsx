@@ -196,7 +196,7 @@ class ProjectsPage extends React.Component {
     tasks = (
       <TaskManagerProj
         username={this.state.username}
-        projid={this.state.projectid}
+        projectid={this.state.projectid}
         tasks={this.state.tasks}
       />
     );

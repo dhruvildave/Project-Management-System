@@ -1,7 +1,19 @@
 import React from "react";
 import { createStyles, withStyles } from "@material-ui/core/styles";
-import { Grid, TextField, Paper, Button, MenuItem } from "@material-ui/core";
+import {
+  Grid,
+  TextField,
+  Paper,
+  Button,
+  MenuItem,
+  Typography,
+} from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
+import { execute, makePromise } from "apollo-link";
+import { ProjectTasks, addTask, link } from "../queries";
+import { withAlert } from "react-alert";
+import Listseltask from "../assets/listseltask";
+
 const useStyles = createStyles((theme) => ({
   avatar: {
     margin: theme.spacing(1),
@@ -20,29 +32,101 @@ const useStyles = createStyles((theme) => ({
 class AddTask extends React.Component {
   constructor(props) {
     super(props);
+    var today = new Date().now;
     this.state = {
-      username: "",
-      projectid: 42069,
+      username: this.props.username,
+      projectid: this.props.projectid,
       priority_type: "",
       status_type: "",
       task_title: "",
-      startdate: "",
-      enddate: "",
+      startdate: today,
+      enddate: today,
       description: "",
       assignedto: [],
+      loaded: "",
+      preqid: [],
+      preqammout: 0,
+      taskall: [],
     };
     this.handleClick = this.handleClick.bind(this);
+    this.fetchTasksFilter = this.fetchTasksFilter.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
   }
+
+  async fetchTasksFilter() {
+    const operation1 = {
+      query: ProjectTasks,
+      variables: {
+        username: this.state.username,
+        taskFilter: null,
+        projectid: this.state.projectid,
+        tasklist: [],
+      }, //optional
+    };
+    let tasklist;
+    await makePromise(execute(link, operation1))
+      .then((data) => {
+        // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        console.log(data);
+        if (data.data) {
+          tasklist = data.data.ProjectTasks;
+          console.log(tasklist);
+          // return tasklist;
+
+          this.setState({ taskall: tasklist, loaded: 1 });
+        }
+      })
+      .catch((error) => {
+        this.props.alert.error(error.message);
+        console.log(error);
+      });
+  }
+
   componentWillMount() {
     if (this.props.username !== undefined) {
       this.setState({ username: this.props.username });
     }
   }
-  handleClick(event) {
-    event.preventDefault();
-    console.log(this.state.assignedto);
+  async handleClick(event) {
+    // event.preventDefault();
+    const operation = {
+      query: addTask,
+      variables: {
+        assignedby: this.state.username,
+        assignedto: this.state.assignedto,
+        description: this.state.description,
+        endtime: this.state.enddate,
+        preqtaskid: this.state.preqid,
+        priority: this.state.priority_type,
+        projectid: this.state.projectid,
+        starttime: this.state.startdate,
+        title: this.state.task_title,
+      }, //optional
+    };
+    await makePromise(execute(link, operation))
+      .then((data) => {
+        // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        console.log(data);
+        if (data.data.addTask.status === false) {
+          this.props.alert.error(data.data.addTask.msg);
+        }
+        if (data.data.addTask.status === true) {
+          this.props.alert.success("Success on adding Task");
+          this.props.handleToUpdate();
+        }
+      })
+      .catch((error) => {
+        this.props.alert.error(error.message);
+        console.log(error);
+      });
     //if success redirect back
     this.props.handleToUpdate();
+  }
+  handleUpdate(sel, select) {
+    this.setState({ preqid: sel, preqammout: select });
+  }
+  componentDidMount() {
+    this.fetchTasksFilter();
   }
   render() {
     const { classes } = this.props;
@@ -62,6 +146,17 @@ class AddTask extends React.Component {
       { value: "low", label: "low" },
     ];
     today = yyyy + "-" + mm + "-" + dd;
+
+    let listtask;
+    if (this.state.loaded === 1) {
+      listtask = (
+        <Listseltask
+          task={this.state.taskall}
+          handleToUpdate={this.handleUpdate}
+        />
+      );
+    }
+
     return (
       <FormControl>
         <Grid container item xs={12} justify="center">
@@ -74,6 +169,9 @@ class AddTask extends React.Component {
                   name="titile"
                   label="Task title"
                   fullWidth
+                  onChange={(event) =>
+                    this.setState({ task_title: event.target.value })
+                  }
                   //   autoComplete="fname"
                 />
               </Grid>
@@ -85,6 +183,10 @@ class AddTask extends React.Component {
                   name="description"
                   label="Description"
                   fullWidth
+                  onChange={(event) =>
+                    this.setState({ description: event.target.value })
+                  }
+
                   //   autoComplete="billing address-line2"
                 />
               </Grid>
@@ -140,6 +242,9 @@ class AddTask extends React.Component {
                   defaultValue={today}
                   fullWidth
                   inputProps={{ readOnly: true }}
+                  onChange={(event) =>
+                    this.setState({ startdate: event.target.value })
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -150,6 +255,9 @@ class AddTask extends React.Component {
                   label="EndDate"
                   defaultValue={today}
                   fullWidth
+                  onChange={(event) =>
+                    this.setState({ enddate: event.target.value })
+                  }
                 />
               </Grid>
               <Grid item xs={12}>
@@ -167,6 +275,10 @@ class AddTask extends React.Component {
                   }}
                   //   autoComplete="fname"
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h6">Select Prerequisite task</Typography>
+                {listtask}
               </Grid>
             </Grid>
           </Paper>
@@ -198,4 +310,4 @@ class AddTask extends React.Component {
   }
 }
 
-export default withStyles(useStyles)(AddTask);
+export default withAlert()(withStyles(useStyles)(AddTask));

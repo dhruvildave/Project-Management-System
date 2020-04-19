@@ -65,8 +65,8 @@ class TaskManagerProj extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
-      projectid: 42069,
+      username: this.props.username,
+      projectid: this.props.projectid,
       tasks: [],
       viewname: "alltasklist", // add task delete task view task ( edit task )
       taskid: 42069,
@@ -123,7 +123,10 @@ class TaskManagerProj extends React.Component {
           }
         }
       })
-      .catch((error) => this.props.alert.error(error));
+      .catch((error) => {
+        this.props.alert.error(error.message);
+        console.log(error);
+      });
   }
   async fetchalldata() {
     await this.fetchTasksFilter(null);
@@ -139,6 +142,7 @@ class TaskManagerProj extends React.Component {
       all: this.state.all,
     };
     this.setState({ tasks: tasklist, loaded: 1 });
+    console.log(tasklist);
     console.log(this.state.tasks);
   }
 
@@ -162,6 +166,7 @@ class TaskManagerProj extends React.Component {
     const { classes } = this.props;
     let mid;
     if (this.state.loaded === 1) {
+      console.log(this.state.tasks);
       mid = (
         <TaskList
           tasklist={this.state.tasks}

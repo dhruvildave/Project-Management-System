@@ -10,6 +10,15 @@ import Copyright from "./components/Copyright";
 import Footer from "./components/Footer";
 import clsx from "clsx";
 import NotesList from "./components/NotesList";
+import { Typography, TextField } from "@material-ui/core";
+import { execute, makePromise } from "apollo-link";
+import {
+  myProjects,
+  getProjectAnalytics,
+  getCumulativeProjectAnalytics,
+  link,
+} from "./queries";
+import Listprojrep from "./assets/listprojrep";
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -51,14 +60,39 @@ class Analytics extends React.Component {
       username: "",
       authenticated: false,
       pagename: "analytics",
+      datapa: {},
+      datapca: {},
+      innerpagename: "projectsel",
+      loaded: 0,
+      startdate: "2010-10-10",
+      enddate: "2010-10-10",
+      projectlist: [],
       //   projectlist: { ongoing: null, completed: null },
     };
-
+    this.handleProjectSelection = this.handleProjectSelection.bind(this);
     // console.log(this.props.username);
     // console.log(this.props.location.state.username);
   }
   // call api here to get rest of user data from backend
   // this.handleClick = this.handleClick.bind(this);
+
+  async handleProjectSelection(projectid, projectname) {
+    const operation = {
+      query: getProjectAnalytics,
+      variables: {
+        projectid: projectid,
+        startdate: this.state.startdate,
+        enddate: this.state.enddate,
+        // projectFilter: "completed",
+      }, //optional
+    };
+    await makePromise(execute(link, operation))
+      .then((data) => {
+        // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        console.log(data);
+      })
+      .catch((error) => this.props.alert.error(error));
+  }
 
   componentWillMount() {
     if (this.props.username !== undefined) {
@@ -79,17 +113,75 @@ class Analytics extends React.Component {
       });
     }
   }
-  componentDidMount() {
+  async componentDidMount() {
     console.log(this.state.username);
     console.log(this.state.authenticated);
+    await this.fetchProjects();
+  }
+
+  async fetchProjects() {
+    let ongoing = [{}];
+    const operation1 = {
+      query: myProjects,
+      variables: {
+        username: this.state.username,
+        projectFilter: "ongoing",
+      }, //optional
+    };
+
+    await makePromise(execute(link, operation1))
+      .then((data) => {
+        // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        console.log(data);
+        if (data.data) {
+          ongoing = data.data.myProjects;
+        }
+      })
+      .catch((error) => this.props.alert.error(error));
+
+    let completed;
+    const operation = {
+      query: myProjects,
+      variables: {
+        username: this.state.username,
+        projectFilter: "completed",
+      }, //optional
+    };
+
+    await makePromise(execute(link, operation))
+      .then((data) => {
+        // console.log(`received data ${JSON.stringify(data, null, 2)}`)
+        console.log(data);
+        completed = data.data.myProjects;
+        console.log(completed);
+        // console.log(projectlist);
+        this.setState({
+          projectlist: ongoing.concat(completed),
+          loaded: 1,
+        });
+        console.log(this.state.projectlist);
+      })
+      .catch((error) => this.props.alert.error(error));
   }
 
   render() {
+    let midpage;
     if (this.state.authenticated === false) {
       return <h1>Not Authenticated Go to Login Page and Login</h1>;
     }
     const { classes } = this.props;
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+
+    if (this.state.innerpagename === "projectsel" && this.state.loaded === 1) {
+      midpage = (
+        <Grid item xs={12}>
+          <Listprojrep
+            projects={this.state.projectlist}
+            handleToUpdate={this.handleProjectSelection}
+          />
+        </Grid>
+      );
+    }
 
     return (
       <div className={classes.root}>
@@ -104,11 +196,48 @@ class Analytics extends React.Component {
           <Container maxWidth="xl" className={classes.container}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={8} lg={9}>
-                <Paper className={fixedHeightPaper}>ok</Paper>
+                <Paper className={fixedHeightPaper}>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <Typography variant="h3">Project Analytics</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="h5">
+                        Click on Project to get analytics for selected dates
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        type="date"
+                        id="date"
+                        name="date"
+                        label="Start Date"
+                        fullWidth
+                        onChange={(event) => {
+                          this.setState({
+                            startdate: event.target.value,
+                          });
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        type="date"
+                        id="date"
+                        name="date"
+                        label="End Date"
+                        fullWidth
+                        onChange={(event) => {
+                          this.setState({
+                            enddate: event.target.value,
+                          });
+                        }}
+                      />
+                    </Grid>
+                    {midpage}
+                  </Grid>
+                </Paper>
               </Grid>
-              {/* <Grid item xs={12} md={4} lg={3}>
-                <Paper className={fixedHeightPaper}></Paper>
-              </Grid> */}
               <NotesList username={this.state.username} />;
               <Footer />
             </Grid>

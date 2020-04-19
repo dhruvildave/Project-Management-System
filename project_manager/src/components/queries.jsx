@@ -401,7 +401,7 @@ export const changePassword = gql`
 
 export const changeName = gql`
   mutation($newfirstname: String!, $newlastname: String!, $username: String!) {
-    changePassword(
+    changeName(
       newfirstname: $newfirstname
       newlastname: $newlastname
       username: $username

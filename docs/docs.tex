@@ -1,0 +1,391 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Project Management System}
+
+\author{\IEEEauthorblockN{Arpit Vaghela}
+  \IEEEauthorblockA{\textit{Ahmedabad University}\\
+    \href{mailto:arpitsinh.v@ahduni.edu.in}{arpitsinh.v@ahduni.edu.in}\\
+    AU1841034}
+  \and
+  \IEEEauthorblockN{Kaushal Patil}
+  \IEEEauthorblockA{\textit{Ahmedabad University}\\
+    \href{mailto:kaushal.p@ahduni.edu.in}{kaushal.p@ahduni.edu.in}\\
+    AU1841040}
+  \and
+  \IEEEauthorblockN{Dhruvil Dave}
+  \IEEEauthorblockA{\textit{Ahmedabad University}\\
+    \href{mailto:dhruvil.d@ahduni.edu.in}{dhruvil.d@ahduni.edu.in}\\
+    AU1841003}
+}
+
+\maketitle
+
+\begin{abstract}
+This is a project management system written using \href{https://reactjs.org/}{React.js} for frontend, \href{https://flask.palletsprojects.com/en/1.1.x/}{Flask} and \href{https://graphql.org/}{GraphQL} for backend and \href{https://www.postgresql.org/}{PostgreSQL} as database. This project was made as a part of subjects Database Management Systems (CSE250) and Database Management Systems Lab (CSE251).
+\end{abstract}
+
+\begin{IEEEkeywords}
+  component, formatting, style, styling, insert
+\end{IEEEkeywords}
+
+\section{Table Design}
+\begin{table}[htbp]
+  \caption{Users}
+  \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{Column} & \textbf{Type} & \textbf{Nullable} & \textbf{Default}\\
+      \hline
+      username & text & not null & \\
+      firstname & text & not null & \\
+      lastname & text & not null & \\
+      password & text & not null & \\
+      emailid & text & not null & \\
+      profilepic & byte array & & \\
+      \hline
+    \end{tabular}
+    \begin{enumerate}
+    \item Indexes:
+      \begin{enumerate}
+      \item PRIMARY KEY (username)
+      \item UNIQUE CONSTRAINT (emailid)
+      \end{enumerate}
+    \item Check Constraints:
+      \begin{enumerate}
+      \item emailid
+      \item firstname
+      \item lastname
+      \item username
+      \end{enumerate}
+    \item Referenced by:
+      \begin{enumerate}
+      \item assignedto \ref{assignedto}
+      \item board \ref{board}
+      \item member \ref{member}
+      \item note \ref{note}
+      \item project \ref{project}
+      \end{enumerate}
+    \item Triggers:
+      \begin{enumerate}
+      \item add\_board AFTER INSERT ON users FOR EACH ROW EXECUTE FUNCTION add\_board()
+      \item create\_hash BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXECUTE FUNCTION create\_hash()
+      \end{enumerate}
+    \end{enumerate}
+    \label{users}
+  \end{center}
+\end{table}
+
+\begin{table}[htbp]
+  \caption{Project}
+  \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{Column} & \textbf{Type} & \textbf{Nullable} & \textbf{Default}\\
+      \hline
+      projectid & integer & not null & serial\\
+      name & text & not null &\\
+      shortdescription & text &&\\
+      longdescription & text &&\\
+      createdon & date &&\\
+      path & text &&\\
+      createdby & text &&\\
+      status & enum(project\_status) & not null & completed\\
+      \hline
+    \end{tabular}
+    \begin{enumerate}
+    \item Indexes:
+      \begin{enumerate}
+      \item PRIMARY KEY (projectid)
+      \item UNIQUE CONSTRAINT (name, createdby)
+      \end{enumerate}
+    \item Foreign Key Contraints:
+      \begin{enumerate}
+        \item createdby REFERENCES users(username)
+      \end{enumerate}
+    \item Check Constraints:
+      \begin{enumerate}
+      \item emailid
+      \item firstname
+      \item lastname
+      \item username
+      \end{enumerate}
+    \item Referenced by:
+      \begin{enumerate}
+      \item board \ref{board}
+      \item member \ref{member}
+      \item projectfiles \ref{projectfiles}
+      \end{enumerate}
+    \item Triggers:
+      \begin{enumerate}
+        \item add\_board AFTER INSERT ON project FOR EACH ROW EXECUTE FUNCTION add\_board()
+        \item add\_leader AFTER INSERT ON project FOR EACH ROW EXECUTE FUNCTION add\_leader()
+      \end{enumerate}
+    \end{enumerate}
+    \label{project}
+  \end{center}
+\end{table}
+
+\begin{table}[htbp]
+  \caption{Member}
+  \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{Column} & \textbf{Type} & \textbf{Nullable} & \textbf{Default}\\
+      \hline
+      username & text & not null &\\
+      projectid & integer & not null &\\
+      role & enum(role\_type) &&\\
+      \hline
+    \end{tabular}
+    \begin{enumerate}
+    \item Indexes:
+      \begin{enumerate}
+      \item PRIMARY KEY (username, projectid)
+      \end{enumerate}
+    \item Foreign Key Contraints:
+      \begin{enumerate}
+      \item projectid REFERENCES users(projectid)
+      \item username REFERENCES users(username)
+      \end{enumerate}
+    \item Referenced by:
+      \begin{enumerate}
+      \item task \ref{task}
+      \end{enumerate}
+    \item Triggers:
+      \begin{enumerate}
+        \item add\_board AFTER INSERT ON project FOR EACH ROW EXECUTE FUNCTION add\_board()
+        \item add\_leader AFTER INSERT ON project FOR EACH ROW EXECUTE FUNCTION add\_leader()
+      \end{enumerate}
+    \end{enumerate}
+    \label{member}
+  \end{center}
+\end{table}
+
+\begin{table}[htbp]
+  \caption{Projectfiles}
+  \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{Column} & \textbf{Type} & \textbf{Nullable} & \textbf{Default}\\
+      \hline
+      fileid & integer & not null & serial\\
+      filename & text & not null &\\
+      file & byte array &&\\
+      lastupdated & timestamp without time zone & not null & serial\\
+      projectid &&&\\
+      \hline
+    \end{tabular}
+    \begin{enumerate}
+    \item Indexes:
+      \begin{enumerate}
+      \item PRIMARY KEY (fileid)
+      \end{enumerate}
+    \item Foreign Key Contraints:
+      \begin{enumerate}
+        \item projectid REFERENCES project(projectid)
+      \end{enumerate}
+    \item Check Constraints:
+      \begin{enumerate}
+      \item filename
+      \end{enumerate}
+    \item Triggers:
+      \begin{enumerate}
+        \item update\_lastupdated\_files BEFORE INSERT OR UPDATE ON projectfiles FOR EACH ROW EXECUTE FUNCTION update\_lastupdated\_files()
+      \end{enumerate}
+    \end{enumerate}
+    \label{projectfiles}
+  \end{center}
+\end{table}
+
+\begin{table}[htbp]
+  \caption{Task}
+  \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{Column} & \textbf{Type} & \textbf{Nullable} & \textbf{Default}\\
+      \hline
+      taskid & integer & not null & serial\\
+      title & text & not null &\\
+      description & text &&\\
+      starttime & timestamp without time zone && now()\\
+      endtime & timestamp without time zone &&\\
+      status & enum(status\_type) && active\\
+      completiontime & timestamp without time zone &&\\
+      priority & enum(priority\_type) && normal\\
+      assignedby & text & not null &\\
+      projectid & integer & not null &\\
+      \hline
+    \end{tabular}
+    \begin{enumerate}
+    \item Indexes:
+      \begin{enumerate}
+      \item PRIMARY KEY (taskid)
+      \item UNIQUE CONSTRAINT (title, assignedby, project)
+      \end{enumerate}
+    \item Foreign Key Contraints:
+      \begin{enumerate}
+        \item (assignedby, projectid) REFERENCES member(username, projectid)
+      \end{enumerate}
+    \item Check Constraints:
+      \begin{enumerate}
+      \item starttime
+      \end{enumerate}
+    \item Referenced by:
+      \begin{enumerate}
+      \item board \ref{assignedto}
+      \item preqtask \ref{preqtask}
+      \end{enumerate}
+    \item Triggers:
+      \begin{enumerate}
+        \item add\_task BEFORE INSERT OR UPDATE ON task FOR EACH ROW EXECUTE FUNCTION add\_task()
+        \item chech\_projectstatus AFTER INSERT OR UPDATE ON task FOR EACH ROW EXECUTE FUNCTION check\_projectstatus()
+        \item update\_status AFTER UPDATE ON task FOR EACH ROW EXECUTE FUNCTION update\_status()
+      \end{enumerate}
+    \end{enumerate}
+    \label{task}
+  \end{center}
+\end{table}
+
+\begin{table}[htbp]
+  \caption{Assignedto}
+  \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{Column} & \textbf{Type} & \textbf{Nullable} & \textbf{Default}\\
+      \hline
+      taskid & integer & not null &\\
+      username & text & not null &\\
+      \hline
+    \end{tabular}
+    \begin{enumerate}
+    \item Indexes:
+      \begin{enumerate}
+      \item PRIMARY KEY (taskid, username)
+      \end{enumerate}
+    \item Foreign Key Contraints:
+      \begin{enumerate}
+      \item taskid REFERENCES task(projectid)
+      \item username REFERENCES users(username)
+      \end{enumerate}
+    \end{enumerate}
+    \label{assignedto}
+  \end{center}
+\end{table}
+
+\begin{table}[htbp]
+  \caption{Preqtask}
+  \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{Column} & \textbf{Type} & \textbf{Nullable} & \textbf{Default}\\
+      \hline
+      task & integer & not null &\\
+      preqtask & integer & not null &\\
+      \hline
+    \end{tabular}
+    \begin{enumerate}
+    \item Indexes:
+      \begin{enumerate}
+      \item PRIMARY KEY (task, preqtask)
+      \end{enumerate}
+    \item Foreign Key Contraints:
+      \begin{enumerate}
+      \item task REFERENCES task(taskid)
+      \item preqtask REFERENCES task(taskid)
+      \end{enumerate}
+    \item Triggers:
+      \begin{enumerate}
+        \item task\_status\_to\_inactive AFTER INSERT OR UPDATE ON preqtask FOR EACH ROW EXECUTE FUNCTION change\_statuson\_preqtask()
+      \end{enumerate}
+    \end{enumerate}
+    \label{preqtask}
+  \end{center}
+\end{table}
+
+\begin{table}[htbp]
+  \caption{Board}
+  \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{Column} & \textbf{Type} & \textbf{Nullable} & \textbf{Default}\\
+      \hline
+      boardid & integer & not null & serial\\
+      title & text & not null &\\
+      description & text &&\\
+      username & text &&\\
+      projectid & integer &&\\
+      \hline
+    \end{tabular}
+    \begin{enumerate}
+    \item Indexes:
+      \begin{enumerate}
+      \item PRIMARY KEY (boardid)
+      \end{enumerate}
+    \item Foreign Key Contraints:
+      \begin{enumerate}
+      \item projectid REFERENCES project(projectid)
+      \item username REFERENCES users(username)
+      \end{enumerate}
+    \item Referenced by:
+      \begin{enumerate}
+        \item note \ref{note}
+      \end{enumerate}
+    \item Triggers:
+      \begin{enumerate}
+        \item check\_board BEFORE INSERT ON board FOR EACH ROW EXECUTE FUNCTION check\_board()
+      \end{enumerate}
+    \end{enumerate}
+    \label{board}
+  \end{center}
+\end{table}
+
+\begin{table}[htbp]
+  \caption{Board}
+  \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{Column} & \textbf{Type} & \textbf{Nullable} & \textbf{Default}\\
+      \hline
+      noteid & integer & not null & serial\\
+      title & text & not null &\\
+      description & text &&\\
+      color & text &&\\
+      createdby & text & not null &\\
+      boardid & integer &&\\
+      \hline
+    \end{tabular}
+    \begin{enumerate}
+    \item Indexes:
+      \begin{enumerate}
+      \item PRIMARY KEY (noteid)
+      \item UNIQUE CONSTRAINT (title, description)
+      \end{enumerate}
+    \item Foreign Key Contraints:
+      \begin{enumerate}
+      \item boardid REFERENCES board(boardid)
+      \item createdby REFERENCES users(username)
+      \end{enumerate}
+    \end{enumerate}
+    \label{note}
+  \end{center}
+\end{table}
+
+\begin{figure}[htbp]
+  \centerline{\includegraphics{fig1.png}}
+  \caption{Example of a figure caption.}
+  \label{fig}
+\end{figure}
+
+\end{document}

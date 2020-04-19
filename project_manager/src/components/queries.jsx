@@ -151,8 +151,8 @@ export const myTasks = gql`
   }
 `;
 
-export const ProjectTask = gql`
-  query($username: String!, $projectid: Int!, $taskFiler: String) {
+export const ProjectTasks = gql`
+  query($username: String!, $projectid: Int!, $taskFilter: String) {
     ProjectTasks(
       username: $username
       projectid: $projectid
@@ -168,7 +168,9 @@ export const ProjectTask = gql`
       priority
       projectid
       assignedby
-      assignedto
+      assignedto {
+        username
+      }
       preqtask
     }
   }

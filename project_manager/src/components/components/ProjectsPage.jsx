@@ -88,8 +88,12 @@ class ProjectsPage extends React.Component {
       },
     };
     this.fetchData = this.fetchData.bind(this);
+    this.handleToUpdate = this.handleToUpdate.bind(this);
   }
 
+  async handleToUpdate() {
+    await this.fetchData();
+  }
   async fetchData() {
     const operation1 = {
       query: getProject,
@@ -150,7 +154,6 @@ class ProjectsPage extends React.Component {
 
     // console.log(this.state.tasks);
   }
-  componentDidMount() {}
 
   render() {
     let projectmid, notes, tasks;
@@ -173,12 +176,13 @@ class ProjectsPage extends React.Component {
           files={this.state.files}
           projectid={this.state.projectid}
           members={this.state.members}
-          description={this.state.description}
+          description={this.state.longdescription}
           shortdescription={this.state.shortdescription}
           date={this.state.createdon}
           path={this.state.path}
           name={this.state.name}
           username={this.state.username}
+          handleToUpdate={this.handleToUpdate}
         />
       );
     }
@@ -192,7 +196,7 @@ class ProjectsPage extends React.Component {
     tasks = (
       <TaskManagerProj
         username={this.state.username}
-        projid={this.state.projectid}
+        projectid={this.state.projectid}
         tasks={this.state.tasks}
       />
     );

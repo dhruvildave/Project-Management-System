@@ -41,9 +41,11 @@ class AddProject extends React.Component {
   }
   handleClick(event) {
     // event.preventDefault();
-    this.setState({
-      members: JSON.parse(this.state.members),
-    });
+    try {
+      JSON.parse(this.state.members);
+    } catch (e) {
+      this.props.alert.error(e.message);
+    }
 
     const operation = {
       query: createProject,
@@ -53,7 +55,7 @@ class AddProject extends React.Component {
         path: this.state.path,
         sd: this.state.shortdescription,
         username: this.state.username,
-        members: this.state.members,
+        members: JSON.parse(this.state.members),
       }, //optional
     };
 
@@ -69,7 +71,7 @@ class AddProject extends React.Component {
           this.props.handleToUpdate();
         }
       })
-      .catch((error) => this.props.alert.error(error));
+      .catch((error) => this.props.alert.error(error.message));
   }
   render() {
     const { classes } = this.props;

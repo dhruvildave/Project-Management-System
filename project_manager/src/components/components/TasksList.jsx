@@ -86,7 +86,7 @@ class TaskList extends React.Component {
         alignItems="center"
         direction="column"
       >
-        <Paper className={classes.root}>
+        <Paper>
           <Tabs
             value={this.state.value}
             onChange={(event, value) => this.setState({ value: value })}

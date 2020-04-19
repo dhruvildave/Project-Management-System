@@ -236,6 +236,19 @@ class Dashboard extends React.Component {
         />
       );
     }
+    if (this.state.pagename === "logout") {
+      return (
+        <Redirect
+          to={{
+            pathname: "/login",
+            state: {
+              username: "",
+              authenticated: false,
+            },
+          }}
+        />
+      );
+    }
     if (this.state.pagename === "reports") {
       return (
         <Redirect
